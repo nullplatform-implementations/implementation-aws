@@ -13,7 +13,7 @@ module "vpc" {
 # EKS
 ###############################################################################
 module "eks" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=feature/eks-primary-sg-output"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v1.40.0"
 
   depends_on = [module.vpc]
 
