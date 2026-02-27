@@ -2,7 +2,7 @@
 # Code Repository (GitHub)
 # =============================================================================
 module "code_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v1.39.0"
 
   git_provider           = "github"
   np_api_key             = var.np_api_key
@@ -15,7 +15,7 @@ module "code_repository" {
 # Asset Repository (ECR)
 # =============================================================================
 module "asset_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v1.39.0"
 
   nrn          = var.nrn
   np_api_key   = var.np_api_key
@@ -26,7 +26,7 @@ module "asset_repository" {
 # Cloud Provider (AWS)
 # =============================================================================
 module "cloud_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v1.39.0"
 
   nrn                    = var.nrn
   np_api_key             = var.np_api_key
@@ -39,7 +39,7 @@ module "cloud_provider" {
 # API Keys - Scope Notifications
 # =============================================================================
 module "scope_notification_api_key" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.39.0"
 
   type               = "scope_notification"
   nrn                = var.nrn
@@ -47,7 +47,7 @@ module "scope_notification_api_key" {
 }
 
 module "scope_notification_api_key_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.39.0"
 
   type               = "scope_notification"
   nrn                = var.nrn
@@ -58,7 +58,7 @@ module "scope_notification_api_key_scheduled_task" {
 # Channel Associations - Scope to Agent
 # =============================================================================
 module "scope_definition_channel_association" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.39.0"
 
   nrn                      = var.nrn
   api_key                  = module.scope_notification_api_key.api_key
@@ -68,7 +68,7 @@ module "scope_definition_channel_association" {
 }
 
 module "scope_definition_channel_association_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.39.0"
 
   nrn                      = var.nrn
   api_key                  = module.scope_notification_api_key_scheduled_task.api_key
@@ -79,7 +79,7 @@ module "scope_definition_channel_association_scheduled_task" {
 }
 
 module "scope_definition_channel_association_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=fix/scope-agent-association-branch-variable"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.39.0"
 
   nrn                      = var.nrn
   api_key                  = module.scope_notification_api_key_scheduled_task.api_key
@@ -98,7 +98,7 @@ module "scope_definition_channel_association_static_scope" {
 # Monitoring (Prometheus)
 # =============================================================================
 module "monitoring_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v1.39.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key

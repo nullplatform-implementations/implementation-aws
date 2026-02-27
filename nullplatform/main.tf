@@ -2,7 +2,7 @@
 # Scope Definition - Containers
 # =============================================================================
 module "scope_definition" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.39.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -17,7 +17,7 @@ module "scope_definition" {
 # Scope Definition - Scheduled Tasks
 # =============================================================================
 module "scope_definition_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.39.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -33,7 +33,7 @@ module "scope_definition_scheduled_task" {
 # Scope Definition - Static Scope
 # =============================================================================
 module "scope_definition_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.39.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -56,7 +56,7 @@ module "scope_definition_static_scope" {
 # Dimensions
 # =============================================================================
 module "dimensions" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimensions?ref=v1.38.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimensions?ref=v1.39.0"
 
   nrn          = var.nrn
   np_api_key   = var.np_api_key
