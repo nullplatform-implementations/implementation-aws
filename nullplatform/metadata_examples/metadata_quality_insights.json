@@ -1,0 +1,32 @@
+{
+  "quality_passed": {
+    "code": {
+      "coverage": 92.5,
+      "lines": 15000
+    },
+    "security": {
+      "critical": 0,
+      "high": 0
+    }
+  },
+  "quality_review": {
+    "code": {
+      "coverage": 65.0,
+      "lines": 12000
+    },
+    "security": {
+      "critical": 0,
+      "high": 3
+    }
+  },
+  "quality_failed": {
+    "code": {
+      "coverage": 35.2,
+      "lines": 8500
+    },
+    "security": {
+      "critical": 3,
+      "high": 12
+    }
+  }
+}

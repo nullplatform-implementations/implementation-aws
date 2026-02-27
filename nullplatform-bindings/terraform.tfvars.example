@@ -1,0 +1,17 @@
+###############################################################################
+# NULLPLATFORM-BINDINGS - terraform.tfvars.example
+# Uso: terraform apply -var-file="../common.tfvars" -var-file="terraform.tfvars"
+###############################################################################
+
+# GitHub Configuration - You need to get these credencials from Github
+github_organization    = ""
+github_installation_id = ""
+
+# Container Registry Authentication - You need to create this from Azure UI
+login_server = "acrcompanynamepoc.azurecr.io"
+path         = "nullplatform"
+username     = ""
+password     = ""
+
+# Azure Cloud Provider Configuration
+dimensions = {}

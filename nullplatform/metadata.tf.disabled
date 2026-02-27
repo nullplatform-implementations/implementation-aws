@@ -1,0 +1,863 @@
+#Metadata Application
+/*
+resource "nullplatform_metadata_specification" "metadata_application" {
+  name        = "Metadata Application"
+  description = "Add metadata to application"
+  nrn         = var.nrn_namespace
+  entity      = "application"
+  metadata    = "metadata_application"
+
+  schema = jsonencode({
+    type = "object"
+    properties = {
+      "APPLICATION OWNER" = {
+        description = "Name of Application Owner"
+        type        = "string"
+      }
+      "PCI" = {
+        description = "Is it a PCI application?"
+        type        = "string"
+        enum        = ["Yes", "No"]
+      }
+      "SLO" = {
+        description = "Application SLO Criteria"
+        type        = "string"
+        enum        = ["Low", "Medium", "Critical", "High"]
+      }
+    }
+    required = [
+      "APPLICATION OWNER",
+      "PCI"
+    ]
+    additionalProperties = false
+  })
+}
+
+#Coverage Example
+resource "nullplatform_metadata_specification" "coverage" {
+  name        = "Coverage Schema"
+  description = "Schema for code coverage configuration"
+  nrn         = var.nrn_namespace
+  entity      = "build"
+  metadata    = "coverage"
+
+  schema = jsonencode({
+    type        = "object"
+    title       = "Code Coverage Results"
+    description = "Schema for code coverage configuration"
+    properties = {
+      code = {
+        type = "object"
+        properties = {
+          coverage = {
+            type        = "number"
+            minimum     = 0
+            maximum     = 100
+            description = "Percentage of code coverage"
+          }
+          lines = {
+            type        = "integer"
+            minimum     = 0
+            description = "Total amount of code lines"
+          }
+        }
+        required             = ["coverage"]
+        additionalProperties = false
+      }
+    }
+    required             = ["code"]
+    additionalProperties = false
+    uiSchema = {
+      "type" : "VerticalLayout",
+      "elements" : [
+        {
+          "type" : "HorizontalLayout",
+          "elements" : [
+            {
+              "type" : "Control",
+              "scope" : "#/properties/code/properties/coverage",
+              "label" : "Coverage",
+              "options" : {
+                "style" : {
+                  "&::after" : {
+                    "content" : "\"%\""
+                  },
+                  "fontSize" : "1.5rem",
+                  "color" : "success.main"
+                },
+                "icon" : "lsicon:coverage-filled"
+              }
+            },
+            {
+              "type" : "Control",
+              "scope" : "#/properties/code/properties/lines",
+              "label" : "Lines of Code",
+              "options" : {
+                "style" : {
+                  "fontSize" : "1.5rem"
+                },
+                "icon" : "mdi:code-braces"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  })
+
+}
+
+resource "nullplatform_metadata_specification" "security" {
+  name        = "Security Schema"
+  description = "Schema for security vulnerability configuration"
+  nrn         = var.nrn_namespace
+  entity      = "build"
+  metadata    = "security"
+
+  schema = jsonencode({
+    type        = "object"
+    title       = "Security Vulnerability Results"
+    description = "Schema for security vulnerability configuration"
+    properties = {
+      security = {
+        type = "object"
+        properties = {
+          vulnerabilities = {
+            type = "object"
+            properties = {
+              high = {
+                type        = "integer"
+                minimum     = 0
+                description = "Number of high severity vulnerabilities"
+              }
+              critical = {
+                type        = "integer"
+                minimum     = 0
+                description = "Number of critical severity vulnerabilities"
+              }
+            }
+            required             = ["high", "critical"]
+            additionalProperties = false
+          }
+        }
+        required             = ["vulnerabilities"]
+        additionalProperties = false
+      }
+    }
+    required             = ["security"]
+    additionalProperties = false
+    uiSchema = {
+      "type" : "VerticalLayout",
+      "elements" : [
+        {
+          "type" : "HorizontalLayout",
+          "elements" : [
+            {
+              "type" : "Control",
+              "scope" : "#/properties/security/properties/vulnerabilities/properties/critical",
+              "label" : "Critical",
+              "options" : {
+                "style" : {
+                  "fontSize" : "1.5rem",
+                  "color" : "error.main"
+                },
+                "icon" : "mdi:alert-octagon"
+              }
+            },
+            {
+              "type" : "Control",
+              "scope" : "#/properties/security/properties/vulnerabilities/properties/high",
+              "label" : "High",
+              "options" : {
+                "style" : {
+                  "fontSize" : "1.5rem",
+                  "color" : "warning.main"
+                },
+                "icon" : "mdi:alert"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  })
+}
+
+#Finops Metadata
+resource "nullplatform_metadata_specification" "finops" {
+  name        = "Finops"
+  description = "Details of Application costs"
+  nrn         = var.nrn_namespace
+  entity      = "application"
+  metadata    = "finops"
+
+  schema = jsonencode({
+    visibleOn = ["read"]
+    type      = "object"
+    properties = {
+      compute_cost = {
+        description = "Application compute cost"
+        type        = "integer"
+      }
+      services_cost = {
+        description = "Application services cost"
+        minimum     = 0
+        type        = "integer"
+      }
+      current_total_cost = {
+        description = "Current total cost"
+        minimum     = 0
+        type        = "integer"
+      }
+      budget_assigned = {
+        description = "Application budget assigned"
+        minimum     = 0
+        type        = "integer"
+      }
+    }
+    required             = []
+    additionalProperties = false
+  })
+}
+
+#Quality Insights (Coverage + Security)
+resource "nullplatform_metadata_specification" "quality_insights" {
+  name        = "Quality Insights Dashboard"
+  description = "Code quality and security metrics across different states"
+  nrn         = var.nrn_namespace
+  entity      = "build"
+  metadata    = "quality_insights"
+
+  schema = jsonencode({
+    type        = "object"
+    title       = "Quality Insights Dashboard"
+    description = "Code quality and security metrics across different states"
+    definitions = {
+      codeMetrics = {
+        type                 = "object"
+        additionalProperties = false
+        properties = {
+          coverage = {
+            type        = "number"
+            minimum     = 0
+            maximum     = 100
+            description = "Percentage of code coverage"
+          }
+          lines = {
+            type        = "integer"
+            minimum     = 0
+            description = "Total amount of code lines"
+          }
+        }
+        required = ["coverage"]
+      }
+      vulnerabilities = {
+        type                 = "object"
+        additionalProperties = false
+        properties = {
+          critical = {
+            type        = "integer"
+            minimum     = 0
+            description = "Number of critical severity vulnerabilities"
+          }
+          high = {
+            type        = "integer"
+            minimum     = 0
+            description = "Number of high severity vulnerabilities"
+          }
+        }
+        required = ["critical", "high"]
+      }
+      qualityState = {
+        type                 = "object"
+        additionalProperties = false
+        properties = {
+          code = {
+            "$ref" = "#/definitions/codeMetrics"
+          }
+          security = {
+            "$ref" = "#/definitions/vulnerabilities"
+          }
+        }
+        required = ["code", "security"]
+      }
+    }
+    properties = {
+      quality_passed = {
+        "$ref"      = "#/definitions/qualityState"
+        title       = "Quality Passed"
+        description = "Metrics representing a passing quality state"
+      }
+      quality_review = {
+        "$ref"      = "#/definitions/qualityState"
+        title       = "Quality Review"
+        description = "Metrics representing a state needing review"
+      }
+      quality_failed = {
+        "$ref"      = "#/definitions/qualityState"
+        title       = "Quality Failed"
+        description = "Metrics representing a failing quality state"
+      }
+    }
+    required             = ["quality_passed", "quality_review", "quality_failed"]
+    additionalProperties = false
+    uiSchema = {
+      type = "VerticalLayout"
+      elements = [
+        {
+          type = "Label"
+          text = "### Quality Insights Dashboard\nComparison of three quality states: Passed, Review, and Failed."
+          options = {
+            format = "markdown"
+          }
+        },
+        {
+          type = "HorizontalLayout"
+          elements = [
+            {
+              type  = "Group"
+              label = "✓ Quality Passed"
+              options = {
+                style = {
+                  borderLeft = "4px solid green"
+                }
+              }
+              elements = [
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_passed/properties/code/properties/coverage"
+                  label = "Coverage (%)"
+                  options = {
+                    style = {
+                      "&::after" = { content = "\"%\"" }
+                      fontSize   = "1.5rem"
+                      fontWeight = "bold"
+                      color      = "error.main"
+                    }
+                    icon = "akar-icons:face-sad"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/code/properties/coverage"
+                          schema = { minimum = 80 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "akar-icons:face-happy"
+                          }
+                          helperText = "Excellent coverage! Above 80%."
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_passed/properties/code/properties/coverage", schema = { minimum = 50 } },
+                            { scope = "#/properties/quality_passed/properties/code/properties/coverage", schema = { maximum = 79 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "akar-icons:face-neutral"
+                          }
+                          helperText = "Coverage needs improvement."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/code/properties/coverage"
+                          schema = { maximum = 49 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "akar-icons:face-sad"
+                          }
+                          helperText = "Critical! Below 50%."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_passed/properties/code/properties/lines"
+                  label = "Lines of Code"
+                  options = {
+                    style = { fontSize = "1.2rem", color = "common.black" }
+                    icon  = "material-symbols:code"
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_passed/properties/security/properties/critical"
+                  label = "Critical Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/security/properties/critical"
+                          schema = { minimum = 1 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:error"
+                          }
+                          helperText = "CRITICAL: Immediate action!"
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/security/properties/critical"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "No critical issues."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_passed/properties/security/properties/high"
+                  label = "High Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/security/properties/high"
+                          schema = { minimum = 5 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:warning"
+                          }
+                          helperText = "Review required!"
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_passed/properties/security/properties/high", schema = { minimum = 1 } },
+                            { scope = "#/properties/quality_passed/properties/security/properties/high", schema = { maximum = 4 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "material-symbols:warning-outline"
+                          }
+                          helperText = "Plan remediation."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_passed/properties/security/properties/high"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "All clear."
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              type  = "Group"
+              label = "⚠ Quality Review"
+              options = {
+                style = {
+                  borderLeft = "4px solid orange"
+                }
+              }
+              elements = [
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_review/properties/code/properties/coverage"
+                  label = "Coverage (%)"
+                  options = {
+                    style = {
+                      "&::after" = { content = "\"%\"" }
+                      fontSize   = "1.5rem"
+                      fontWeight = "bold"
+                      color      = "error.main"
+                    }
+                    icon = "akar-icons:face-sad"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/code/properties/coverage"
+                          schema = { minimum = 80 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "akar-icons:face-happy"
+                          }
+                          helperText = "Excellent coverage! Above 80%."
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_review/properties/code/properties/coverage", schema = { minimum = 50 } },
+                            { scope = "#/properties/quality_review/properties/code/properties/coverage", schema = { maximum = 79 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "akar-icons:face-neutral"
+                          }
+                          helperText = "Coverage needs improvement."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/code/properties/coverage"
+                          schema = { maximum = 49 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "akar-icons:face-sad"
+                          }
+                          helperText = "Critical! Below 50%."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_review/properties/code/properties/lines"
+                  label = "Lines of Code"
+                  options = {
+                    style = { fontSize = "1.2rem", color = "common.black" }
+                    icon  = "material-symbols:code"
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_review/properties/security/properties/critical"
+                  label = "Critical Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/security/properties/critical"
+                          schema = { minimum = 1 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:error"
+                          }
+                          helperText = "CRITICAL: Immediate action!"
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/security/properties/critical"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "No critical issues."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_review/properties/security/properties/high"
+                  label = "High Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/security/properties/high"
+                          schema = { minimum = 5 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:warning"
+                          }
+                          helperText = "Review required!"
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_review/properties/security/properties/high", schema = { minimum = 1 } },
+                            { scope = "#/properties/quality_review/properties/security/properties/high", schema = { maximum = 4 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "material-symbols:warning-outline"
+                          }
+                          helperText = "Plan remediation."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_review/properties/security/properties/high"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "All clear."
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              type  = "Group"
+              label = "✗ Quality Failed"
+              options = {
+                style = {
+                  borderLeft = "4px solid red"
+                }
+              }
+              elements = [
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_failed/properties/code/properties/coverage"
+                  label = "Coverage (%)"
+                  options = {
+                    style = {
+                      "&::after" = { content = "\"%\"" }
+                      fontSize   = "1.5rem"
+                      fontWeight = "bold"
+                      color      = "error.main"
+                    }
+                    icon = "akar-icons:face-sad"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/code/properties/coverage"
+                          schema = { minimum = 80 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "akar-icons:face-happy"
+                          }
+                          helperText = "Excellent coverage! Above 80%."
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_failed/properties/code/properties/coverage", schema = { minimum = 50 } },
+                            { scope = "#/properties/quality_failed/properties/code/properties/coverage", schema = { maximum = 79 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "akar-icons:face-neutral"
+                          }
+                          helperText = "Coverage needs improvement."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/code/properties/coverage"
+                          schema = { maximum = 49 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "akar-icons:face-sad"
+                          }
+                          helperText = "Critical! Below 50%."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_failed/properties/code/properties/lines"
+                  label = "Lines of Code"
+                  options = {
+                    style = { fontSize = "1.2rem", color = "common.black" }
+                    icon  = "material-symbols:code"
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_failed/properties/security/properties/critical"
+                  label = "Critical Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/security/properties/critical"
+                          schema = { minimum = 1 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:error"
+                          }
+                          helperText = "CRITICAL: Immediate action!"
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/security/properties/critical"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "No critical issues."
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  type  = "Control"
+                  scope = "#/properties/quality_failed/properties/security/properties/high"
+                  label = "High Vulnerabilities"
+                  options = {
+                    style = { fontWeight = "bold", fontSize = "1.5rem", color = "success.main" }
+                    icon  = "lets-icons:check-fill"
+                  }
+                  rule = {
+                    effect    = "APPLY"
+                    condition = true
+                    cases = [
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/security/properties/high"
+                          schema = { minimum = 5 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "error.main" }
+                            icon  = "material-symbols:warning"
+                          }
+                          helperText = "Review required!"
+                        }
+                      },
+                      {
+                        condition = {
+                          type = "AND"
+                          conditions = [
+                            { scope = "#/properties/quality_failed/properties/security/properties/high", schema = { minimum = 1 } },
+                            { scope = "#/properties/quality_failed/properties/security/properties/high", schema = { maximum = 4 } }
+                          ]
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "warning.main" }
+                            icon  = "material-symbols:warning-outline"
+                          }
+                          helperText = "Plan remediation."
+                        }
+                      },
+                      {
+                        condition = {
+                          scope  = "#/properties/quality_failed/properties/security/properties/high"
+                          schema = { maximum = 0 }
+                        }
+                        outcome = {
+                          options = {
+                            style = { color = "success.main" }
+                            icon  = "lets-icons:check-fill"
+                          }
+                          helperText = "All clear."
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  })
+}
+*/

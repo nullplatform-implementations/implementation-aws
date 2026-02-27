@@ -1,0 +1,16 @@
+###############################################################################
+# COMMON TFVARS
+# Variables shared by all modules
+# Uso: terraform apply -var-file="../../common.tfvars" -var-file="terraform.tfvars" (desde infrastructure/{cloud})
+#       terraform apply -var-file="../common.tfvars" -var-file="terraform.tfvars" (desde nullplatform/ o nullplatform-bindings/)
+###############################################################################
+
+# Nullplatform Configuration
+nrn        = "organization=1858797910:account=758973013:namespace=1340017944"
+np_api_key = "apiKeyToken"
+organization_slug = "organization-name"
+
+# Tags to link channel with the Agent
+tags_selectors = {
+  "environment" : "development"
+}

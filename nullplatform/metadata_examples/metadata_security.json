@@ -1,0 +1,8 @@
+{
+  "security": {
+    "vulnerabilities": {
+      "high": 5,
+      "critical": 2
+    }
+  }
+}
