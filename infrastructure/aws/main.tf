@@ -13,7 +13,7 @@ module "vpc" {
 # EKS
 ###############################################################################
 module "eks" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v1.39.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=feature/eks-primary-sg-output"
 
   depends_on = [module.vpc]
 
@@ -168,7 +168,10 @@ module "security" {
 
   cluster_name = module.eks.eks_cluster_name
   vpc_id       = module.vpc.vpc_id
-  health_check_rules_enabled = true
+  health_check_rules_enabled  = true
+  gateway_internal_enabled    = true
+  cluster_security_group_id   = module.eks.eks_cluster_primary_security_group_id
+  gateway_port                = 443
 }
 
 ###############################################################################
@@ -195,6 +198,8 @@ module "base" {
   gateway_private_aws_security_group_id = module.security.private_gateway_security_group_id
   gateway_enabled                       = true
   gateway_internal_enabled              = true
+  gateway_public_aws_name               = "k8s-np-aws-services-public"
+  gateway_internal_aws_name             = "k8s-np-aws-services-int"
 
   metrics_server_enabled                = true
   
