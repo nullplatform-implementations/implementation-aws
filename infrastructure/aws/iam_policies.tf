@@ -18,17 +18,8 @@ resource "aws_iam_policy" "agent_static_scopes" {
           "s3:ListBucket",
           "s3:GetBucketLocation",
           "s3:GetBucketPolicy",
-          "s3:PutBucketPolicy"
-        ]
-        Resource = "*"
-      },
-      {
-        Sid    = "DynamoDBTofuLock"
-        Effect = "Allow"
-        Action = [
-          "dynamodb:GetItem",
-          "dynamodb:PutItem",
-          "dynamodb:DeleteItem"
+          "s3:PutBucketPolicy",
+          "s3:DeleteBucketPolicy"
         ]
         Resource = "*"
       },
@@ -49,6 +40,29 @@ resource "aws_iam_policy" "agent_static_scopes" {
           "cloudfront:GetOriginAccessControl",
           "cloudfront:UpdateOriginAccessControl",
           "cloudfront:DeleteOriginAccessControl"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "ACMCertificates"
+        Effect = "Allow"
+        Action = [
+          "acm:ListCertificates",
+          "acm:DescribeCertificate",
+          "acm:GetCertificate",
+          "acm:ListTagsForCertificate"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Route53DNS"
+        Effect = "Allow"
+        Action = [
+          "route53:ListHostedZones",
+          "route53:GetHostedZone",
+          "route53:ChangeResourceRecordSets",
+          "route53:ListResourceRecordSets",
+          "route53:GetChange"
         ]
         Resource = "*"
       }
