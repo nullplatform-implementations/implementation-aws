@@ -229,11 +229,11 @@ module "agent" {
 
   extra_envs = {
      TOFU_PROVIDER="aws"
-     AWS_REGION="Us-east-1"
+     AWS_REGION="us-east-1"
      TOFU_PROVIDER_BUCKET="tf-state-0269fb2df210b43c"
      NETWORK_LAYER="route53"
-     TOFU_LOCK_TABLE="my-lock-table"
      DISTRIBUTION_LAYER="cloudfront"
+     TOFU_CMD="mise exec -- tofu"
   }
 }
 
