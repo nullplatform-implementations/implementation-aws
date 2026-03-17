@@ -54,6 +54,16 @@ module "scope_notification_api_key_scheduled_task" {
   specification_slug = local.scope_specification_slug_scheduled_task
 }
 
+module "scope_notification_api_key_static_scope" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.39.0"
+
+  type               = "scope_notification"
+  nrn                = var.nrn
+  specification_slug = local.scope_specification_slug_static_scope
+}
+
+
+
 # =============================================================================
 # Channel Associations - Scope to Agent
 # =============================================================================
@@ -82,14 +92,15 @@ module "scope_definition_channel_association_static_scope" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v1.39.0"
 
   nrn                      = var.nrn
-  api_key                  = module.scope_notification_api_key_scheduled_task.api_key
+  api_key                  = module.scope_notification_api_key_static_scope.api_key
   scope_specification_id   = local.scope_specification_id_static_scope
   scope_specification_slug = local.scope_specification_slug_static_scope
   tags_selectors           = var.tags_selectors
   service_path             = "static-files"
+  repo_path                = "/root/.np/nullplatform/scopes-static-files"
 
   repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_notification_channel_branch = "no-testing-submodule"
+  repository_notification_channel_branch = "main"
 }
 
 

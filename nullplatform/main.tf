@@ -44,11 +44,11 @@ module "scope_definition_static_scope" {
   action_spec_names        = var.action_spec_names_static_scope
 
   repository_service_spec      = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_service_spec_branch     = "no-testing-submodule"
+  repository_service_spec_branch     = "main"
   repository_scope_template    = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_scope_template_branch   = "no-testing-submodule"
+  repository_scope_template_branch   = "main"
   repository_action_templates  = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_action_templates_branch = "no-testing-submodule"
+  repository_action_templates_branch = "main"
 }
 
 

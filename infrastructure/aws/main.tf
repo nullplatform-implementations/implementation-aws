@@ -225,16 +225,8 @@ module "agent" {
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_extra       = ["https://github.com/nullplatform/scopes-static-files.git"]
+  agent_repos_extra       = ["https://github.com/nullplatform/scopes-static-files.git#main"]
 
-  extra_envs = {
-     TOFU_PROVIDER="aws"
-     AWS_REGION="us-east-1"
-     TOFU_PROVIDER_BUCKET="tf-state-0269fb2df210b43c"
-     NETWORK_LAYER="route53"
-     DISTRIBUTION_LAYER="cloudfront"
-     TOFU_CMD="mise exec -- tofu"
-  }
 }
 
 ###############################################################################

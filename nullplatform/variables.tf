@@ -112,7 +112,7 @@ variable "service_spec_name_static_scope" {
 variable "service_spec_description_static_scope" {
   description = "Description of the static scope service specification"
   type        = string
-  default     = "Allows you to deploy static to S3"
+  default     = "Allows you to deploy static content to S3"
 }
 
 

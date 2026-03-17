@@ -85,7 +85,7 @@ EOF
 variable "image_tag" {
   description = "Docker image tag for the Nullplatform agent"
   type        = string
-  default     = "aws"
+  default     = "aws-0.7.0"
 }
 
 variable "tags_selectors" {
