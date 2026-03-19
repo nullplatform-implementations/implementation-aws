@@ -63,6 +63,24 @@ module "scope_notification_api_key_static_scope" {
 }
 
 
+module "service_notification_api_key_rds_server" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.45.0"
+
+  type               = "service_notification"
+  nrn                = var.nrn
+  specification_slug = local.service_specification_slug_rds_server
+}
+
+
+module "service_notification_api_key_rds_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.45.0"
+
+  type               = "service_notification"
+  nrn                = var.nrn
+  specification_slug = local.service_specification_slug_rds_db
+}
+
+
 
 # =============================================================================
 # Channel Associations - Scope to Agent
@@ -101,6 +119,29 @@ module "scope_definition_channel_association_static_scope" {
 
   repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
   repository_notification_channel_branch = "main"
+}
+
+
+module "service_definition_channel_association_rds_server" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v1.45.0"
+
+  nrn                          = var.nrn
+  api_key                      = module.service_notification_api_key_rds_server.api_key
+  tags_selectors               = var.tags_selectors
+  service_specification_slug   = local.service_specification_slug_rds_server
+  repository_service_spec_repo = "nullplatform/services"
+  service_path                 = "databases/rds-postgres-server"
+}
+
+module "service_definition_channel_association_rds_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v1.45.0"
+
+  nrn                          = var.nrn
+  api_key                      = module.service_notification_api_key_rds_db.api_key
+  tags_selectors               = var.tags_selectors
+  service_specification_slug   = local.service_specification_slug_rds_db
+  repository_service_spec_repo = "nullplatform/services"
+  service_path                 = "databases/rds-postgres-db"
 }
 
 

@@ -53,6 +53,38 @@ module "scope_definition_static_scope" {
 
 
 # =============================================================================
+# Service Definition - RDS Server (Postgres)
+# =============================================================================
+module "service_definition_rds_server" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.45.0"
+  nrn = var.nrn
+  repository_org    = "nullplatform"
+  repository_name   = "services"
+  repository_branch = "feature/add-rds-postgress"
+  service_path      = "databases/rds-postgres-server"
+  service_name      = "RDS Postgres Server - Agustin Test"
+}
+
+
+# =============================================================================
+# Service Definition - RDS Database (Postgres)
+# =============================================================================
+module "service_definition_rds_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.45.0"
+  nrn = var.nrn
+  repository_org    = "nullplatform"
+  repository_name   = "services"
+  repository_branch = "feature/add-rds-postgress"
+  service_path      = "databases/rds-postgres-db"
+  service_name      = "RDS Postgres Database - Agustin Test"
+}
+
+
+
+
+
+
+# =============================================================================
 # Dimensions
 # =============================================================================
 module "dimensions" {

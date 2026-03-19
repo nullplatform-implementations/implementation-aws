@@ -53,3 +53,25 @@ output "scope_specification_slug_static_scope" {
   description = "Scope specification slug for static scope"
   value       = module.scope_definition_static_scope.service_slug
 }
+
+
+output "service_specification_slug_rds_server" {
+  description = "Slug of the service created by service_definition for Azure cosmos db"
+  value       = module.service_definition_rds_server.service_specification_slug
+}
+
+output "service_specification_id_rds_server" {
+  description = "Slug of the service created by service_definition for Azure cosmos db"
+  value       = module.service_definition_rds_server.service_specification_id
+}
+
+
+output "service_specification_slug_rds_db" {
+  description = "Slug of the service created by service_definition for Azure cosmos db"
+  value       = module.service_definition_rds_db.service_specification_slug
+}
+
+output "service_specification_id_rds_dn" {
+  description = "Slug of the service created by service_definition for Azure cosmos db"
+  value       = module.service_definition_rds_db.service_specification_id
+}

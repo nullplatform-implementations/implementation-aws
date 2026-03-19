@@ -103,6 +103,10 @@ module "agent_iam" {
 
   additional_policies = {
     "static_scopes_policy" = aws_iam_policy.agent_static_scopes.arn
+    "rds_policy"= aws_iam_policy.nullplatform_rds_policy.arn
+    "rds_secret_manager_policy"= aws_iam_policy.nullplatform_rds_secretsmanager_policy.arn 
+    "rds_s3_policy"= aws_iam_policy.nullplatform_rds_s3_policy.arn
+    "rds_sg_policy"= aws_iam_policy.nullplatform_rds_sg_policy.arn
   }
 }
 
@@ -225,7 +229,10 @@ module "agent" {
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_extra       = ["https://github.com/nullplatform/scopes-static-files.git#main"]
+  agent_repos_extra = [
+    "https://github.com/nullplatform/scopes-static-files.git#main",
+    "https://github.com/nullplatform/services.git#feature/add-rds-postgress"
+  ]
 
 }
 

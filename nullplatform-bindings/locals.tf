@@ -13,5 +13,6 @@ locals {
   scope_specification_id_static_scope   = data.terraform_remote_state.nullplatform.outputs.scope_specification_id_static_scope
   scope_specification_slug_static_scope = data.terraform_remote_state.nullplatform.outputs.scope_specification_slug_static_scope
 
-
+  service_specification_slug_rds_server = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_server
+  service_specification_slug_rds_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_db
 }
