@@ -20,6 +20,12 @@ provider "aws" {
   profile = var.aws_profile != "" ? var.aws_profile : null
 }
 
+provider "aws" {
+  alias   = "sa_east_1"
+  region  = "sa-east-1"
+  profile = var.aws_profile != "" ? var.aws_profile : null
+}
+
 provider "kubernetes" {
   host                   = module.eks.eks_cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.eks_cluster_ca)

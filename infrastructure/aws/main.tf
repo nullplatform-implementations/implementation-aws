@@ -2,7 +2,7 @@
 # VPC
 ###############################################################################
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v1.39.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v1.48.0"
 
   organization    = var.organization
   account         = var.account
@@ -230,7 +230,7 @@ module "agent" {
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
   agent_repos_extra = [
-    "https://github.com/nullplatform/scopes-static-files.git#main",
+    "https://github.com/nullplatform/scopes-static-files.git#feature/remove-s3-policy",
     "https://github.com/nullplatform/services.git#feature/add-rds-postgress"
   ]
 
@@ -240,7 +240,33 @@ module "agent" {
 # S3 Bucket - Static Assets
 ###############################################################################
 resource "aws_s3_bucket" "assets" {
-  bucket = "assets-aws-services-main"
+  provider = aws.sa_east_1
+  bucket   = "assets-aws-services-main-sao-paulo"
+}
+
+resource "aws_s3_bucket_policy" "static" {
+  provider = aws.sa_east_1
+  bucket   = aws_s3_bucket.assets.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "AllowCloudFrontServicePrincipalReadOnly"
+        Effect    = "Allow"
+        Principal = {
+          Service = "cloudfront.amazonaws.com"
+        }
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.assets.arn}/*"
+        Condition = {
+          StringEquals = {
+            "AWS:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 }
 
 ###############################################################################

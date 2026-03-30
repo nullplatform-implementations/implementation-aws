@@ -144,6 +144,17 @@ module "service_definition_channel_association_rds_db" {
   service_path                 = "databases/rds-postgres-db"
 }
 
+module "vpc" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v1.46.0"
+
+  np_api_key          = var.np_api_key
+  nrn                 = var.nrn
+  vpc_id              = local.vpc_id
+  vpc_security_groups = local.vpc_security_groups_ids
+  vpc_subnets         = local.vpc_subnets_ids
+}
+
+
 
 
 # =============================================================================
