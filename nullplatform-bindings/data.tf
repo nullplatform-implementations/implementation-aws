@@ -9,7 +9,7 @@ data "terraform_remote_state" "infrastructure" {
     bucket  = "tf-state-0269fb2df210b43c"
     key     = "infrastructure.tfstate"
     region  = "us-east-1"
-    profile = "providers-test"
+    profile = "Implementations"
   }
 }
 
@@ -23,6 +23,6 @@ data "terraform_remote_state" "nullplatform" {
     bucket  = "tf-state-0269fb2df210b43c"
     key     = "nullplatform.tfstate"
     region  = "us-east-1"
-    profile = "providers-test"
+    profile = "Implementations"
   }
 }

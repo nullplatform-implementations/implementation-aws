@@ -82,6 +82,24 @@ module "service_definition_rds_db" {
 
 
 # =============================================================================
+# Service Definition - AWS S3 Bucket
+# Specs are fetched from https://github.com/nullplatform/services-s-3 (public).
+# =============================================================================
+module "service_definition_aws_s3_bucket" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.51.0"
+  nrn = var.nrn
+
+  git_provider      = "github"
+  repository_org    = "nullplatform"
+  repository_name   = "services-s-3"
+  repository_branch = "main"
+
+  service_path = "aws-s3-bucket"
+  service_name = "AWS S3 Bucket - Agustin Test"
+}
+
+
+# =============================================================================
 # Scope Configuration - Static Scope
 # =============================================================================
 module "scope_configuration_static_scope" {

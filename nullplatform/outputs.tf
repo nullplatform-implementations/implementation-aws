@@ -75,3 +75,14 @@ output "service_specification_id_rds_dn" {
   description = "Slug of the service created by service_definition for Azure cosmos db"
   value       = module.service_definition_rds_db.service_specification_id
 }
+
+
+output "service_specification_slug_aws_s3_bucket" {
+  description = "Slug of the AWS S3 Bucket service specification"
+  value       = module.service_definition_aws_s3_bucket.service_specification_slug
+}
+
+output "service_specification_id_aws_s3_bucket" {
+  description = "ID of the AWS S3 Bucket service specification"
+  value       = module.service_definition_aws_s3_bucket.service_specification_id
+}
