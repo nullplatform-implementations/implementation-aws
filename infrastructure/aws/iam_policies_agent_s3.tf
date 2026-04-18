@@ -8,35 +8,17 @@ resource "aws_iam_policy" "nullplatform_s3_policy" {
   name        = "nullplatform_${module.eks.eks_cluster_name}_s3_policy"
   description = "Policy for managing S3 buckets provisioned by the aws-s3-bucket service"
 
+  # The AWS provider (v6+) refreshes aws_s3_bucket by reading a wide surface of
+  # bucket attributes (ACL, CORS, Logging, Lifecycle, Replication, etc.).
+  # Enumerating each s3:Get* action is brittle, so we grant s3:* scoped to the
+  # same wildcard resource already chosen. If a tighter scope is ever needed,
+  # narrow the Resource (e.g. arn:aws:s3:::np-*) rather than the Action list.
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
-        "Action" : [
-          "s3:CreateBucket",
-          "s3:DeleteBucket",
-          "s3:GetBucketLocation",
-          "s3:GetBucketVersioning",
-          "s3:GetBucketEncryption",
-          "s3:GetBucketPublicAccessBlock",
-          "s3:GetBucketPolicy",
-          "s3:GetBucketTagging",
-          "s3:PutBucketVersioning",
-          "s3:PutBucketEncryption",
-          "s3:PutBucketPublicAccessBlock",
-          "s3:PutBucketPolicy",
-          "s3:PutBucketTagging",
-          "s3:DeleteBucketPolicy",
-          "s3:HeadBucket",
-          "s3:ListBucket",
-          "s3:ListBucketVersions",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:DeleteObjectVersion",
-          "s3:ListAllMyBuckets"
-        ],
+        "Action" : "s3:*",
         "Resource" : "*"
       }
     ]

@@ -21,6 +21,11 @@ module "eks" {
   aws_vpc_vpc_id               = module.vpc.vpc_id
   aws_subnets_private_ids      = module.vpc.private_subnets
   endpoint_public_access_cidrs = var.endpoint_public_access_cidrs
+
+  # Bump node count from 2 to 3 to give the cluster overhead for node drains
+  # (istiod HA + rolling updates). Current 2-node cluster is saturated.
+  node_group_min_size     = 3
+  node_group_desired_size = 3
 }
 
 ###############################################################################
@@ -52,11 +57,14 @@ module "alb_controller" {
 # Istio
 ###############################################################################
 module "istio" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=v1.51.0"
-  
-  service_type = "LoadBalancer"
+  # TEMP: pinned to the feat/istiod-replicas branch until PR #292 is merged.
+  # Once merged, bump back to a tagged ref (v1.52.0 or later).
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=feat/istiod-replicas"
 
-depends_on = [module.alb_controller]
+  service_type     = "LoadBalancer"
+  istiod_replicas  = 2
+
+  depends_on = [module.alb_controller]
 }
 
 ###############################################################################
@@ -232,9 +240,9 @@ module "agent" {
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
   agent_repos_extra = [
-    "https://github.com/nullplatform/scopes-static-files.git",
-    "https://github.com/nullplatform/services.git",
-    "https://github.com/nullplatform/services-s-3.git"
+    "https://github.com/nullplatform/scopes-static-files.git#main",
+    "https://github.com/nullplatform/services.git#main",
+    "https://github.com/nullplatform/services-s-3.git#main"
   ]
 
 }

@@ -95,7 +95,7 @@ module "service_definition_aws_s3_bucket" {
   repository_branch = "main"
 
   service_path = "aws-s3-bucket"
-  service_name = "AWS S3 Bucket - Agustin Test"
+  service_name = "AWS S3 Bucket - Agent K8s"
 }
 
 
