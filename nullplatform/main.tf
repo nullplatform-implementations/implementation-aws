@@ -2,7 +2,7 @@
 # Scope Definition - Containers
 # =============================================================================
 module "scope_definition" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.39.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.53.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -17,7 +17,7 @@ module "scope_definition" {
 # Scope Definition - Scheduled Tasks
 # =============================================================================
 module "scope_definition_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.39.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.53.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -33,7 +33,7 @@ module "scope_definition_scheduled_task" {
 # Scope Definition - Static Scope
 # =============================================================================
 module "scope_definition_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.48.3"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v1.53.0"
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
@@ -57,7 +57,7 @@ module "scope_definition_static_scope" {
 # Service Definition - RDS Server (Postgres)
 # =============================================================================
 module "service_definition_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.46.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.53.0"
   nrn = var.nrn
   repository_org    = "nullplatform"
   repository_name   = "services"
@@ -71,7 +71,7 @@ module "service_definition_rds_server" {
 # Service Definition - RDS Database (Postgres)
 # =============================================================================
 module "service_definition_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.46.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.53.0"
   nrn = var.nrn
   repository_org    = "nullplatform"
   repository_name   = "services"
@@ -86,7 +86,7 @@ module "service_definition_rds_db" {
 # Specs are fetched from https://github.com/nullplatform/services-s-3 (public).
 # =============================================================================
 module "service_definition_aws_s3_bucket" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.53.0"
   nrn = var.nrn
 
   git_provider      = "github"
@@ -103,11 +103,14 @@ module "service_definition_aws_s3_bucket" {
 # Scope Configuration - Static Scope
 # =============================================================================
 module "scope_configuration_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=feature/scope-configuration-module"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v1.53.0"
 
   nrn                       = var.nrn
   np_api_key                = var.np_api_key
   provider_specification_slug = module.scope_definition_static_scope.provider_specification_slug
+  dimensions = {
+    environment = "development"
+  }
   attributes = {
     cloud_provider = "aws"
     provider = {
@@ -128,9 +131,8 @@ module "scope_configuration_static_scope" {
 # Dimensions
 # =============================================================================
 module "dimensions" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimensions?ref=v1.39.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimensions?ref=v1.53.0"
 
   nrn          = var.nrn
-  np_api_key   = var.np_api_key
   environments = var.environments
 }
