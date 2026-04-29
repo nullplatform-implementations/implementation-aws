@@ -18,6 +18,8 @@ locals {
 
   service_specification_slug_aws_s3_bucket = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_aws_s3_bucket
 
+  service_specification_slug_postgres_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_postgres_db
+
   vpc_id = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
   vpc_security_groups_ids  = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids

@@ -100,6 +100,30 @@ module "service_definition_aws_s3_bucket" {
 
 
 # =============================================================================
+# Service Definition - Postgres DB (Kubernetes)
+# Specs are fetched from https://github.com/nullplatform/services-postgresql-k-8-s
+# on the alignment proposal branch (coexists with the existing layout until
+# validated).
+# available_links defaults to ["connect"] in the module — we override it with
+# the postgres-db link name so the HTTP fetch hits the right JSON template.
+# =============================================================================
+module "service_definition_postgres_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.53.0"
+  nrn = var.nrn
+
+  git_provider      = "github"
+  repository_org    = "nullplatform"
+  repository_name   = "services-postgresql-k-8-s"
+  repository_branch = "proposal/align-with-services-s-3"
+
+  service_path      = "postgres-db"
+  service_name      = "Postgres DB K8s - Agustin Test"
+  available_links   = ["database-user"]
+  available_actions = ["run-ddl-query", "run-dml-query"]
+}
+
+
+# =============================================================================
 # Scope Configuration - Static Scope
 # =============================================================================
 module "scope_configuration_static_scope" {

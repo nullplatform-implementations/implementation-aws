@@ -85,6 +85,14 @@ module "service_notification_api_key_aws_s3_bucket" {
   specification_slug = local.service_specification_slug_aws_s3_bucket
 }
 
+module "service_notification_api_key_postgres_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.53.0"
+
+  type               = "service_notification"
+  nrn                = var.nrn
+  specification_slug = local.service_specification_slug_postgres_db
+}
+
 
 
 # =============================================================================
@@ -165,6 +173,25 @@ module "service_definition_channel_association_aws_s3_bucket" {
   service_specification_slug   = local.service_specification_slug_aws_s3_bucket
   repository_service_spec_repo = "nullplatform/services-s-3"
   service_path                 = "aws-s3-bucket"
+}
+
+# =============================================================================
+# Service Definition - Postgres DB (Kubernetes)
+# Entrypoint resolved from:
+#   /root/.np/nullplatform/services-postgresql-k-8-s/postgres-db/entrypoint/entrypoint
+# The branch to clone is handled by the agent itself (driven by the
+# service_definition registered in the nullplatform state, currently pinned
+# to `proposal/align-with-services-s-3`).
+# =============================================================================
+module "service_definition_channel_association_postgres_db" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v1.53.0"
+
+  nrn                          = var.nrn
+  api_key                      = module.service_notification_api_key_postgres_db.api_key
+  tags_selectors               = var.tags_selectors
+  service_specification_slug   = local.service_specification_slug_postgres_db
+  repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
+  service_path                 = "postgres-db"
 }
 
 module "vpc" {

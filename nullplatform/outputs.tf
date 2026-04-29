@@ -86,3 +86,14 @@ output "service_specification_id_aws_s3_bucket" {
   description = "ID of the AWS S3 Bucket service specification"
   value       = module.service_definition_aws_s3_bucket.service_specification_id
 }
+
+
+output "service_specification_slug_postgres_db" {
+  description = "Slug of the Postgres DB (K8s) service specification"
+  value       = module.service_definition_postgres_db.service_specification_slug
+}
+
+output "service_specification_id_postgres_db" {
+  description = "ID of the Postgres DB (K8s) service specification"
+  value       = module.service_definition_postgres_db.service_specification_id
+}

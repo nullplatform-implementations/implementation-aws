@@ -11,11 +11,14 @@ module "vpc" {
 
 ###############################################################################
 # EKS
+# v1.54.0 adds the aws-ebs-csi-driver addon + gp3 StorageClass (default),
+# demoting the legacy gp2 in-tree class. The module now ships its own
+# kubernetes provider internally, which forbids depends_on/count/for_each on
+# the caller block — ordering vs. module.vpc is already guaranteed by the
+# aws_vpc_vpc_id / aws_subnets_private_ids references below.
 ###############################################################################
 module "eks" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v1.51.0"
-
-  depends_on = [module.vpc]
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v1.54.0"
 
   name                         = local.cluster_name
   aws_vpc_vpc_id               = module.vpc.vpc_id
@@ -242,7 +245,8 @@ module "agent" {
   agent_repos_extra = [
     "https://github.com/nullplatform/scopes-static-files.git#main",
     "https://github.com/nullplatform/services.git#main",
-    "https://github.com/nullplatform/services-s-3.git#main"
+    "https://github.com/nullplatform/services-s-3.git#main",
+    "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3"
   ]
 
 }
