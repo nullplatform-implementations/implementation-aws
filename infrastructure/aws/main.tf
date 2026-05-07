@@ -2,7 +2,7 @@
 # VPC
 ###############################################################################
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v2.2.1"
 
   organization    = var.organization
   account         = var.account
@@ -18,7 +18,9 @@ module "vpc" {
 # aws_vpc_vpc_id / aws_subnets_private_ids references below.
 ###############################################################################
 module "eks" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v1.54.0"
+  # TEMP: testing feat/eks-expose-ami-release-version branch before PR.
+  # Once PR merges, bump back to a tagged ref.
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=feat/eks-expose-ami-release-version"
 
   name                         = local.cluster_name
   aws_vpc_vpc_id               = module.vpc.vpc_id
@@ -29,13 +31,17 @@ module "eks" {
   # (istiod HA + rolling updates). Current 2-node cluster is saturated.
   node_group_min_size     = 3
   node_group_desired_size = 3
+
+  # Pin AMI to avoid rolling drift on every plan. Current state value.
+  ami_release_version            = "1.34.6-20260415"
+  use_latest_ami_release_version = false
 }
 
 ###############################################################################
 # Route53 DNS
 ###############################################################################
 module "dns" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/dns?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/dns?ref=v2.2.1"
 
   depends_on = [module.vpc]
 
@@ -47,7 +53,7 @@ module "dns" {
 # ALB Controller
 ###############################################################################
 module "alb_controller" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/aws_load_balancer_controller?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/aws_load_balancer_controller?ref=v2.2.1"
 
   depends_on = [module.eks]
 
@@ -74,14 +80,14 @@ module "istio" {
 # Prometheus
 ###############################################################################
 module "prometheus" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/prometheus?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/prometheus?ref=v2.2.1"
 }
 
 ###############################################################################
 # IAM Roles
 ###############################################################################
 module "external_dns_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/external_dns?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/external_dns?ref=v2.2.1"
 
   hosted_zone_public_id            = module.dns.public_zone_id
   hosted_zone_private_id           = module.dns.private_zone_id
@@ -90,7 +96,7 @@ module "external_dns_iam" {
 }
 
 module "cert_manager_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/cert_manager?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/cert_manager?ref=v2.2.1"
 
   hosted_zone_public_id            = module.dns.public_zone_id
   hosted_zone_private_id           = module.dns.private_zone_id
@@ -99,14 +105,14 @@ module "cert_manager_iam" {
 }
 
 module "alb_controller_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/aws_load_balancer_controller_iam?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/aws_load_balancer_controller_iam?ref=v2.2.1"
 
   cluster_name                        = module.eks.eks_cluster_name
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
 }
 
 module "agent_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v2.2.1"
 
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
   agent_namespace                     = var.agent_namespace
@@ -127,7 +133,7 @@ module "agent_iam" {
 # External DNS
 ###############################################################################
 module "external_dns_public" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v2.2.1"
 
   depends_on = [module.alb_controller]
 
@@ -143,7 +149,7 @@ module "external_dns_public" {
 }
 
 module "external_dns_private" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v2.2.1"
 
   depends_on = [module.alb_controller, module.external_dns_public]
 
@@ -163,7 +169,7 @@ module "external_dns_private" {
 # Cert Manager
 ###############################################################################
 module "cert_manager" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/cert_manager?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/cert_manager?ref=v2.2.1"
 
   depends_on = [module.alb_controller]
 
@@ -179,7 +185,7 @@ module "cert_manager" {
 # Security
 ###############################################################################
 module "security" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/security?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/security?ref=v2.2.1"
 
   depends_on = [module.eks]
 
@@ -195,7 +201,7 @@ module "security" {
 # Nullplatform Agent API Key
 ###############################################################################
 module "agent_api_key" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v2.2.1"
 
   nrn  = var.nrn
   type = "agent"
@@ -205,10 +211,8 @@ module "agent_api_key" {
 # Nullplatform Base
 ###############################################################################
 module "base" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/base?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/base?ref=v2.2.1"
 
-
-  nrn            = var.nrn
   np_api_key     = module.agent_api_key.api_key
   k8s_provider   = var.k8s_provider
   gateway_public_aws_security_group_id  = module.security.public_gateway_security_group_id
@@ -226,7 +230,7 @@ module "base" {
 # Nullplatform Agent
 ###############################################################################
 module "agent" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v1.51.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v2.2.1"
 
   depends_on = [module.base]
 
