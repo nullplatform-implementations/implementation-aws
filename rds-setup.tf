@@ -162,7 +162,7 @@ resource "aws_iam_policy" "nullplatform_rds_secretsmanager_policy" {
 # --- Service Definitions -----------------------------------------------------
 
 module "service_definition_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.46.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v2.2.1"
 
   nrn               = var.nrn
   repository_org    = "nullplatform"
@@ -173,7 +173,7 @@ module "service_definition_rds_server" {
 }
 
 module "service_definition_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v1.46.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v2.2.1"
 
   nrn               = var.nrn
   repository_org    = "nullplatform"
@@ -220,7 +220,7 @@ output "service_specification_id_rds_db" {
 # --- API Keys ----------------------------------------------------------------
 
 module "service_notification_api_key_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.45.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v2.2.1"
 
   type               = "service_notification"
   nrn                = var.nrn
@@ -228,7 +228,7 @@ module "service_notification_api_key_rds_server" {
 }
 
 module "service_notification_api_key_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v1.45.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v2.2.1"
 
   type               = "service_notification"
   nrn                = var.nrn
@@ -238,7 +238,7 @@ module "service_notification_api_key_rds_db" {
 # --- Channel Associations (Service to Agent) ---------------------------------
 
 module "service_definition_channel_association_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v1.45.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v2.2.1"
 
   nrn                          = var.nrn
   api_key                      = module.service_notification_api_key_rds_server.api_key
@@ -249,7 +249,7 @@ module "service_definition_channel_association_rds_server" {
 }
 
 module "service_definition_channel_association_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v1.45.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v2.2.1"
 
   nrn                          = var.nrn
   api_key                      = module.service_notification_api_key_rds_db.api_key
