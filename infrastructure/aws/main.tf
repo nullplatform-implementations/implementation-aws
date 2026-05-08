@@ -18,9 +18,7 @@ module "vpc" {
 # aws_vpc_vpc_id / aws_subnets_private_ids references below.
 ###############################################################################
 module "eks" {
-  # TEMP: testing feat/eks-expose-ami-release-version branch before PR.
-  # Once PR merges, bump back to a tagged ref.
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=feat/eks-expose-ami-release-version"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v2.3.0"
 
   name                         = local.cluster_name
   aws_vpc_vpc_id               = module.vpc.vpc_id
@@ -66,9 +64,7 @@ module "alb_controller" {
 # Istio
 ###############################################################################
 module "istio" {
-  # TEMP: pinned to the feat/istiod-replicas branch until PR #292 is merged.
-  # Once merged, bump back to a tagged ref (v1.52.0 or later).
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=feat/istiod-replicas"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=v2.3.0"
 
   service_type     = "LoadBalancer"
   istiod_replicas  = 2
