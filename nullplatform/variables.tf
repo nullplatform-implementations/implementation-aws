@@ -142,6 +142,12 @@ variable "environments" {
   default     = ["development", "staging", "production"]
 }
 
+variable "regions" {
+  type        = list(string)
+  description = "The list of regions"
+  default     = ["us-east-1", "us-west-1"]
+}
+
 ################################################################################
 # Tags
 ################################################################################

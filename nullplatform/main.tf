@@ -138,15 +138,19 @@ module "scope_configuration_static_scope" {
   attributes = {
     cloud_provider = "aws"
     provider = {
-      aws_region       = "sa-east-1"
-      aws_state_bucket = "tf-state-0269fb2df210b43c-sao-pabloe"
+      aws_region       = "us-east-1"
+      aws_state_bucket = "tf-state-0269fb2df210b43c"
     }
     distribution = {
       aws_distribution = "cloudfront"
     }
     network = {
       aws_network               = "route53"
-      aws_hosted_public_zone_id = "Z071237515YM3PL1X3KX"
+      aws_hosted_public_zone_id = "Z08274782HV2M61TD1NFE"
+    }
+    security = {
+      aws_security     = "none"
+      aws_web_acl_name = ""
     }
   }
 }
@@ -154,9 +158,29 @@ module "scope_configuration_static_scope" {
 # =============================================================================
 # Dimensions
 # =============================================================================
-module "dimensions" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimensions?ref=v2.5.1"
+module "dimension_environment" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v3.0.0"
 
-  nrn          = var.nrn
-  environments = var.environments
+  nrn    = var.nrn
+  name   = "Environment"
+  order  = 1
+  values = var.environments
+}
+
+module "dimension_region" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v3.0.0"
+
+  nrn    = var.nrn
+  name   = "Region"
+  order  = 2
+  values = var.regions
+}
+
+# Extra value for the Environment dimension, scoped to a specific namespace.
+module "dimension_value_environment_produccion_only" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v3.0.0"
+
+  dimension_id = module.dimension_environment.id
+  name         = "produccion-only"
+  nrn          = "organization=1698562351:account=1372325109:namespace=1901730273"
 }

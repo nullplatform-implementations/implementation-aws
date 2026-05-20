@@ -65,6 +65,15 @@ resource "aws_iam_policy" "agent_static_scopes" {
           "route53:GetChange"
         ]
         Resource = "*"
+      },
+      {
+        Sid    = "WAFv2WebACLLookup"
+        Effect = "Allow"
+        Action = [
+          "wafv2:ListWebACLs",
+          "wafv2:GetWebACL"
+        ]
+        Resource = "arn:aws:wafv2:us-east-1:*:global/webacl/*/*"
       }
     ]
   })
