@@ -148,6 +148,13 @@ variable "regions" {
   default     = ["us-east-1", "us-west-1"]
 }
 
+variable "clouds" {
+  type        = list(string)
+  description = "The list of clouds"
+  default     = ["ORACLE", "GCP"]
+}
+
+
 ################################################################################
 # Tags
 ################################################################################

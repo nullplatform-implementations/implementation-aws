@@ -176,6 +176,15 @@ module "dimension_region" {
   values = var.regions
 }
 
+module "dimension_cloud" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v3.0.0"
+
+  nrn    = var.nrn
+  name   = "Cloud"
+  order  = 3
+  values = var.clouds
+}
+
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v3.0.0"
