@@ -133,7 +133,7 @@ variable "policy" {
 variable "sources" {
   description = "External DNS sources to watch (e.g. crd, ingress, service, gateway-httproute)"
   type        = list(string)
-  default     = ["crd", "gateway-httproute"]
+  default     = ["crd"]
 }
 
 variable "organization_slug" {

@@ -24,6 +24,11 @@ locals {
   vpc_subnets_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
   vpc_security_groups_ids  = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids
 
+  # ECR IAM (created by infrastructure/aws module "ecr_iam", consumed by asset_repository)
+  ecr_application_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
+  ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
+  ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
+
 
 
 

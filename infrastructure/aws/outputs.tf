@@ -33,3 +33,19 @@ output "vpc_security_groups_ids" {
   description = "The VPC security group IDs"
   value       = module.vpc.security_group_ids
 }
+
+output "ecr_application_role_arn" {
+  description = "IAM role ARN consumed by nullplatform/asset/ecr for application image pulls"
+  value       = module.ecr_iam.application_role_arn
+}
+
+output "ecr_build_workflow_access_key_id" {
+  description = "Access key ID for the CI/CD build workflow IAM user (consumed by nullplatform/asset/ecr)"
+  value       = module.ecr_iam.build_workflow_access_key_id
+}
+
+output "ecr_build_workflow_access_key_secret" {
+  description = "Secret access key for the CI/CD build workflow IAM user (consumed by nullplatform/asset/ecr)"
+  value       = module.ecr_iam.build_workflow_access_key_secret
+  sensitive   = true
+}
