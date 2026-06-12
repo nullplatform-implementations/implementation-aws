@@ -5,18 +5,23 @@ locals {
   cluster_name    = var.cluster_name != null ? var.cluster_name : data.terraform_remote_state.infrastructure[0].outputs.cluster_name
   domain_name     = var.domain_name != null ? var.domain_name : data.terraform_remote_state.infrastructure[0].outputs.domain_name
 
-  # Nullplatform - always from remote state
-  scope_specification_id                 = data.terraform_remote_state.nullplatform.outputs.scope_specification_id
-  scope_specification_slug               = data.terraform_remote_state.nullplatform.outputs.scope_specification_slug
-  scope_specification_id_scheduled_task   = data.terraform_remote_state.nullplatform.outputs.scope_specification_id_scheduled_task
-  scope_specification_slug_scheduled_task = data.terraform_remote_state.nullplatform.outputs.scope_specification_slug_scheduled_task
-  scope_specification_id_static_scope   = data.terraform_remote_state.nullplatform.outputs.scope_specification_id_static_scope
-  scope_specification_slug_static_scope = data.terraform_remote_state.nullplatform.outputs.scope_specification_slug_static_scope
+  # Nullplatform specs — read from the remote state maps (keyed by catalog slug,
+  # only enabled entries present). Mapped explicitly to the per-entry locals the
+  # catalogs below already consume, so the catalogs stay untouched.
+  scope_specs   = data.terraform_remote_state.nullplatform.outputs.scope_definitions
+  service_specs = data.terraform_remote_state.nullplatform.outputs.service_definitions
 
-  service_specification_slug_rds_server = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_server
-  service_specification_slug_rds_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_db
-  service_specification_slug_aws_s3_bucket = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_aws_s3_bucket
-  service_specification_slug_postgres_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_postgres_db
+  scope_specification_id                  = local.scope_specs["containers"].id
+  scope_specification_slug                = local.scope_specs["containers"].slug
+  scope_specification_id_scheduled_task   = local.scope_specs["scheduled_tasks"].id
+  scope_specification_slug_scheduled_task = local.scope_specs["scheduled_tasks"].slug
+  scope_specification_id_static_scope     = local.scope_specs["static_files"].id
+  scope_specification_slug_static_scope   = local.scope_specs["static_files"].slug
+
+  service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
+  service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
+  service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
+  service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
 
   vpc_id = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids

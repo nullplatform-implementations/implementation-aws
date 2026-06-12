@@ -213,8 +213,9 @@ output "service_specification_id_rds_db" {
 # --- Locals (from remote state) ----------------------------------------------
 #
 # locals {
-#   service_specification_slug_rds_server = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_server
-#   service_specification_slug_rds_db     = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_db
+#   service_specs = data.terraform_remote_state.nullplatform.outputs.service_definitions
+#   service_specification_slug_rds_server = local.service_specs["rds_postgres_server"].slug
+#   service_specification_slug_rds_db     = local.service_specs["rds_postgres_db"].slug
 # }
 
 # --- API Keys ----------------------------------------------------------------
