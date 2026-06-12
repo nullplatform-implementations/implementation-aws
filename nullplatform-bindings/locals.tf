@@ -17,6 +17,8 @@ locals {
   scope_specification_slug_scheduled_task = local.scope_specs["scheduled_tasks"].slug
   scope_specification_id_static_scope     = local.scope_specs["static_files"].id
   scope_specification_slug_static_scope   = local.scope_specs["static_files"].slug
+  scope_specification_id_lambda           = local.scope_specs["aws_lambda"].id
+  scope_specification_slug_lambda         = local.scope_specs["aws_lambda"].slug
 
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
@@ -43,6 +45,7 @@ locals {
     containers     = { type = "scope_notification", specification_slug = local.scope_specification_slug }
     scheduled_task = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
     static_scope   = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
+    aws_lambda     = { type = "scope_notification", specification_slug = local.scope_specification_slug_lambda }
     rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
     rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
     aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
@@ -80,6 +83,14 @@ locals {
       repo_path                              = "/root/.np/nullplatform/scopes-static-files"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
       repository_notification_channel_branch = "main"
+    }
+    aws_lambda = {
+      scope_specification_id                 = local.scope_specification_id_lambda
+      scope_specification_slug               = local.scope_specification_slug_lambda
+      service_path                           = "lambda"
+      repo_path                              = "/root/.np/nullplatform/scopes-lambda"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
+      repository_notification_channel_branch = "feature/assume-role-support"
     }
   }
 

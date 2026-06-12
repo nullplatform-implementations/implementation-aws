@@ -123,6 +123,12 @@ module "agent_iam" {
     "s3_policy"= aws_iam_policy.nullplatform_s3_policy.arn
     "s3_iam_policy"= aws_iam_policy.nullplatform_s3_iam_policy.arn
   }
+
+  # Lambda scope uses assume-role: the agent assumes this dedicated role
+  # (defined in iam_lambda_assume_role.tf) instead of holding Lambda
+  # permissions directly. The rest of the scopes/services stay on
+  # additional_policies above (direct permissions).
+  assume_role_arns = [aws_iam_role.nullplatform_lambda.arn]
 }
 
 module "ecr_iam" {
@@ -253,9 +259,16 @@ module "agent" {
     "https://github.com/nullplatform/scopes-static-files.git#main",
     "https://github.com/nullplatform/services.git#main",
     "https://github.com/nullplatform/services-s-3.git#main",
-    "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3"
+    "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
+    "https://github.com/nullplatform/scopes-lambda.git#feature/assume-role-support"
   ]
 
+  # Account defaults for the Lambda scope, consumed by the scope's
+  # assume-role resolution (fallback level 4) and placeholder bootstrap.
+  extra_envs = {
+    ASSUME_ROLE_ARN_DEFAULT       = aws_iam_role.nullplatform_lambda.arn
+    PLACEHOLDER_IMAGE_URI_DEFAULT = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/aws-lambda/nullplatform-lambda-placeholder:latest-amd64"
+  }
 }
 
 ###############################################################################

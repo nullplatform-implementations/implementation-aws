@@ -70,10 +70,36 @@ locals {
     ]
   }
 
+  aws_lambda_definition = {
+    service_spec_name          = "AWS Lambda Agustin"
+    service_spec_description   = "AWS Lambda"
+    service_path               = "lambda"
+    repository_org             = "nullplatform"
+    repository_name            = "scopes-lambda"
+    create_scope_configuration = true
+    action_spec_names = [
+      "adjust-provisioned-concurrency",
+      "adjust-reserved-concurrency",
+      "create-scope",
+      "delete-deployment",
+      "delete-scope",
+      "diagnose-deployment",
+      "diagnose-scope",
+      "finalize-blue-green",
+      "invoke",
+      "rollback-deployment",
+      "start-blue-green",
+      "start-initial",
+      "switch-traffic",
+      "update-scope",
+    ]
+  }
+
   scope_definitions_catalog = {
     containers      = local.containers_definition
     scheduled_tasks = local.scheduled_tasks_definition
     static_files    = local.static_files_definition
+    aws_lambda      = local.aws_lambda_definition
   }
 
   # Merge the catalog with per-environment overrides from var.scope_definitions
