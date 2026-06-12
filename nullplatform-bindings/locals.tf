@@ -15,9 +15,7 @@ locals {
 
   service_specification_slug_rds_server = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_server
   service_specification_slug_rds_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_rds_db
-
   service_specification_slug_aws_s3_bucket = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_aws_s3_bucket
-
   service_specification_slug_postgres_db = data.terraform_remote_state.nullplatform.outputs.service_specification_slug_postgres_db
 
   vpc_id = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
@@ -28,6 +26,83 @@ locals {
   ecr_application_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
   ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
+
+  ##############################################################################
+  # Notification API keys catalog
+  #
+  # One nullplatform notification api_key per scope/service, keyed by slug.
+  # 'type' selects scope vs service notification; 'specification_slug' is the
+  # spec the key is scoped to (resolved from the nullplatform remote state).
+  ##############################################################################
+  notification_api_keys_catalog = {
+    containers     = { type = "scope_notification", specification_slug = local.scope_specification_slug }
+    scheduled_task = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
+    static_scope   = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
+    rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
+    rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
+    aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
+    postgres_db    = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
+  }
+
+  ##############################################################################
+  # Scope channel associations catalog (scope_definition_agent_association)
+  #
+  # Optional fields (service_path, repo_path, repository_notification_channel*)
+  # are null when the scope relies on the module defaults. Keys match
+  # notification_api_keys_catalog so api_key wires by each.key.
+  ##############################################################################
+  scope_channel_associations_catalog = {
+    containers = {
+      scope_specification_id                 = local.scope_specification_id
+      scope_specification_slug               = local.scope_specification_slug
+      service_path                           = "k8s"
+      repo_path                              = "/root/.np/nullplatform/scopes"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/heads"
+      repository_notification_channel_branch = "main"
+    }
+    scheduled_task = {
+      scope_specification_id                 = local.scope_specification_id_scheduled_task
+      scope_specification_slug               = local.scope_specification_slug_scheduled_task
+      service_path                           = "scheduled_task"
+      repo_path                              = "/root/.np/nullplatform/scopes"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/heads"
+      repository_notification_channel_branch = "main"
+    }
+    static_scope = {
+      scope_specification_id                 = local.scope_specification_id_static_scope
+      scope_specification_slug               = local.scope_specification_slug_static_scope
+      service_path                           = "static-files"
+      repo_path                              = "/root/.np/nullplatform/scopes-static-files"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
+      repository_notification_channel_branch = "main"
+    }
+  }
+
+  ##############################################################################
+  # Service channel associations catalog (service_definition_agent_association)
+  ##############################################################################
+  service_channel_associations_catalog = {
+    rds_server = {
+      service_specification_slug   = local.service_specification_slug_rds_server
+      repository_service_spec_repo = "nullplatform/services"
+      service_path                 = "databases/rds-postgres-server"
+    }
+    rds_db = {
+      service_specification_slug   = local.service_specification_slug_rds_db
+      repository_service_spec_repo = "nullplatform/services"
+      service_path                 = "databases/rds-postgres-db"
+    }
+    aws_s3_bucket = {
+      service_specification_slug   = local.service_specification_slug_aws_s3_bucket
+      repository_service_spec_repo = "nullplatform/services-s-3"
+      service_path                 = "aws-s3-bucket"
+    }
+    postgres_db = {
+      service_specification_slug   = local.service_specification_slug_postgres_db
+      repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
+      service_path                 = "postgres-db"
+    }
+  }
 
 
 
