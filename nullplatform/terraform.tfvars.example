@@ -1,12 +1,49 @@
 ###############################################################################
 # NULLPLATFORM - terraform.tfvars.example
-# Uso: terraform apply -var-file="../common.tfvars" -var-file="terraform.tfvars"
+#
+# Usage: tofu plan -var-file="../common.tfvars" -var-file="terraform.tfvars"
+#
+# Scope, service and dimension definitions are described in code:
+#   - the static configuration (paths, action specs, values) lives in locals.tf
+#   - sensible defaults that reproduce the standard setup live in variables.tf
+#
+# As a result terraform.tfvars can be EMPTY: with no overrides every scope,
+# service and dimension from the catalog is registered with its default
+# version/values. Only set the maps below when an environment needs to deviate
+# (disable something, pin a spec-repo branch, or change a dimension's values).
 ###############################################################################
 
-# Scope Definition Configuration
-service_path = "/azure"                          #Folder inside https://github.com/nullplatform/scopes to look for the code to execute
-service_path_scheduled_task= "/scheduled_task"   #Folder inside https://github.com/nullplatform/scopes to look for the code to execute
+# --- Scope definitions -------------------------------------------------------
+# Keys must match local.scope_definitions_catalog.
+#   enabled: register the scope (default true)
+#   version: spec-repo branch for the service spec/templates (default "main")
+#   repository_*: override the catalog-derived URL/branch for a specific pair
+#
+# scope_definitions = {
+#   containers      = { enabled = true }
+#   scheduled_tasks = { enabled = true }
+#   static_files    = { enabled = false }            # example: turn one off
+# }
 
+# --- Service definitions -----------------------------------------------------
+# Keys must match local.service_definitions_catalog.
+#   enabled: register the service (default true)
+#   version: overrides the catalog branch of the spec repo (else catalog wins)
+#
+# service_definitions = {
+#   rds_postgres_server = { enabled = true }
+#   rds_postgres_db     = { enabled = true }
+#   aws_s3_bucket       = { enabled = true, version = "main" }
+#   postgres_db_k8s     = { enabled = true }         # keeps the catalog branch
+# }
 
-#Used to configured metadata and policies to an specific Namespace
-nrn_namespace = "organization=XXXXX:account=XXXXX:namespace=XXXXX"
+# --- Dimensions --------------------------------------------------------------
+# Keys must match local.dimensions_catalog.
+#   enabled: register the dimension (default true)
+#   values:  override the catalog value list when provided
+#
+# dimensions = {
+#   environment = { values = ["development", "staging", "production"] }
+#   region      = { enabled = true }
+#   cloud       = { enabled = false }                # example: turn one off
+# }
