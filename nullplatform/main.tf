@@ -1,127 +1,49 @@
 # =============================================================================
-# Scope Definition - Containers
+# Scope definitions
+#
+# One module instance per enabled entry in local.scope_definitions_enabled.
+# Add/remove a scope by editing the catalog in locals.tf; toggle or pin a
+# version per environment from terraform.tfvars (var.scope_definitions).
 # =============================================================================
-module "scope_definition" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.2.0"
+module "scope_definitions" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.2.0"
+  for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
   np_api_key = var.np_api_key
 
-  service_path             = var.service_path
-  service_spec_name        = var.service_spec_name
-  service_spec_description = var.service_spec_description
-  action_spec_names        = var.action_spec_names
+  service_spec_name          = each.value.service_spec_name
+  service_spec_description   = each.value.service_spec_description
+  service_path               = each.value.service_path
+  action_spec_names          = each.value.action_spec_names
+  create_scope_configuration = each.value.create_scope_configuration
+
+  repository_service_spec            = coalesce(each.value.repository_service_spec, each.value.repository_url)
+  repository_service_spec_branch     = coalesce(each.value.repository_service_spec_version, each.value.version)
+  repository_scope_template          = coalesce(each.value.repository_scope_template, each.value.repository_url)
+  repository_scope_template_branch   = coalesce(each.value.repository_scope_template_version, each.value.version)
+  repository_action_templates        = coalesce(each.value.repository_action_templates, each.value.repository_url)
+  repository_action_templates_branch = coalesce(each.value.repository_action_templates_version, each.value.version)
 }
 
 # =============================================================================
-# Scope Definition - Scheduled Tasks
+# Service definitions
+#
+# One module instance per enabled entry in local.service_definitions_enabled.
 # =============================================================================
-module "scope_definition_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.2.0"
+module "service_definitions" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.2.0"
+  for_each = local.service_definitions_enabled
 
-  nrn        = var.nrn
-  np_api_key = var.np_api_key
-
-  service_path             = var.service_path_scheduled_task
-  service_spec_name        = var.service_spec_name_scheduled_task
-  service_spec_description = var.service_spec_description_scheduled_task
-  action_spec_names        = var.action_spec_names_scheduled_task
+  nrn               = var.nrn
+  repository_org    = each.value.repository_org
+  repository_name   = each.value.repository_name
+  repository_branch = each.value.repository_branch
+  service_path      = each.value.service_path
+  service_name      = each.value.service_name
+  available_links   = each.value.available_links
+  available_actions = each.value.available_actions
 }
-
-
-# =============================================================================
-# Scope Definition - Static Scope
-# =============================================================================
-module "scope_definition_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.2.0"
-
-  nrn        = var.nrn
-  np_api_key = var.np_api_key
-
-  service_path             = var.service_path_static_scope
-  service_spec_name        = var.service_spec_name_static_scope
-  service_spec_description = var.service_spec_description_static_scope
-  action_spec_names        = var.action_spec_names_static_scope
-  create_scope_configuration = true
-
-  repository_service_spec      = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_service_spec_branch     = "main"
-  repository_scope_template    = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_scope_template_branch   = "main"
-  repository_action_templates  = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_action_templates_branch = "main"
-}
-
-
-# =============================================================================
-# Service Definition - RDS Server (Postgres)
-# =============================================================================
-module "service_definition_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.2.0"
-  nrn = var.nrn
-  repository_org    = "nullplatform"
-  repository_name   = "services"
-  repository_branch = "main"
-  service_path      = "databases/rds-postgres-server"
-  service_name      = "RDS Postgres Server - Agustin Test"
-}
-
-
-# =============================================================================
-# Service Definition - RDS Database (Postgres)
-# =============================================================================
-module "service_definition_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.2.0"
-  nrn = var.nrn
-  repository_org    = "nullplatform"
-  repository_name   = "services"
-  repository_branch = "main"
-  service_path      = "databases/rds-postgres-db"
-  service_name      = "RDS Postgres Database - Agustin Test"
-}
-
-
-# =============================================================================
-# Service Definition - AWS S3 Bucket
-# Specs are fetched from https://github.com/nullplatform/services-s-3 (public).
-# =============================================================================
-module "service_definition_aws_s3_bucket" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.2.0"
-  nrn = var.nrn
-
-  git_provider      = "github"
-  repository_org    = "nullplatform"
-  repository_name   = "services-s-3"
-  repository_branch = "main"
-
-  service_path = "aws-s3-bucket"
-  service_name = "AWS S3 Bucket - Agent K8s"
-}
-
-
-# =============================================================================
-# Service Definition - Postgres DB (Kubernetes)
-# Specs are fetched from https://github.com/nullplatform/services-postgresql-k-8-s
-# on the alignment proposal branch (coexists with the existing layout until
-# validated).
-# available_links defaults to ["connect"] in the module — we override it with
-# the postgres-db link name so the HTTP fetch hits the right JSON template.
-# =============================================================================
-module "service_definition_postgres_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.2.0"
-  nrn = var.nrn
-
-  git_provider      = "github"
-  repository_org    = "nullplatform"
-  repository_name   = "services-postgresql-k-8-s"
-  repository_branch = "proposal/align-with-services-s-3"
-
-  service_path      = "postgres-db"
-  service_name      = "Postgres DB K8s - Agustin Test"
-  available_links   = ["database-user"]
-  available_actions = ["run-ddl-query", "run-dml-query"]
-}
-
 
 # =============================================================================
 # Scope Configuration - Static Scope
@@ -129,9 +51,9 @@ module "service_definition_postgres_db" {
 module "scope_configuration_static_scope" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v4.2.0"
 
-  nrn                       = var.nrn
-  np_api_key                = var.np_api_key
-  provider_specification_slug = module.scope_definition_static_scope.provider_specification_slug
+  nrn                         = var.nrn
+  np_api_key                  = var.np_api_key
+  provider_specification_slug = module.scope_definitions["static_files"].provider_specification_slug
   dimensions = {
     environment = "development"
   }
@@ -157,39 +79,26 @@ module "scope_configuration_static_scope" {
 
 # =============================================================================
 # Dimensions
+#
+# One module instance per enabled entry in local.dimensions_enabled. Add/remove
+# a dimension by editing the catalog in locals.tf; toggle or override values per
+# environment from terraform.tfvars (var.dimensions).
 # =============================================================================
-module "dimension_environment" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.2.0"
+module "dimensions" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.2.0"
+  for_each = local.dimensions_enabled
 
   nrn    = var.nrn
-  name   = "Environment"
-  order  = 1
-  values = var.environments
-}
-
-module "dimension_region" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.2.0"
-
-  nrn    = var.nrn
-  name   = "Region"
-  order  = 2
-  values = var.regions
-}
-
-module "dimension_cloud" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.2.0"
-
-  nrn    = var.nrn
-  name   = "Cloud"
-  order  = 3
-  values = var.clouds
+  name   = each.value.name
+  order  = each.value.order
+  values = each.value.values
 }
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v4.2.0"
 
-  dimension_id = module.dimension_environment.id
+  dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"
   nrn          = "organization=1698562351:account=1372325109:namespace=1901730273"
 }
