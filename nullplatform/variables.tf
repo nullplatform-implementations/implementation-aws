@@ -14,146 +14,58 @@ variable "np_api_key" {
 }
 
 ################################################################################
-# Scope Definition - Containers
+# Scope definitions
 ################################################################################
 
-variable "service_path" {
-  description = "Path to the service directory within the repository structure"
-  type        = string
-  default     = "k8s"
-}
-
-variable "service_spec_name" {
-  description = "Name of the container service specification"
-  type        = string
-  default     = "Containers"
-}
-
-variable "service_spec_description" {
-  description = "Description of the container service specification"
-  type        = string
-  default     = "Docker containers on pods"
-}
-
-variable "action_spec_names" {
-  description = "List of action specification names for containers"
-  type        = list(string)
-  default = [
-    "create-scope",
-    "delete-scope",
-    "start-initial",
-    "start-blue-green",
-    "finalize-blue-green",
-    "rollback-deployment",
-    "delete-deployment",
-    "switch-traffic",
-    "set-desired-instance-count",
-    "pause-autoscaling",
-    "resume-autoscaling",
-    "restart-pods",
-    "kill-instances",
-    "diagnose-deployment",
-    "diagnose-scope"
-  ]
+variable "scope_definitions" {
+  description = "Per-environment configuration for scope definitions, keyed by scope slug (keys must match local.scope_definitions_catalog). 'enabled' toggles registration (default true); 'version' pins the spec repo branch (default 'main'). The optional 'repository_*' fields override the catalog-derived URL/branch for a specific spec pair (service_spec, scope_template or action_templates)."
+  type = map(object({
+    enabled                             = optional(bool, true)
+    version                             = optional(string, "main")
+    repository_service_spec             = optional(string)
+    repository_service_spec_version     = optional(string)
+    repository_scope_template           = optional(string)
+    repository_scope_template_version   = optional(string)
+    repository_action_templates         = optional(string)
+    repository_action_templates_version = optional(string)
+  }))
+  default = {
+    containers      = { enabled = true }
+    scheduled_tasks = { enabled = true }
+    static_files    = { enabled = true }
+  }
 }
 
 ################################################################################
-# Scope Definition - Scheduled Tasks
+# Service definitions
 ################################################################################
 
-variable "service_path_scheduled_task" {
-  description = "Path to the scheduled task service directory"
-  type        = string
+variable "service_definitions" {
+  description = "Per-environment configuration for service definitions, keyed by service slug (keys must match local.service_definitions_catalog). 'enabled' toggles registration (default true); 'version' overrides the catalog branch of the spec repo (defaults to the catalog branch)."
+  type = map(object({
+    enabled = optional(bool, true)
+    version = optional(string)
+  }))
+  default = {
+    rds_postgres_server = { enabled = true }
+    rds_postgres_db     = { enabled = true }
+    aws_s3_bucket       = { enabled = true }
+    postgres_db_k8s     = { enabled = true }
+  }
 }
-
-variable "service_spec_name_scheduled_task" {
-  description = "Name of the scheduled task service specification"
-  type        = string
-  default     = "Scheduled Task"
-}
-
-variable "service_spec_description_scheduled_task" {
-  description = "Description of the scheduled task service specification"
-  type        = string
-  default     = "Allows you to deploy periodic jobs in Kubernetes"
-}
-
-variable "action_spec_names_scheduled_task" {
-  description = "List of action specification names for scheduled tasks"
-  type        = list(string)
-  default = [
-    "create-scope",
-    "delete-scope",
-    "start-initial",
-    "start-blue-green",
-    "finalize-blue-green",
-    "rollback-deployment",
-    "delete-deployment",
-    "trigger"
-  ]
-}
-
-################################################################################
-# Scope Definition - Static Scopes
-################################################################################
-
-variable "service_path_static_scope" {
-  description = "Path to the static scope service directory"
-  type        = string
-  default = "static-files"
-}
-
-variable "service_spec_name_static_scope" {
-  description = "Name of the static scope service specification"
-  type        = string
-  default     = "Static Scope"
-}
-
-variable "service_spec_description_static_scope" {
-  description = "Description of the static scope service specification"
-  type        = string
-  default     = "Allows you to deploy static to S3"
-}
-
-
-variable "action_spec_names_static_scope" {
-  description = "List of action specification names for static scopes"
-  type        = list(string)
-  default = [
-    "create-scope",
-    "delete-scope",
-    "start-initial",
-    "start-blue-green",
-    "finalize-blue-green",
-    "rollback-deployment",
-    "delete-deployment"
-  ]
-}
-
-
 
 ################################################################################
 # Dimensions
 ################################################################################
 
-variable "environments" {
-  type        = list(string)
-  description = "The list of environments"
-  default     = ["development", "staging", "production"]
+variable "dimensions" {
+  description = "Per-environment configuration for dimensions, keyed by dimension slug (keys must match local.dimensions_catalog). 'enabled' toggles registration (default true); 'values' overrides the catalog value list when provided."
+  type = map(object({
+    enabled = optional(bool, true)
+    values  = optional(list(string))
+  }))
+  default = {}
 }
-
-variable "regions" {
-  type        = list(string)
-  description = "The list of regions"
-  default     = ["us-east-1", "us-west-1"]
-}
-
-variable "clouds" {
-  type        = list(string)
-  description = "The list of clouds"
-  default     = ["ORACLE", "GCP"]
-}
-
 
 ################################################################################
 # Tags
