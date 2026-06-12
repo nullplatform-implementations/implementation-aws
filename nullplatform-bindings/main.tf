@@ -35,165 +35,58 @@ module "cloud_provider" {
 }
 
 # =============================================================================
-# API Keys - Scope Notifications
+# Notification API Keys
+#
+# One module instance per entry in local.notification_api_keys_catalog
+# (scope_notification and service_notification keys, keyed by scope/service slug).
 # =============================================================================
-module "scope_notification_api_key" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
+module "notification_api_keys" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
+  for_each = local.notification_api_keys_catalog
 
-  type               = "scope_notification"
+  type               = each.value.type
   nrn                = var.nrn
-  specification_slug = local.scope_specification_slug
+  specification_slug = each.value.specification_slug
 }
-
-module "scope_notification_api_key_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "scope_notification"
-  nrn                = var.nrn
-  specification_slug = local.scope_specification_slug_scheduled_task
-}
-
-module "scope_notification_api_key_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "scope_notification"
-  nrn                = var.nrn
-  specification_slug = local.scope_specification_slug_static_scope
-}
-
-
-module "service_notification_api_key_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "service_notification"
-  nrn                = var.nrn
-  specification_slug = local.service_specification_slug_rds_server
-}
-
-
-module "service_notification_api_key_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "service_notification"
-  nrn                = var.nrn
-  specification_slug = local.service_specification_slug_rds_db
-}
-
-module "service_notification_api_key_aws_s3_bucket" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "service_notification"
-  nrn                = var.nrn
-  specification_slug = local.service_specification_slug_aws_s3_bucket
-}
-
-module "service_notification_api_key_postgres_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.2.0"
-
-  type               = "service_notification"
-  nrn                = var.nrn
-  specification_slug = local.service_specification_slug_postgres_db
-}
-
-
 
 # =============================================================================
 # Channel Associations - Scope to Agent
+#
+# One module instance per entry in local.scope_channel_associations_catalog.
+# api_key wires by each.key to module.notification_api_keys.
 # =============================================================================
-module "scope_definition_channel_association" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.2.0"
+module "scope_channel_associations" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.2.0"
+  for_each = local.scope_channel_associations_catalog
 
-  nrn                      = var.nrn
-  api_key                  = module.scope_notification_api_key.api_key
-  scope_specification_id   = local.scope_specification_id
-  scope_specification_slug = local.scope_specification_slug
-  tags_selectors           = var.tags_selectors
+  nrn                                    = var.nrn
+  api_key                                = module.notification_api_keys[each.key].api_key
+  tags_selectors                         = var.tags_selectors
+  scope_specification_id                 = each.value.scope_specification_id
+  scope_specification_slug               = each.value.scope_specification_slug
+  service_path                           = each.value.service_path
+  repo_path                              = each.value.repo_path
+  repository_notification_channel        = each.value.repository_notification_channel
+  repository_notification_channel_branch = each.value.repository_notification_channel_branch
 }
-
-module "scope_definition_channel_association_scheduled_task" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.2.0"
-
-  nrn                      = var.nrn
-  api_key                  = module.scope_notification_api_key_scheduled_task.api_key
-  scope_specification_id   = local.scope_specification_id_scheduled_task
-  scope_specification_slug = local.scope_specification_slug_scheduled_task
-  tags_selectors           = var.tags_selectors
-  service_path             = "scheduled_task"
-}
-
-module "scope_definition_channel_association_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.2.0"
-
-  nrn                      = var.nrn
-  api_key                  = module.scope_notification_api_key_static_scope.api_key
-  scope_specification_id   = local.scope_specification_id_static_scope
-  scope_specification_slug = local.scope_specification_slug_static_scope
-  tags_selectors           = var.tags_selectors
-  service_path             = "static-files"
-  repo_path                = "/root/.np/nullplatform/scopes-static-files"
-
-  repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-  repository_notification_channel_branch = "main"
-}
-
-
-module "service_definition_channel_association_rds_server" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.2.0"
-
-  nrn                          = var.nrn
-  api_key                      = module.service_notification_api_key_rds_server.api_key
-  tags_selectors               = var.tags_selectors
-  service_specification_slug   = local.service_specification_slug_rds_server
-  repository_service_spec_repo = "nullplatform/services"
-  service_path                 = "databases/rds-postgres-server"
-}
-
-module "service_definition_channel_association_rds_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.2.0"
-
-  nrn                          = var.nrn
-  api_key                      = module.service_notification_api_key_rds_db.api_key
-  tags_selectors               = var.tags_selectors
-  service_specification_slug   = local.service_specification_slug_rds_db
-  repository_service_spec_repo = "nullplatform/services"
-  service_path                 = "databases/rds-postgres-db"
-}
-
 
 # =============================================================================
-# Service Definition - AWS S3 Bucket
-# The agent executes the entrypoint from:
+# Channel Associations - Service to Agent
+#
+# One module instance per entry in local.service_channel_associations_catalog.
+# The agent resolves the entrypoint from:
 #   <base_clone_path>/<repository_service_spec_repo>/<service_path>/entrypoint/entrypoint
-# = /root/.np/nullplatform/services-s-3/aws-s3-bucket/entrypoint/entrypoint
 # =============================================================================
-module "service_definition_channel_association_aws_s3_bucket" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.2.0"
+module "service_channel_associations" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.2.0"
+  for_each = local.service_channel_associations_catalog
 
   nrn                          = var.nrn
-  api_key                      = module.service_notification_api_key_aws_s3_bucket.api_key
+  api_key                      = module.notification_api_keys[each.key].api_key
   tags_selectors               = var.tags_selectors
-  service_specification_slug   = local.service_specification_slug_aws_s3_bucket
-  repository_service_spec_repo = "nullplatform/services-s-3"
-  service_path                 = "aws-s3-bucket"
-}
-
-# =============================================================================
-# Service Definition - Postgres DB (Kubernetes)
-# Entrypoint resolved from:
-#   /root/.np/nullplatform/services-postgresql-k-8-s/postgres-db/entrypoint/entrypoint
-# The branch to clone is handled by the agent itself (driven by the
-# service_definition registered in the nullplatform state, currently pinned
-# to `proposal/align-with-services-s-3`).
-# =============================================================================
-module "service_definition_channel_association_postgres_db" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.2.0"
-
-  nrn                          = var.nrn
-  api_key                      = module.service_notification_api_key_postgres_db.api_key
-  tags_selectors               = var.tags_selectors
-  service_specification_slug   = local.service_specification_slug_postgres_db
-  repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
-  service_path                 = "postgres-db"
+  service_specification_slug   = each.value.service_specification_slug
+  repository_service_spec_repo = each.value.repository_service_spec_repo
+  service_path                 = each.value.service_path
 }
 
 module "vpc" {
@@ -204,8 +97,6 @@ module "vpc" {
   vpc_security_groups = local.vpc_security_groups_ids
   vpc_subnets         = local.vpc_subnets_ids
 }
-
-
 
 
 # =============================================================================
