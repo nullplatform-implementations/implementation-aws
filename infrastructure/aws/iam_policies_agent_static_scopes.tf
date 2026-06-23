@@ -74,6 +74,18 @@ resource "aws_iam_policy" "agent_static_scopes" {
           "wafv2:GetWebACL"
         ]
         Resource = "arn:aws:wafv2:us-east-1:*:global/webacl/*/*"
+      },
+      {
+        # Lambda@Edge function associations on CloudFront cache behaviors.
+        # CloudFront validates these permissions for the caller when
+        # creating/updating a distribution that references a Lambda@Edge function.
+        Sid    = "LambdaEdgeAssociation"
+        Effect = "Allow"
+        Action = [
+          "lambda:GetFunction",
+          "lambda:EnableReplication*"
+        ]
+        Resource = "arn:aws:lambda:us-east-1:*:function:*"
       }
     ]
   })

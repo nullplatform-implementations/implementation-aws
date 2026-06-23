@@ -131,10 +131,25 @@ module "agent_iam" {
   assume_role_arns = [aws_iam_role.nullplatform_lambda.arn]
 }
 
-module "ecr_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ecr?ref=v4.3.0"
+module "build_user" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/build-user?ref=feat/separate-build-user-from-asset-repositories"
 
   cluster_name = module.eks.eks_cluster_name
+}
+
+module "ecr_iam" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ecr?ref=feat/separate-build-user-from-asset-repositories"
+
+  cluster_name              = module.eks.eks_cluster_name
+  build_workflow_group_name = module.build_user.group_name
+}
+
+module "s3_assets_iam" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3-assets?ref=feat/separate-build-user-from-asset-repositories"
+
+  cluster_name              = module.eks.eks_cluster_name
+  build_workflow_group_name = module.build_user.group_name
+  assets_bucket             = "lambda-files-aws-services"
 }
 
 ###############################################################################

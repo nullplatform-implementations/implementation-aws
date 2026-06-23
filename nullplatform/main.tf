@@ -65,6 +65,12 @@ module "scope_configuration_static_scope" {
     }
     distribution = {
       aws_distribution = "cloudfront"
+      lambda_associations = [
+        {
+          event_type   = "viewer-response"
+          function_arn = "arn:aws:lambda:us-east-1:235494813897:function:edge-test-header:1"
+        }
+      ]
     }
     network = {
       aws_network               = "route53"

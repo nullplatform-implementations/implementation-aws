@@ -23,6 +23,16 @@ module "asset_repository" {
 }
 
 # =============================================================================
+# Asset Repository (S3 - Lambda/bundle assets)
+# =============================================================================
+module "asset_s3" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/s3?ref=feat/separate-build-user-from-asset-repositories"
+
+  nrn         = var.nrn
+  bucket_name = "lambda-files-aws-services"
+}
+
+# =============================================================================
 # Cloud Provider (AWS)
 # =============================================================================
 module "cloud_provider" {
@@ -32,6 +42,29 @@ module "cloud_provider" {
   domain_name            = local.domain_name
   hosted_public_zone_id  = local.public_zone_id
   hosted_private_zone_id = local.private_zone_id
+}
+
+# =============================================================================
+# Identity & Access Control (AWS IAM provider)
+#
+# Publishes assumable role ARNs keyed by selector. The Lambda scope resolves
+# its role here (selector "lambda") via the provider — replacing the
+# ASSUME_ROLE_ARN_DEFAULT env var on the agent. The ARN comes from the Lambda
+# assume-role created in infrastructure/aws (read via remote state).
+# =============================================================================
+module "identity_access_control" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v4.3.0"
+
+  nrn = var.nrn
+
+  # type defaults to "aws-iam-configuration"
+  attributes = {
+    iam_role_arns = {
+      arns = [
+        { selector = "lambda", arn = local.lambda_assume_role_arn }
+      ]
+    }
+  }
 }
 
 # =============================================================================

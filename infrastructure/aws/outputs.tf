@@ -40,12 +40,17 @@ output "ecr_application_role_arn" {
 }
 
 output "ecr_build_workflow_access_key_id" {
-  description = "Access key ID for the CI/CD build workflow IAM user (consumed by nullplatform/asset/ecr)"
-  value       = module.ecr_iam.build_workflow_access_key_id
+  description = "Access key ID for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
+  value       = module.build_user.build_workflow_access_key_id
 }
 
 output "ecr_build_workflow_access_key_secret" {
-  description = "Secret access key for the CI/CD build workflow IAM user (consumed by nullplatform/asset/ecr)"
-  value       = module.ecr_iam.build_workflow_access_key_secret
+  description = "Secret access key for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
+  value       = module.build_user.build_workflow_access_key_secret
   sensitive   = true
+}
+
+output "lambda_assume_role_arn" {
+  description = "ARN of the Lambda assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"lambda\")"
+  value       = aws_iam_role.nullplatform_lambda.arn
 }

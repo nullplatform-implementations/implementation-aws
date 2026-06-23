@@ -34,6 +34,10 @@ locals {
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
   ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
 
+  # Lambda assume-role ARN (created in infrastructure/aws), published to the AWS
+  # IAM provider below so the Lambda scope resolves it by selector "lambda".
+  lambda_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
+
   ##############################################################################
   # Notification API keys catalog
   #
