@@ -41,12 +41,12 @@ output "ecr_application_role_arn" {
 
 output "ecr_build_workflow_access_key_id" {
   description = "Access key ID for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
-  value       = module.build_user.build_workflow_access_key_id
+  value       = module.ci_build_workflow_user.build_workflow_access_key_id
 }
 
 output "ecr_build_workflow_access_key_secret" {
   description = "Secret access key for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
-  value       = module.build_user.build_workflow_access_key_secret
+  value       = module.ci_build_workflow_user.build_workflow_access_key_secret
   sensitive   = true
 }
 
