@@ -2,7 +2,7 @@
 # Code Repository (GitHub)
 # =============================================================================
 module "code_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v4.5.2"
 
   git_provider           = "github"
   nrn                    = var.nrn
@@ -14,7 +14,7 @@ module "code_repository" {
 # Asset Repository (ECR)
 # =============================================================================
 module "asset_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v4.5.2"
 
   nrn                              = var.nrn
   application_role_arn             = local.ecr_application_role_arn
@@ -36,7 +36,7 @@ module "asset_s3" {
 # Cloud Provider (AWS)
 # =============================================================================
 module "cloud_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v4.5.2"
 
   nrn                    = var.nrn
   domain_name            = local.domain_name
@@ -53,7 +53,7 @@ module "cloud_provider" {
 # assume-role created in infrastructure/aws (read via remote state).
 # =============================================================================
 module "identity_access_control" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v4.5.2"
 
   nrn = var.nrn
 
@@ -74,7 +74,7 @@ module "identity_access_control" {
 # (scope_notification and service_notification keys, keyed by scope/service slug).
 # =============================================================================
 module "notification_api_keys" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v4.5.2"
   for_each = local.notification_api_keys_catalog
 
   type               = each.value.type
@@ -89,7 +89,7 @@ module "notification_api_keys" {
 # api_key wires by each.key to module.notification_api_keys.
 # =============================================================================
 module "scope_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v4.5.2"
   for_each = local.scope_channel_associations_catalog
 
   nrn                                    = var.nrn
@@ -111,7 +111,7 @@ module "scope_channel_associations" {
 #   <base_clone_path>/<repository_service_spec_repo>/<service_path>/entrypoint/entrypoint
 # =============================================================================
 module "service_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v4.5.2"
   for_each = local.service_channel_associations_catalog
 
   nrn                          = var.nrn
@@ -123,7 +123,7 @@ module "service_channel_associations" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v4.5.2"
 
   nrn                 = var.nrn
   vpc_id              = local.vpc_id
@@ -136,7 +136,7 @@ module "vpc" {
 # Monitoring (Prometheus)
 # =============================================================================
 module "monitoring_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v4.5.2"
 
-  nrn        = var.nrn
+  nrn = var.nrn
 }

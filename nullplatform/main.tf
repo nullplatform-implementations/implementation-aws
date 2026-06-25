@@ -6,7 +6,7 @@
 # version per environment from terraform.tfvars (var.scope_definitions).
 # =============================================================================
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v4.5.2"
   for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
@@ -32,7 +32,7 @@ module "scope_definitions" {
 # One module instance per enabled entry in local.service_definitions_enabled.
 # =============================================================================
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v4.5.2"
   for_each = local.service_definitions_enabled
 
   nrn               = var.nrn
@@ -49,7 +49,7 @@ module "service_definitions" {
 # Scope Configuration - Static Scope
 # =============================================================================
 module "scope_configuration_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v4.5.2"
 
   nrn                         = var.nrn
   np_api_key                  = var.np_api_key
@@ -83,6 +83,31 @@ module "scope_configuration_static_scope" {
   }
 }
 
+
+# =============================================================================
+# Scope Configuration - Lambda
+# =============================================================================
+module "scope_configuration_lambda" {
+
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v4.5.2"
+
+  nrn                         = var.nrn
+  np_api_key                  = var.np_api_key
+  provider_specification_slug = module.scope_definitions["aws_lambda"].provider_specification_slug
+  dimensions = {
+    environment = "development"
+  }
+
+  attributes = {
+    state = {
+      tofu_state_bucket = "tf-state-0269fb2df210b43c"
+    }
+    deployment = {
+      placeholder_image_uri = "235494813897.dkr.ecr.us-east-1.amazonaws.com/aws-lambda/nullplatform-lambda-placeholder:latest-amd64"
+    }
+  }
+}
+
 # =============================================================================
 # Dimensions
 #
@@ -91,7 +116,7 @@ module "scope_configuration_static_scope" {
 # environment from terraform.tfvars (var.dimensions).
 # =============================================================================
 module "dimensions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.3.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v4.5.2"
   for_each = local.dimensions_enabled
 
   nrn    = var.nrn
@@ -102,7 +127,7 @@ module "dimensions" {
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v4.3.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v4.5.2"
 
   dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"

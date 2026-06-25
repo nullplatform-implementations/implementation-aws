@@ -54,3 +54,4 @@ output "lambda_assume_role_arn" {
   description = "ARN of the Lambda assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"lambda\")"
   value       = aws_iam_role.nullplatform_lambda.arn
 }
+
