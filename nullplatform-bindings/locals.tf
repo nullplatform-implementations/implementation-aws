@@ -25,14 +25,18 @@ locals {
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
 
-  vpc_id = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
-  vpc_subnets_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
-  vpc_security_groups_ids  = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids
+  vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
+  vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
+  vpc_security_groups_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids
 
   # ECR IAM (created by infrastructure/aws module "ecr_iam", consumed by asset_repository)
   ecr_application_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
   ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
+
+  # Lambda assume-role ARN (created in infrastructure/aws), published to the AWS
+  # IAM provider below so the Lambda scope resolves it by selector "lambda".
+  lambda_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
 
   ##############################################################################
   # Notification API keys catalog

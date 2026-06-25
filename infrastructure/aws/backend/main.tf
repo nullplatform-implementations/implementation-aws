@@ -14,9 +14,9 @@ resource "aws_s3_bucket" "tf_state" {
   force_destroy       = var.force_destroy
 
   tags = {
-    Name        = "Terraform State"
-    ManagedBy   = "Terraform"
-    Purpose     = "Terraform remote state storage"
+    Name      = "Terraform State"
+    ManagedBy = "Terraform"
+    Purpose   = "Terraform remote state storage"
   }
 }
 
