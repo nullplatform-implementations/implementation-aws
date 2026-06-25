@@ -100,7 +100,7 @@ module "scope_configuration_lambda" {
 
   attributes = {
     state = {
-      tofu_state_bucket = "tf-state-0269fb2df210b43c"
+      tofu_state_bucket = "nullplatform-lambda-tfstate-aws-services"
     }
     deployment = {
       placeholder_image_uri = "235494813897.dkr.ecr.us-east-1.amazonaws.com/aws-lambda/nullplatform-lambda-placeholder:latest-amd64"
