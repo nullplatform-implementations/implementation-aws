@@ -262,6 +262,18 @@ resource "aws_iam_policy" "nullplatform_lambda_storage_policy" {
           "arn:aws:s3:::nullplatform-lambda-tfstate-*",
           "arn:aws:s3:::nullplatform-lambda-tfstate-*/*",
         ]
+      },
+      {
+        Sid    = "S3Assets"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
+        Resource = [
+          "arn:aws:s3:::lambda-files-aws-services",
+          "arn:aws:s3:::lambda-files-aws-services/*",
+        ]
       }
     ]
   })
