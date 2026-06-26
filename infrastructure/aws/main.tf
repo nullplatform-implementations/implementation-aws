@@ -275,7 +275,7 @@ module "agent" {
     "https://github.com/nullplatform/services.git#main",
     "https://github.com/nullplatform/services-s-3.git#main",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#feature/assume-role-support"
+    "https://github.com/nullplatform/scopes-lambda.git#main"
   ]
 }
 
