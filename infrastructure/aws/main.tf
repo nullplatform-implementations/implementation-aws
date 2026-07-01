@@ -124,8 +124,8 @@ module "agent_iam" {
     "s3_iam_policy"             = aws_iam_policy.nullplatform_s3_iam_policy.arn
   }
 
-  assume_role_arns = [        
-        aws_iam_role.nullplatform_lambda.arn,
+  assume_role_arns = [
+        module.scope_requirements_lambda.permissions_role_arn,
         module.scope_requirements_k8s.permissions_role_arn
   ]
 }
@@ -136,6 +136,14 @@ module "scope_requirements_k8s" {
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
+
+module "scope_requirements_lambda" {
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/requirements?ref=main"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
 
 module "ci_build_workflow_user" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ci-build-workflow-user?ref=v5.3.1"

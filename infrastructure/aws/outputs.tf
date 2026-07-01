@@ -52,7 +52,7 @@ output "ecr_build_workflow_access_key_secret" {
 
 output "lambda_assume_role_arn" {
   description = "ARN of the Lambda assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"lambda\")"
-  value       = aws_iam_role.nullplatform_lambda.arn
+  value       = module.scope_requirements_lambda.permissions_role_arn
 }
 
 output "k8s_assume_role_arn" {
