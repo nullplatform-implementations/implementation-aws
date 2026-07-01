@@ -126,11 +126,11 @@ module "agent_iam" {
 
   assume_role_arns = [        
         aws_iam_role.nullplatform_lambda.arn,
-        module.k8s_agent_permissions.permissions_role_arn
+        module.scope_requirements_k8s.permissions_role_arn
   ]
 }
 
-module "k8s_agent_permissions" {
+module "scope_requirements_k8s" {
   source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/tofu?ref=beta"
 
   cluster_name   = module.eks.eks_cluster_name
