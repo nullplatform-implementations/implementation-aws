@@ -115,7 +115,6 @@ module "agent_iam" {
   cluster_name                        = module.eks.eks_cluster_name
 
   additional_policies = {
-    "static_scopes_policy"      = aws_iam_policy.agent_static_scopes.arn
     "rds_policy"                = aws_iam_policy.nullplatform_rds_policy.arn
     "rds_secret_manager_policy" = aws_iam_policy.nullplatform_rds_secretsmanager_policy.arn
     "rds_s3_policy"             = aws_iam_policy.nullplatform_rds_s3_policy.arn
@@ -126,7 +125,8 @@ module "agent_iam" {
 
   assume_role_arns = [
         module.scope_requirements_lambda.permissions_role_arn,
-        module.scope_requirements_k8s.permissions_role_arn
+        module.scope_requirements_k8s.permissions_role_arn,
+        module.scope_requirements_static_files.permissions_role_arn
   ]
 }
 
@@ -139,6 +139,13 @@ module "scope_requirements_k8s" {
 
 module "scope_requirements_lambda" {
   source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/requirements?ref=main"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "scope_requirements_static_files" {
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/requirements/aws?ref=main"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn

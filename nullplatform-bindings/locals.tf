@@ -36,8 +36,9 @@ locals {
 
   # Lambda assume-role ARN (created in infrastructure/aws), published to the AWS
   # IAM provider below so the Lambda scope resolves it by selector "lambda".
-  lambda_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
-  k8s_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
+  lambda_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
+  k8s_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
+  static_files_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
 
 
   ##############################################################################

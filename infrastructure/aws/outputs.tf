@@ -60,3 +60,8 @@ output "k8s_assume_role_arn" {
   value       = module.scope_requirements_k8s.permissions_role_arn
 }
 
+output "static_files_assume_role_arn" {
+  description = "ARN of the static-files assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"static-files\")"
+  value       = module.scope_requirements_static_files.permissions_role_arn
+}
+

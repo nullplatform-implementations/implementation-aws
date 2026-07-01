@@ -62,8 +62,8 @@ module "identity_access_control" {
     iam_role_arns = {
       arns = [
         { selector = "lambda", arn = local.lambda_assume_role_arn },
-        { selector = "k8s", arn = local.k8s_assume_role_arn }
-        
+        { selector = "k8s", arn = local.k8s_assume_role_arn },
+        { selector = "static-files", arn = local.static_files_assume_role_arn }
       ]
     }
   }
