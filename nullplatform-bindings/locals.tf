@@ -37,6 +37,8 @@ locals {
   # Lambda assume-role ARN (created in infrastructure/aws), published to the AWS
   # IAM provider below so the Lambda scope resolves it by selector "lambda".
   lambda_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
+  k8s_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
+
 
   ##############################################################################
   # Notification API keys catalog
@@ -94,7 +96,7 @@ locals {
       service_path                           = "lambda"
       repo_path                              = "/root/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
-      repository_notification_channel_branch = "feature/assume-role-support"
+      repository_notification_channel_branch = "main"
     }
   }
 

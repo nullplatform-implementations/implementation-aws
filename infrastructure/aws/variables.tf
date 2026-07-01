@@ -146,3 +146,9 @@ variable "endpoint_public_access_cidrs" {
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }
+
+variable "iam_role_name" {
+  description = "Name of the agent IRSA role created by iam_agent; the permissions role trusts it and the agent runs as it"
+  type        = string
+  default     = ""
+}

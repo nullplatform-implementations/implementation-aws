@@ -33,7 +33,7 @@ variable "scope_definitions" {
     containers      = { enabled = true }
     scheduled_tasks = { enabled = true }
     static_files    = { enabled = true }
-    aws_lambda      = { enabled = true, version = "feature/assume-role-support" }
+    aws_lambda      = { enabled = true, version = "main" }
   }
 }
 

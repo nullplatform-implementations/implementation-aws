@@ -55,3 +55,8 @@ output "lambda_assume_role_arn" {
   value       = aws_iam_role.nullplatform_lambda.arn
 }
 
+output "k8s_assume_role_arn" {
+  description = "ARN of the K8s assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"k8s\")"
+  value       = module.k8s_agent_permissions.permissions_role_arn
+}
+
