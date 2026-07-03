@@ -152,3 +152,29 @@ variable "iam_role_name" {
   type        = string
   default     = ""
 }
+
+variable "iam_role" {
+  description = <<-EOT
+    Optionally create the AWS IAM role with least-privilege permissions this provider needs.
+    Fields:
+      enable             — set true to create the role + inline policy.
+      name               — role name (required when enable=true).
+      mode               — "default" (ssm + default KMS) or "with_kms" (adds customer-managed KMS perms).
+      trusted_principals — list of ARNs allowed to assume the role. Defaults to the current account root
+                           (any principal in the account, further controlled by their own IAM policies).
+      kms_key_arn        — required when mode="with_kms". The customer-managed KMS key the role can use.
+    The role's ARN is exposed via the `iam_role_arn` output so operators can plug it into the
+    identity-access-control provider's iam_role_arns.arns[].arn field with selector="parameter_store".
+  EOT
+  type = object({
+    enable             = bool
+    name               = string
+    mode               = optional(string, "default")
+    trusted_principals = optional(list(string), [])
+    kms_key_arn        = optional(string, "")
+  })
+  default = {
+    enable = false
+    name   = ""
+  }
+}

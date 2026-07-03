@@ -126,7 +126,8 @@ module "agent_iam" {
   assume_role_arns = [
         module.scope_requirements_lambda.permissions_role_arn,
         module.scope_requirements_k8s.permissions_role_arn,
-        module.scope_requirements_static_files.permissions_role_arn
+        module.scope_requirements_static_files.permissions_role_arn,
+        aws_iam_role.parameter_store_permissions_role[0].arn
   ]
 }
 
@@ -290,7 +291,7 @@ module "agent" {
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#beta"
+  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#feature/parameters-package"
   agent_repos_extra = [
     "https://github.com/nullplatform/scopes-static-files.git#main",
     "https://github.com/nullplatform/services.git#main",
@@ -366,3 +367,29 @@ resource "aws_s3_bucket_policy" "static" {
 #   certificate_arn         = aws_acm_certificate.wildcard.arn
 #   validation_record_fqdns = [for record in aws_route53_record.wildcard_validation : record.fqdn]
 # }
+
+
+resource "aws_iam_role" "parameter_store_permissions_role" {
+  count = local.iam_enabled ? 1 : 0
+  name  = var.iam_role.name
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = local.effective_trusted_principals
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "this" {
+  count  = local.iam_enabled ? 1 : 0
+  name   = "${var.iam_role.name}-policy"
+  role   = aws_iam_role.parameter_store_permissions_role[0].name
+  policy = local.policy_doc
+}

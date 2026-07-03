@@ -65,3 +65,10 @@ output "static_files_assume_role_arn" {
   value       = module.scope_requirements_static_files.permissions_role_arn
 }
 
+
+
+output "iam_role_arn" {
+  description = "ARN of the IAM role created when iam_role.enable=true. Wire this into the identity-access-control provider's iam_role_arns.arns[] with selector=\"parameter_store\". Empty when iam_role.enable=false."
+  value       = length(aws_iam_role.parameter_store_permissions_role) > 0 ? aws_iam_role.parameter_store_permissions_role[0].arn : ""
+}
+

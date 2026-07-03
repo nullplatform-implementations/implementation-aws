@@ -46,69 +46,6 @@ module "service_definitions" {
 }
 
 # =============================================================================
-# Scope Configuration - Static Scope
-# =============================================================================
-module "scope_configuration_static_scope" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v5.3.1"
-
-  nrn                         = var.nrn
-  np_api_key                  = var.np_api_key
-  provider_specification_slug = module.scope_definitions["static_files"].provider_specification_slug
-  dimensions = {
-    environment = "development"
-  }
-  attributes = {
-    cloud_provider = "aws"
-    provider = {
-      aws_region       = "us-east-1"
-      aws_state_bucket = "tf-state-0269fb2df210b43c"
-    }
-    distribution = {
-      aws_distribution = "cloudfront"
-      lambda_associations = [
-        {
-          event_type   = "viewer-response"
-          function_arn = "arn:aws:lambda:us-east-1:235494813897:function:edge-test-header:1"
-        }
-      ]
-    }
-    network = {
-      aws_network               = "route53"
-      aws_hosted_public_zone_id = "Z08274782HV2M61TD1NFE"
-    }
-    security = {
-      aws_security     = "none"
-      aws_web_acl_name = ""
-    }
-  }
-}
-
-
-# =============================================================================
-# Scope Configuration - Lambda
-# =============================================================================
-module "scope_configuration_lambda" {
-
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v5.3.1"
-
-  nrn                         = var.nrn
-  np_api_key                  = var.np_api_key
-  provider_specification_slug = module.scope_definitions["aws_lambda"].provider_specification_slug
-  dimensions = {
-    environment = "development"
-  }
-
-  attributes = {
-    state = {
-      tofu_state_bucket = "nullplatform-lambda-tfstate-aws-services"
-    }
-    deployment = {
-      placeholder_image_uri = "235494813897.dkr.ecr.us-east-1.amazonaws.com/aws-lambda/nullplatform-lambda-placeholder:latest-amd64"
-    }
-  }
-}
-
-# =============================================================================
 # Dimensions
 #
 # One module instance per enabled entry in local.dimensions_enabled. Add/remove
