@@ -173,11 +173,11 @@ module "ecr_iam" {
 }
 
 module "s3_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v6.1.0"
 
   cluster_name              = module.eks.eks_cluster_name
   build_workflow_group_name = module.ci_build_workflow_user.group_name
-  assets_bucket             = "lambda-files-aws-services"
+  bucket                    = "lambda-files-aws-services"
 }
 
 ###############################################################################
