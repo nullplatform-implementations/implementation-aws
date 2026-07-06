@@ -119,34 +119,40 @@ module "agent_iam" {
     "rds_secret_manager_policy" = aws_iam_policy.nullplatform_rds_secretsmanager_policy.arn
     "rds_s3_policy"             = aws_iam_policy.nullplatform_rds_s3_policy.arn
     "rds_sg_policy"             = aws_iam_policy.nullplatform_rds_sg_policy.arn
-    "s3_policy"                 = aws_iam_policy.nullplatform_s3_policy.arn
-    "s3_iam_policy"             = aws_iam_policy.nullplatform_s3_iam_policy.arn
   }
 
   assume_role_arns = [
         module.scope_requirements_lambda.permissions_role_arn,
         module.scope_requirements_k8s.permissions_role_arn,
         module.scope_requirements_static_files.permissions_role_arn,
+        module.service_requirements_s3.permissions_role_arn,
         aws_iam_role.parameter_store_permissions_role[0].arn
   ]
 }
 
 module "scope_requirements_k8s" {
-  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/tofu?ref=beta"
+  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=beta"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/requirements?ref=main"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=main"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/requirements/aws?ref=main"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=main"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_s3" {
+  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=main"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -166,8 +172,8 @@ module "ecr_iam" {
   build_workflow_group_name = module.ci_build_workflow_user.group_name
 }
 
-module "s3_assets_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3-assets?ref=v5.3.1"
+module "s3_iam" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v5.3.1"
 
   cluster_name              = module.eks.eks_cluster_name
   build_workflow_group_name = module.ci_build_workflow_user.group_name

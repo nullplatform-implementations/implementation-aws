@@ -40,6 +40,7 @@ locals {
   k8s_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
   static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
+  s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
 
 
   ##############################################################################

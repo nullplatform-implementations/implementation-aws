@@ -64,8 +64,8 @@ module "identity_access_control" {
         { selector = "lambda", arn = local.lambda_assume_role_arn },
         { selector = "k8s", arn = local.k8s_assume_role_arn },
         { selector = "static-files", arn = local.static_files_assume_role_arn },
-        { selector = "parameter_store", arn = local.parameter_store_assume_role_arn }
-
+        { selector = "parameter_store", arn = local.parameter_store_assume_role_arn },
+        { selector = "s3", arn = local.s3_assume_role_arn }
       ]
     }
   }
