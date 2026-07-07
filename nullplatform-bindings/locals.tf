@@ -111,13 +111,13 @@ locals {
   service_channel_associations_catalog = {
     rds_server = {
       service_specification_slug   = local.service_specification_slug_rds_server
-      repository_service_spec_repo = "nullplatform/services"
-      service_path                 = "databases/rds-postgres-server"
+      repository_service_spec_repo = "nullplatform/services-rds"
+      service_path                 = "rds-postgres-server"
     }
     rds_db = {
       service_specification_slug   = local.service_specification_slug_rds_db
-      repository_service_spec_repo = "nullplatform/services"
-      service_path                 = "databases/rds-postgres-db"
+      repository_service_spec_repo = "nullplatform/services-rds"
+      service_path                 = "rds-postgres-db"
     }
     aws_s3_bucket = {
       service_specification_slug   = local.service_specification_slug_aws_s3_bucket

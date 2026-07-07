@@ -131,9 +131,9 @@ locals {
 
   rds_postgres_server_definition = {
     repository_org    = "nullplatform"
-    repository_name   = "services"
+    repository_name   = "services-rds"
     repository_branch = "1.0.0"
-    service_path      = "databases/rds-postgres-server"
+    service_path      = "rds-postgres-server"
     service_name      = "RDS Postgres Server - Agustin Test"
     available_links   = ["connect"]
     available_actions = []
@@ -141,9 +141,9 @@ locals {
 
   rds_postgres_db_definition = {
     repository_org    = "nullplatform"
-    repository_name   = "services"
+    repository_name   = "services-rds"
     repository_branch = "1.0.0"
-    service_path      = "databases/rds-postgres-db"
+    service_path      = "rds-postgres-db"
     service_name      = "RDS Postgres Database - Agustin Test"
     available_links   = ["connect"]
     available_actions = []
