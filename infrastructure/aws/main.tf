@@ -114,18 +114,13 @@ module "agent_iam" {
   agent_namespace                     = var.agent_namespace
   cluster_name                        = module.eks.eks_cluster_name
 
-  additional_policies = {
-    "rds_policy"                = aws_iam_policy.nullplatform_rds_policy.arn
-    "rds_secret_manager_policy" = aws_iam_policy.nullplatform_rds_secretsmanager_policy.arn
-    "rds_s3_policy"             = aws_iam_policy.nullplatform_rds_s3_policy.arn
-    "rds_sg_policy"             = aws_iam_policy.nullplatform_rds_sg_policy.arn
-  }
-
   assume_role_arns = [
         module.scope_requirements_lambda.permissions_role_arn,
         module.scope_requirements_k8s.permissions_role_arn,
         module.scope_requirements_static_files.permissions_role_arn,
         module.service_requirements_s3.permissions_role_arn,
+        module.service_requirements_rds_server.permissions_role_arn,
+        module.service_requirements_rds_db.permissions_role_arn,
         aws_iam_role.parameter_store_permissions_role[0].arn
   ]
 }
@@ -138,21 +133,35 @@ module "scope_requirements_k8s" {
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=main"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=1.0.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=main"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=1.0.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_s3" {
-  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=main"
+  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=1.0.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_rds_server" {
+  source = "git::https://github.com/nullplatform/services.git//databases/rds-postgres-server/specs/requirements/aws?ref=1.0.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_rds_db" {
+  source = "git::https://github.com/nullplatform/services.git//databases/rds-postgres-db/specs/requirements/aws?ref=1.0.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -299,11 +308,11 @@ module "agent" {
   blue_green_ingress_path = var.blue_green_ingress_path
   agent_repos_scope       = "https://github.com/nullplatform/scopes.git#feature/parameters-package"
   agent_repos_extra = [
-    "https://github.com/nullplatform/scopes-static-files.git#main",
-    "https://github.com/nullplatform/services.git#main",
-    "https://github.com/nullplatform/services-s-3.git#main",
+    "https://github.com/nullplatform/scopes-static-files.git#1.0.0",
+    "https://github.com/nullplatform/services.git#1.0.0",
+    "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#main"
+    "https://github.com/nullplatform/scopes-lambda.git#1.0.0"
   ]
 }
 

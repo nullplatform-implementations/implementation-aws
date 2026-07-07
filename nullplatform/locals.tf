@@ -29,9 +29,10 @@ locals {
       "restart-pods",
       "kill-instances",
       "diagnose-deployment",
-      "diagnose-scope",
+      "diagnose-scope"
     ]
   }
+
 
   scheduled_tasks_definition = {
     service_spec_name          = "Scheduled Task"
@@ -127,7 +128,7 @@ locals {
   rds_postgres_server_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services"
-    repository_branch = "main"
+    repository_branch = "1.0.0"
     service_path      = "databases/rds-postgres-server"
     service_name      = "RDS Postgres Server - Agustin Test"
     available_links   = ["connect"]
@@ -137,7 +138,7 @@ locals {
   rds_postgres_db_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services"
-    repository_branch = "main"
+    repository_branch = "1.0.0"
     service_path      = "databases/rds-postgres-db"
     service_name      = "RDS Postgres Database - Agustin Test"
     available_links   = ["connect"]
@@ -147,7 +148,7 @@ locals {
   aws_s3_bucket_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-s-3"
-    repository_branch = "main"
+    repository_branch = "1.0.0"
     service_path      = "aws-s3-bucket"
     service_name      = "AWS S3 Bucket - Agent K8s"
     available_links   = ["connect"]
@@ -157,8 +158,8 @@ locals {
   postgres_db_k8s_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-postgresql-k-8-s"
-    repository_branch = "proposal/align-with-services-s-3"
-    service_path      = "postgres-db"
+    repository_branch = "main"
+    service_path      = "postgres/k8s"
     service_name      = "Postgres DB K8s - Agustin Test"
     available_links   = ["database-user"]
     available_actions = ["run-ddl-query", "run-dml-query"]

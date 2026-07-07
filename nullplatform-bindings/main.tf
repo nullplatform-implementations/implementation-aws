@@ -65,7 +65,9 @@ module "identity_access_control" {
         { selector = "k8s", arn = local.k8s_assume_role_arn },
         { selector = "static-files", arn = local.static_files_assume_role_arn },
         { selector = "parameter_store", arn = local.parameter_store_assume_role_arn },
-        { selector = "s3", arn = local.s3_assume_role_arn }
+        { selector = "s3", arn = local.s3_assume_role_arn },
+        { selector = "rds-postgres-server", arn = local.rds_server_assume_role_arn },
+        { selector = "rds-postgres-db", arn = local.rds_db_assume_role_arn }
       ]
     }
   }

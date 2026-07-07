@@ -41,6 +41,8 @@ locals {
   static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
   s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  rds_server_assume_role_arn      = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
+  rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 
 
   ##############################################################################
@@ -91,7 +93,7 @@ locals {
       service_path                           = "static-files"
       repo_path                              = "/root/.np/nullplatform/scopes-static-files"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-      repository_notification_channel_branch = "main"
+      repository_notification_channel_branch = "1.0.0"
     }
     aws_lambda = {
       scope_specification_id                 = local.scope_specification_id_lambda
@@ -99,7 +101,7 @@ locals {
       service_path                           = "lambda"
       repo_path                              = "/root/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
-      repository_notification_channel_branch = "main"
+      repository_notification_channel_branch = "1.0.0"
     }
   }
 
