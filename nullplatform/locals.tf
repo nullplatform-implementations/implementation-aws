@@ -13,6 +13,7 @@ locals {
     service_path               = "k8s"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
+    version                    = "main"
     create_scope_configuration = false
     action_spec_names = [
       "create-scope",
@@ -40,6 +41,7 @@ locals {
     service_path               = "scheduled_task"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
+    version                    = "main"
     create_scope_configuration = false
     action_spec_names = [
       "create-scope",
@@ -59,6 +61,7 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
+    version                    = "1.0.0"
     create_scope_configuration = true
     action_spec_names = [
       "create-scope",
@@ -77,6 +80,7 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
+    version                    = "1.0.0"
     create_scope_configuration = true
     action_spec_names = [
       "adjust-provisioned-concurrency",
@@ -108,7 +112,7 @@ locals {
   # the catalog-derived raw.githubusercontent.com URL unless an override is set.
   scope_definitions_enabled = {
     for k, v in local.scope_definitions_catalog : k => merge(v, {
-      version        = try(var.scope_definitions[k].version, "main")
+      version        = coalesce(try(var.scope_definitions[k].version, null), v.version)
       repository_url = "https://raw.githubusercontent.com/${v.repository_org}/${v.repository_name}/refs/heads"
 
       repository_service_spec             = try(var.scope_definitions[k].repository_service_spec, null)
