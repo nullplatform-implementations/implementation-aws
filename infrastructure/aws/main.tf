@@ -115,13 +115,14 @@ module "agent_iam" {
   cluster_name                        = module.eks.eks_cluster_name
 
   assume_role_arns = [
-        module.scope_requirements_lambda.permissions_role_arn,
-        module.scope_requirements_k8s.permissions_role_arn,
-        module.scope_requirements_static_files.permissions_role_arn,
-        module.service_requirements_s3.permissions_role_arn,
-        module.service_requirements_rds_server.permissions_role_arn,
-        module.service_requirements_rds_db.permissions_role_arn,
-        aws_iam_role.parameter_store_permissions_role[0].arn
+    module.scope_requirements_lambda.permissions_role_arn,
+    module.scope_requirements_k8s.permissions_role_arn,
+    module.scope_requirements_static_files.permissions_role_arn,
+    module.service_requirements_s3.permissions_role_arn,
+    module.service_requirements_rds_server.permissions_role_arn,
+    module.service_requirements_rds_db.permissions_role_arn,
+    module.parameter_store_requirements.iam_role_arn,
+    module.secrets_manager_requirements.iam_role_arn
   ]
 }
 
@@ -306,13 +307,14 @@ module "agent" {
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#feature/parameters-package"
+  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#beta"
   agent_repos_extra = [
     "https://github.com/nullplatform/scopes-static-files.git#1.0.0",
     "https://github.com/nullplatform/services-rds.git#1.0.0",
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#1.0.0"
+    "https://github.com/nullplatform/scopes-lambda.git#1.0.0",
+    "https://github.com/nullplatform/parameters-provider.git#main"
   ]
 }
 
@@ -384,27 +386,31 @@ resource "aws_s3_bucket_policy" "static" {
 # }
 
 
-resource "aws_iam_role" "parameter_store_permissions_role" {
-  count = local.iam_enabled ? 1 : 0
-  name  = var.iam_role.name
+# Parameter Store / Secrets Manager IAM roles.
+#
+# Both use the provider's own requirements module (same pattern as the scope/
+# service requirements above), instead of the previously hand-rolled role.
+# The agent assumes each by selector: parameter_store / secret_manager.
+module "parameter_store_requirements" {
+  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-parameter-store/specs/requirements?ref=main"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          AWS = local.effective_trusted_principals
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  iam_role = var.iam_role
 }
 
-resource "aws_iam_role_policy" "this" {
-  count  = local.iam_enabled ? 1 : 0
-  name   = "${var.iam_role.name}-policy"
-  role   = aws_iam_role.parameter_store_permissions_role[0].name
-  policy = local.policy_doc
+module "secrets_manager_requirements" {
+  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-secrets-manager/specs/requeriments?ref=main"
+
+  iam_role = var.secrets_manager_iam_role
+}
+
+# Preserve the existing parameter_store role (keeps its ARN, already wired into
+# the identity-access-control provider) instead of destroying/recreating it.
+moved {
+  from = aws_iam_role.parameter_store_permissions_role[0]
+  to   = module.parameter_store_requirements.aws_iam_role.this[0]
+}
+
+moved {
+  from = aws_iam_role_policy.this[0]
+  to   = module.parameter_store_requirements.aws_iam_role_policy.this[0]
 }

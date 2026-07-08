@@ -178,3 +178,22 @@ variable "iam_role" {
     name   = ""
   }
 }
+
+variable "secrets_manager_iam_role" {
+  description = <<-EOT
+    IAM role for the AWS Secrets Manager parameters provider. Same shape as iam_role.
+    mode is "default" (secretsmanager + default KMS) or "kms" (adds customer-managed KMS perms).
+    The role's ARN is published to the identity-access-control provider with selector="secret_manager".
+  EOT
+  type = object({
+    enable             = bool
+    name               = string
+    mode               = optional(string, "default")
+    trusted_principals = optional(list(string), [])
+    kms_key_arn        = optional(string, "")
+  })
+  default = {
+    enable = false
+    name   = ""
+  }
+}

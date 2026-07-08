@@ -40,6 +40,7 @@ locals {
   k8s_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
   static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
+  secret_manager_assume_role_arn  = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
   rds_server_assume_role_arn      = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
   rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
@@ -131,33 +132,5 @@ locals {
     }
   }
 
-
-  template_path     = "${path.module}/aws-parameter-store-configuration.json.tpl"
-  template_raw      = file(local.template_path)
-  template_rendered = replace(local.template_raw, "{{ env.Getenv \"NRN\" }}", var.nrn)
-  config            = jsondecode(local.template_rendered)
-  cmdline_path      = "nullplatform/scopes/parameters/entrypoint"
-
-  instance_nrns = distinct([for _, inst in var.parameter_store_instances : inst.nrn])
-  spec_visible_to = distinct(concat(
-    [var.nrn],
-    local.instance_nrns,
-    var.extra_visible_to_nrns,
-  ))
-
-  
-  # Instances that get their own agent API key + notification channel.
-  notification_instances = {
-    for key, instance in var.parameter_store_instances : key => instance
-    if instance.notification_channel_enabled
-  }
-
-  api_key_grants = [
-    "controlplane:agent",
-    "developer",
-    "ops",
-    "secops",
-    "secrets-reader",
-  ]
 
 }

@@ -65,6 +65,7 @@ module "identity_access_control" {
         { selector = "k8s", arn = local.k8s_assume_role_arn },
         { selector = "static-files", arn = local.static_files_assume_role_arn },
         { selector = "parameter_store", arn = local.parameter_store_assume_role_arn },
+        { selector = "secret_manager", arn = local.secret_manager_assume_role_arn },
         { selector = "s3", arn = local.s3_assume_role_arn },
         { selector = "rds-postgres-server", arn = local.rds_server_assume_role_arn },
         { selector = "rds-postgres-db", arn = local.rds_db_assume_role_arn }
@@ -151,86 +152,120 @@ module "monitoring_provider" {
 
 # =============================================================================
 # PARAMETER STORE VIA AGENT
+#
+# Migrated from inline resources to the dedicated parameter-storage modules
+# (tofu-modules v6.2.0 / api_key v6.1.0). The provider spec is now fetched
+# remotely from the parameters-provider repo (data.http + gomplate) instead of
+# the local .tpl.
 # =============================================================================
 
-resource "nullplatform_provider_specification" "this" {
-  name             = local.config.name
-  icon             = local.config.icon
-  description      = local.config.description
-  category         = local.config.category
-  allow_dimensions = local.config.allow_dimensions
-  visible_to       = local.spec_visible_to
-  schema           = jsonencode(local.config.schema)
+# Provider specification (replaces nullplatform_provider_specification.this).
+module "parameter_store_spec" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v6.2.2"
+
+  nrn                                      = var.nrn
+  np_api_key                               = var.np_api_key
+  extra_visible_to_nrns                    = var.extra_visible_to_nrns
+  template_path                            = var.template_path
+  repository_parameter_storage_spec_branch = var.repository_parameter_storage_spec_branch
+  repository_parameter_storage_spec        = var.repository_parameter_storage_spec
 }
 
-module "scope_configuration" {
+# Provider instances (replaces module.scope_configuration on scope_configuration v4.5.1).
+module "parameter_store_configuration" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v6.2.2"
+
   for_each = var.parameter_store_instances
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v4.5.1"
 
   nrn                         = each.value.nrn
   np_api_key                  = var.np_api_key
-  provider_specification_slug = local.config.slug
+  provider_specification_slug = module.parameter_store_spec.slug
   dimensions                  = each.value.dimensions
+  attributes                  = each.value.attributes
 
-  attributes = {
-    sensibility = {
-      applies_to = each.value.applies_to
-    }
-    setup = {
-      kms_key_id = each.value.kms_key_id
-      tier       = each.value.tier
-    }
-  }
-
-  depends_on = [nullplatform_provider_specification.this]
+  depends_on = [module.parameter_store_spec]
 }
 
-resource "nullplatform_api_key" "this" {
-  for_each = local.notification_instances
+# Agent API keys (replaces nullplatform_api_key.this). type="agent" applies the
+# same grants: controlplane:agent, developer, ops, secops, secrets-reader.
+module "parameter_store_api_keys" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.1.0"
+  for_each = { for key, instance in var.parameter_store_instances : key => instance if instance.enable_notification_channel }
 
-  name = "parameter-api-key-${each.key}"
-  dynamic "grants" {
-    for_each = toset(local.api_key_grants)
-    content {
-      nrn       = each.value.nrn
-      role_slug = grants.value
-    }
-  }
-
-  tags {
-    key   = "managedBy"
-    value = "IaC"
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
+  type               = "agent"
+  nrn                = each.value.nrn
+  specification_slug = "parameter_storage"
 }
 
-resource "nullplatform_notification_channel" "from_template" {
-  for_each = local.notification_instances
+# Agent notification channels (replaces nullplatform_notification_channel.from_template).
+module "parameter_store_channels" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.2.2"
+  for_each = { for key, instance in var.parameter_store_instances : key => instance if instance.enable_notification_channel }
 
-  nrn         = each.value.nrn
-  type        = "agent"
-  source      = ["parameters"]
-  description = "Notification channel to handle parameter storage and retrieval"
-  configuration {
-    agent {
-      api_key  = nullplatform_api_key.this[each.key].api_key
-      selector = each.value.tags_selectors
-      command {
-        data = {
-          "cmdline" : local.cmdline_path
-          "environment" : jsonencode({
-            NP_ACTION_CONTEXT = "'$${NOTIFICATION_CONTEXT}'"
-            LOG_LEVEL         = "debug"
-          })
-        }
-        type = "exec"
-      }
-    }
-  }
+  nrn            = each.value.nrn
+  api_key        = module.parameter_store_api_keys[each.key].api_key
+  tags_selectors = each.value.tags_selectors
+
+  depends_on = [module.parameter_store_spec]
 }
+
+# =============================================================================
+# SECRETS MANAGER VIA AGENT
+#
+# Same parameter-storage modules as Parameter Store (the modules are generic).
+# The provider differs only in the remote spec template (slug aws-secrets-manager,
+# schema without `tier`), fetched from the same parameters-provider repo.
+# =============================================================================
+
+# Provider specification.
+module "secrets_manager_spec" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v6.2.2"
+
+  nrn                                      = var.nrn
+  np_api_key                               = var.np_api_key
+  extra_visible_to_nrns                    = var.extra_visible_to_nrns
+  template_path                            = var.secrets_manager_template_path
+  repository_parameter_storage_spec_branch = var.repository_parameter_storage_spec_branch
+  repository_parameter_storage_spec        = var.repository_parameter_storage_spec
+}
+
+# Provider instances.
+module "secrets_manager_configuration" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v6.2.2"
+
+  for_each = var.secrets_manager_instances
+
+  nrn                         = each.value.nrn
+  np_api_key                  = var.np_api_key
+  provider_specification_slug = module.secrets_manager_spec.slug
+  dimensions                  = each.value.dimensions
+  attributes                  = each.value.attributes
+
+  depends_on = [module.secrets_manager_spec]
+}
+
+# Agent API keys (type="agent"). specification_slug stays "parameter_storage".
+module "secrets_manager_api_keys" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.1.0"
+  for_each = { for key, instance in var.secrets_manager_instances : key => instance if instance.enable_notification_channel }
+
+  type               = "agent"
+  nrn                = each.value.nrn
+  specification_slug = "parameter_storage"
+}
+
+# Agent notification channels.
+module "secrets_manager_channels" {
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.2.2"
+  for_each = { for key, instance in var.secrets_manager_instances : key => instance if instance.enable_notification_channel }
+
+  nrn            = each.value.nrn
+  api_key        = module.secrets_manager_api_keys[each.key].api_key
+  tags_selectors = each.value.tags_selectors
+
+  depends_on = [module.secrets_manager_spec]
+}
+
 
 # =============================================================================
 # Scope Configuration - Static Scope

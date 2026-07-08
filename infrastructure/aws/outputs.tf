@@ -83,7 +83,12 @@ output "rds_db_assume_role_arn" {
 
 
 output "iam_role_arn" {
-  description = "ARN of the IAM role created when iam_role.enable=true. Wire this into the identity-access-control provider's iam_role_arns.arns[] with selector=\"parameter_store\". Empty when iam_role.enable=false."
-  value       = length(aws_iam_role.parameter_store_permissions_role) > 0 ? aws_iam_role.parameter_store_permissions_role[0].arn : ""
+  description = "ARN of the Parameter Store IAM role. Wire this into the identity-access-control provider's iam_role_arns.arns[] with selector=\"parameter_store\". Empty when iam_role.enable=false."
+  value       = module.parameter_store_requirements.iam_role_arn
+}
+
+output "secret_manager_iam_role_arn" {
+  description = "ARN of the Secrets Manager IAM role. Wire this into the identity-access-control provider's iam_role_arns.arns[] with selector=\"secret_manager\". Empty when secrets_manager_iam_role.enable=false."
+  value       = module.secrets_manager_requirements.iam_role_arn
 }
 
