@@ -76,9 +76,6 @@ variable "domain_name" {
 }
 
 
-
-
-
 variable "extra_visible_to_nrns" {
   description = "Additional NRNs that should see the provider specification besides var.nrn and the per-instance NRNs."
   type        = list(string)

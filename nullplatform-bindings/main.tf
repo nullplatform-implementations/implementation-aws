@@ -108,6 +108,12 @@ module "scope_channel_associations" {
   repo_path                              = each.value.repo_path
   repository_notification_channel        = each.value.repository_notification_channel
   repository_notification_channel_branch = each.value.repository_notification_channel_branch
+
+  # Workflow overrides (e.g. scopes-networking for the Lambda scope). Default
+  # off for scopes that don't set them in the catalog.
+  enabled_override       = try(each.value.enabled_override, false)
+  override_repo_path     = try(each.value.override_repo_path, "")
+  overrides_service_path = try(each.value.overrides_service_path, "")
 }
 
 # =============================================================================
@@ -130,12 +136,28 @@ module "service_channel_associations" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=feat/vpc-load-balancer-input"
 
   nrn                 = var.nrn
   vpc_id              = local.vpc_id
   vpc_security_groups = local.vpc_security_groups_ids
   vpc_subnets         = local.vpc_subnets_ids
+
+  # Lambda ALB listener published under load_balancer.{public,private} so the
+  # Lambda scope workflow resolves ALB_PUBLIC_LISTENER_ARN / ALB_PRIVATE_LISTENER_ARN
+  # and attaches per-scope target groups + rules at runtime. Same ALB for both
+  # sides here (the ALB is public); a dedicated internal ALB can be added later
+  # for true private scopes.
+  load_balancer = {
+    public = {
+      arn          = local.lambda_alb_arn
+      listener_arn = local.lambda_alb_listener_arn
+    }
+    private = {
+      arn          = local.lambda_alb_arn
+      listener_arn = local.lambda_alb_listener_arn
+    }
+  }
 }
 
 

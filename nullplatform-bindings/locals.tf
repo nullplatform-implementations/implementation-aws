@@ -29,6 +29,12 @@ locals {
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
   vpc_security_groups_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids
 
+  # Public Lambda ALB (created in infrastructure/aws when install_alb=true),
+  # published to the aws-networking-configuration provider so the Lambda scope
+  # workflow resolves load_balancer.public.listener_arn.
+  lambda_alb_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_arn
+  lambda_alb_listener_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_listener_arn
+
   # ECR IAM (created by infrastructure/aws module "ecr_iam", consumed by asset_repository)
   ecr_application_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
@@ -103,6 +109,13 @@ locals {
       repo_path                              = "/root/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
       repository_notification_channel_branch = "1.0.0"
+      # Networking overrides: the agent composes the base Lambda scope workflows
+      # (scopes-lambda) with scopes-networking's setup_networking step (ALB /
+      # API Gateway / Route53) during create/delete-scope. Without this the
+      # scope never wires the ALB (target group + listener rule).
+      enabled_override       = true
+      override_repo_path     = "/root/.np/nullplatform/scopes-networking/"
+      overrides_service_path = "lambda"
     }
   }
 

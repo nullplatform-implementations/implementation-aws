@@ -55,6 +55,16 @@ output "lambda_assume_role_arn" {
   value       = module.scope_requirements_lambda.permissions_role_arn
 }
 
+output "lambda_alb_arn" {
+  description = "ARN of the public Lambda ALB (empty when install_alb=false)."
+  value       = module.scope_requirements_lambda.lambda_alb_arn
+}
+
+output "lambda_alb_listener_arn" {
+  description = "HTTPS listener ARN of the Lambda ALB; consumed by nullplatform-bindings to publish the aws-networking-configuration provider (load_balancer.public.listener_arn)."
+  value       = module.scope_requirements_lambda.lambda_alb_listener_arn
+}
+
 output "k8s_assume_role_arn" {
   description = "ARN of the K8s assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"k8s\")"
   value       = module.scope_requirements_k8s.permissions_role_arn

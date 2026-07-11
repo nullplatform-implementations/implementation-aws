@@ -133,11 +133,24 @@ module "scope_requirements_k8s" {
   agent_role_arn = local.agent_role_arn
 }
 
+# Existing wildcard cert (*.<domain>) reused for the Lambda ALB HTTPS listener,
+# so we don't mint a second wildcard alongside the one already issued.
+data "aws_acm_certificate" "wildcard" {
+  domain      = "*.${local.domain_name}"
+  statuses    = ["ISSUED"]
+  most_recent = true
+}
+
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=1.0.0"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=feat/optional-lambda-alb"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
+
+  # Opt-in public ALB for exposing Lambda over HTTP.
+  install_alb     = true
+  vpc_id          = module.vpc.vpc_id
+  certificate_arn = data.aws_acm_certificate.wildcard.arn
 }
 
 module "scope_requirements_static_files" {
@@ -314,6 +327,7 @@ module "agent" {
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
     "https://github.com/nullplatform/scopes-lambda.git#1.0.0",
+    "https://github.com/nullplatform/scopes-networking.git#main",
     "https://github.com/nullplatform/parameters-provider.git#main"
   ]
 }
@@ -387,10 +401,7 @@ resource "aws_s3_bucket_policy" "static" {
 
 
 # Parameter Store / Secrets Manager IAM roles.
-#
-# Both use the provider's own requirements module (same pattern as the scope/
-# service requirements above), instead of the previously hand-rolled role.
-# The agent assumes each by selector: parameter_store / secret_manager.
+
 module "parameter_store_requirements" {
   source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-parameter-store/specs/requirements?ref=main"
 
@@ -401,16 +412,4 @@ module "secrets_manager_requirements" {
   source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-secrets-manager/specs/requeriments?ref=main"
 
   iam_role = var.secrets_manager_iam_role
-}
-
-# Preserve the existing parameter_store role (keeps its ARN, already wired into
-# the identity-access-control provider) instead of destroying/recreating it.
-moved {
-  from = aws_iam_role.parameter_store_permissions_role[0]
-  to   = module.parameter_store_requirements.aws_iam_role.this[0]
-}
-
-moved {
-  from = aws_iam_role_policy.this[0]
-  to   = module.parameter_store_requirements.aws_iam_role_policy.this[0]
 }
