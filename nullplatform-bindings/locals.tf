@@ -108,7 +108,7 @@ locals {
       service_path                           = "lambda"
       repo_path                              = "/root/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
-      repository_notification_channel_branch = "1.0.0"
+      repository_notification_channel_branch = "1.0.1"
       # Networking overrides: the agent composes the base Lambda scope workflows
       # (scopes-lambda) with scopes-networking's setup_networking step (ALB /
       # API Gateway / Route53) during create/delete-scope. Without this the

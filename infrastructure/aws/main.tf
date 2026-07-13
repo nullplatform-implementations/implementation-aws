@@ -142,7 +142,7 @@ data "aws_acm_certificate" "wildcard" {
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=feat/optional-lambda-alb"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=1.0.1"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -326,7 +326,7 @@ module "agent" {
     "https://github.com/nullplatform/services-rds.git#1.0.0",
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#1.0.0",
+    "https://github.com/nullplatform/scopes-lambda.git#1.0.1",
     "https://github.com/nullplatform/scopes-networking.git#main",
     "https://github.com/nullplatform/parameters-provider.git#main"
   ]

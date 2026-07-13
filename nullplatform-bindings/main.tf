@@ -136,7 +136,7 @@ module "service_channel_associations" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=feat/vpc-load-balancer-input"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v6.3.0"
 
   nrn                 = var.nrn
   vpc_id              = local.vpc_id
