@@ -403,13 +403,13 @@ resource "aws_s3_bucket_policy" "static" {
 # Parameter Store / Secrets Manager IAM roles.
 
 module "parameter_store_requirements" {
-  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-parameter-store/specs/requirements?ref=main"
+  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-parameter-store/specs/requirements?ref=v0.3.0"
 
   iam_role = var.iam_role
 }
 
 module "secrets_manager_requirements" {
-  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-secrets-manager/specs/requeriments?ref=main"
+  source = "git::https://github.com/nullplatform/parameters-provider.git//parameters/providers/aws-secrets-manager/specs/requirements?ref=v0.3.0"
 
   iam_role = var.secrets_manager_iam_role
 }
