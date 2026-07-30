@@ -24,6 +24,7 @@ locals {
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
+  service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
 
   vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
@@ -138,6 +139,11 @@ locals {
       service_specification_slug   = local.service_specification_slug_aws_s3_bucket
       repository_service_spec_repo = "nullplatform/services-s-3"
       service_path                 = "aws-s3-bucket"
+    }
+    aws_dynamodb = {
+      service_specification_slug   = local.service_specification_slug_aws_dynamodb
+      repository_service_spec_repo = "nullplatform/services-dynamo-db"
+      service_path                 = "dynamodb"
     }
     postgres_db = {
       service_specification_slug   = local.service_specification_slug_postgres_db
