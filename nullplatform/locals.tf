@@ -159,6 +159,16 @@ locals {
     available_actions = []
   }
 
+  aws_dynamodb_definition = {
+    repository_org    = "nullplatform"
+    repository_name   = "services-dynamo-db"
+    repository_branch = "feature/dynamodb-service"
+    service_path      = "dynamodb"
+    service_name      = "AWS DynamoDB - Agustin Test"
+    available_links   = ["connect", "trigger"]
+    available_actions = []
+  }
+
   postgres_db_k8s_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-postgresql-k-8-s"
@@ -173,6 +183,7 @@ locals {
     rds_postgres_server = local.rds_postgres_server_definition
     rds_postgres_db     = local.rds_postgres_db_definition
     aws_s3_bucket       = local.aws_s3_bucket_definition
+    aws_dynamodb        = local.aws_dynamodb_definition
     postgres_db_k8s     = local.postgres_db_k8s_definition
   }
 

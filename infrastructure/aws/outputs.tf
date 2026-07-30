@@ -80,6 +80,11 @@ output "s3_assume_role_arn" {
   value       = module.service_requirements_s3.permissions_role_arn
 }
 
+output "dynamodb_assume_role_arn" {
+  description = "ARN of the aws-dynamodb service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"dynamodb\")"
+  value       = module.service_requirements_dynamodb.permissions_role_arn
+}
+
 output "rds_server_assume_role_arn" {
   description = "ARN of the rds-postgres-server service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"rds-postgres-server\")"
   value       = module.service_requirements_rds_server.permissions_role_arn

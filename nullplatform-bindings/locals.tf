@@ -48,6 +48,7 @@ locals {
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
   secret_manager_assume_role_arn  = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  dynamodb_assume_role_arn        = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
   rds_server_assume_role_arn      = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
   rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 

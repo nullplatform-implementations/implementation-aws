@@ -67,6 +67,7 @@ module "identity_access_control" {
         { selector = "parameter_store", arn = local.parameter_store_assume_role_arn },
         { selector = "secret_manager", arn = local.secret_manager_assume_role_arn },
         { selector = "s3", arn = local.s3_assume_role_arn },
+        { selector = "dynamodb", arn = local.dynamodb_assume_role_arn },
         { selector = "rds-postgres-server", arn = local.rds_server_assume_role_arn },
         { selector = "rds-postgres-db", arn = local.rds_db_assume_role_arn }
       ]

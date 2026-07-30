@@ -119,6 +119,7 @@ module "agent_iam" {
     module.scope_requirements_k8s.permissions_role_arn,
     module.scope_requirements_static_files.permissions_role_arn,
     module.service_requirements_s3.permissions_role_arn,
+    module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,
     module.service_requirements_rds_db.permissions_role_arn,
     module.parameter_store_requirements.iam_role_arn,
@@ -162,6 +163,13 @@ module "scope_requirements_static_files" {
 
 module "service_requirements_s3" {
   source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=1.0.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_dynamodb" {
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=feature/dynamodb-service"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -327,6 +335,7 @@ module "agent" {
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
     "https://github.com/nullplatform/scopes-lambda.git#1.0.1",
+    "https://github.com/nullplatform/services-dynamo-db.git#feature/dynamodb-service",
     "https://github.com/nullplatform/scopes-networking.git#main",
     "https://github.com/nullplatform/parameters-provider.git#main"
   ]
