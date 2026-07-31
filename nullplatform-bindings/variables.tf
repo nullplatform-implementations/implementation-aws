@@ -116,6 +116,7 @@ variable "parameter_store_instances" {
     nrn                         = string
     dimensions                  = map(string)
     enable_notification_channel = optional(bool, false)
+    description                 = optional(string, "Notification channel to handle parameter storage and retrieval")
     tags_selectors              = optional(map(string), {})
     attributes = object({
       sensibility = object({
@@ -149,6 +150,7 @@ variable "secrets_manager_instances" {
     nrn                         = string
     dimensions                  = map(string)
     enable_notification_channel = optional(bool, false)
+    description                 = optional(string, "Notification channel to handle secret storage and retrieval")
     tags_selectors              = optional(map(string), {})
     attributes = object({
       sensibility = object({

@@ -82,6 +82,7 @@ locals {
   ##############################################################################
   scope_channel_associations_catalog = {
     containers = {
+      description                            = "Containers scope agent channel"
       scope_specification_id                 = local.scope_specification_id
       scope_specification_slug               = local.scope_specification_slug
       service_path                           = "k8s"
@@ -90,6 +91,7 @@ locals {
       repository_notification_channel_branch = "main"
     }
     scheduled_task = {
+      description                            = "Scheduled task scope agent channel"
       scope_specification_id                 = local.scope_specification_id_scheduled_task
       scope_specification_slug               = local.scope_specification_slug_scheduled_task
       service_path                           = "scheduled_task"
@@ -98,6 +100,7 @@ locals {
       repository_notification_channel_branch = "main"
     }
     static_scope = {
+      description                            = "Static scope agent channel"
       scope_specification_id                 = local.scope_specification_id_static_scope
       scope_specification_slug               = local.scope_specification_slug_static_scope
       service_path                           = "static-files"
@@ -106,6 +109,7 @@ locals {
       repository_notification_channel_branch = "1.0.0"
     }
     aws_lambda = {
+      description                            = "AWS Lambda scope agent channel"
       scope_specification_id                 = local.scope_specification_id_lambda
       scope_specification_slug               = local.scope_specification_slug_lambda
       service_path                           = "lambda"
@@ -127,26 +131,31 @@ locals {
   ##############################################################################
   service_channel_associations_catalog = {
     rds_server = {
+      description                  = "RDS server service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_server
       repository_service_spec_repo = "nullplatform/services-rds"
       service_path                 = "rds-postgres-server"
     }
     rds_db = {
+      description                  = "RDS DB service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_db
       repository_service_spec_repo = "nullplatform/services-rds"
       service_path                 = "rds-postgres-db"
     }
     aws_s3_bucket = {
+      description                  = "AWS S3 bucket service agent channel"
       service_specification_slug   = local.service_specification_slug_aws_s3_bucket
       repository_service_spec_repo = "nullplatform/services-s-3"
       service_path                 = "aws-s3-bucket"
     }
     aws_dynamodb = {
+      description                  = "AWS DynamoDB service agent channel"
       service_specification_slug   = local.service_specification_slug_aws_dynamodb
       repository_service_spec_repo = "nullplatform/services-dynamo-db"
       service_path                 = "dynamodb"
     }
     postgres_db = {
+      description                  = "Postgres DB service agent channel"
       service_specification_slug   = local.service_specification_slug_postgres_db
       repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
       service_path                 = "postgres-db"

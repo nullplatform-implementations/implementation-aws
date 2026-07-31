@@ -97,12 +97,13 @@ module "notification_api_keys" {
 # api_key wires by each.key to module.notification_api_keys.
 # =============================================================================
 module "scope_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v5.3.1"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v6.7.2"
   for_each = local.scope_channel_associations_catalog
 
   nrn                                    = var.nrn
   api_key                                = module.notification_api_keys[each.key].api_key
   tags_selectors                         = var.tags_selectors
+  description                            = each.value.description
   scope_specification_id                 = each.value.scope_specification_id
   scope_specification_slug               = each.value.scope_specification_slug
   service_path                           = each.value.service_path
@@ -125,12 +126,13 @@ module "scope_channel_associations" {
 #   <base_clone_path>/<repository_service_spec_repo>/<service_path>/entrypoint/entrypoint
 # =============================================================================
 module "service_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v5.3.1"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v6.7.2"
   for_each = local.service_channel_associations_catalog
 
   nrn                          = var.nrn
   api_key                      = module.notification_api_keys[each.key].api_key
   tags_selectors               = var.tags_selectors
+  description                  = each.value.description
   service_specification_slug   = each.value.service_specification_slug
   repository_service_spec_repo = each.value.repository_service_spec_repo
   service_path                 = each.value.service_path
@@ -222,11 +224,12 @@ module "parameter_store_api_keys" {
 
 # Agent notification channels (replaces nullplatform_notification_channel.from_template).
 module "parameter_store_channels" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.2.2"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.7.2"
   for_each = { for key, instance in var.parameter_store_instances : key => instance if instance.enable_notification_channel }
 
   nrn            = each.value.nrn
   api_key        = module.parameter_store_api_keys[each.key].api_key
+  description    = each.value.description
   tags_selectors = each.value.tags_selectors
 
   depends_on = [module.parameter_store_spec]
@@ -279,11 +282,12 @@ module "secrets_manager_api_keys" {
 
 # Agent notification channels.
 module "secrets_manager_channels" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.2.2"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v6.7.2"
   for_each = { for key, instance in var.secrets_manager_instances : key => instance if instance.enable_notification_channel }
 
   nrn            = each.value.nrn
   api_key        = module.secrets_manager_api_keys[each.key].api_key
+  description    = each.value.description
   tags_selectors = each.value.tags_selectors
 
   depends_on = [module.secrets_manager_spec]
