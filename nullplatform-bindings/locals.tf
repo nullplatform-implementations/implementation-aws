@@ -69,6 +69,7 @@ locals {
     rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
     rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
     aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
+    aws_dynamodb   = { type = "service_notification", specification_slug = local.service_specification_slug_aws_dynamodb }
     postgres_db    = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
   }
 
