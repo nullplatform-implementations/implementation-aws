@@ -162,7 +162,7 @@ locals {
   aws_dynamodb_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-dynamo-db"
-    repository_branch = "feature/dynamodb-service"
+    repository_branch = "0.1.0"
     service_path      = "dynamodb"
     service_name      = "AWS DynamoDB - Agustin Test"
     available_links   = ["connect", "trigger"]

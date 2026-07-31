@@ -169,7 +169,7 @@ module "service_requirements_s3" {
 }
 
 module "service_requirements_dynamodb" {
-  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=feature/dynamodb-service"
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=0.1.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -334,8 +334,8 @@ module "agent" {
     "https://github.com/nullplatform/services-rds.git#1.0.0",
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#feat/update-lambda-runtimes",
-    "https://github.com/nullplatform/services-dynamo-db.git#feature/dynamodb-service",
+    "https://github.com/nullplatform/scopes-lambda.git#0.2.0",
+    "https://github.com/nullplatform/services-dynamo-db.git#0.1.0",
     "https://github.com/nullplatform/scopes-networking.git#main",
     "https://github.com/nullplatform/parameters-provider.git#main"
   ]
