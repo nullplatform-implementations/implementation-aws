@@ -18,10 +18,10 @@ variable "np_api_key" {
 ################################################################################
 
 variable "scope_definitions" {
-  description = "Per-environment configuration for scope definitions, keyed by scope slug (keys must match local.scope_definitions_catalog). 'enabled' toggles registration (default true); 'version' pins the spec repo branch (default 'main'). The optional 'repository_*' fields override the catalog-derived URL/branch for a specific spec pair (service_spec, scope_template or action_templates)."
+  description = "Per-environment configuration for scope definitions, keyed by scope slug (keys must match local.scope_definitions_catalog). 'enabled' toggles registration (default true); 'version' pins the spec repo branch, falling back to the branch in local.scope_definitions_catalog when unset. The optional 'repository_*' fields override the catalog-derived URL/branch for a specific spec pair (service_spec, scope_template or action_templates)."
   type = map(object({
     enabled                             = optional(bool, true)
-    version                             = optional(string, "main")
+    version                             = optional(string)
     repository_service_spec             = optional(string)
     repository_service_spec_version     = optional(string)
     repository_scope_template           = optional(string)
@@ -33,7 +33,7 @@ variable "scope_definitions" {
     containers      = { enabled = true }
     scheduled_tasks = { enabled = true }
     static_files    = { enabled = true }
-    aws_lambda      = { enabled = true, version = "main" }
+    aws_lambda      = { enabled = true }
   }
 }
 
