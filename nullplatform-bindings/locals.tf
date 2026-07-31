@@ -24,6 +24,7 @@ locals {
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
+  service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
 
   vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
@@ -48,6 +49,7 @@ locals {
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
   secret_manager_assume_role_arn  = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  dynamodb_assume_role_arn        = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
   rds_server_assume_role_arn      = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
   rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 
@@ -67,6 +69,7 @@ locals {
     rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
     rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
     aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
+    aws_dynamodb   = { type = "service_notification", specification_slug = local.service_specification_slug_aws_dynamodb }
     postgres_db    = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
   }
 
@@ -79,6 +82,7 @@ locals {
   ##############################################################################
   scope_channel_associations_catalog = {
     containers = {
+      description                            = "Containers scope agent channel"
       scope_specification_id                 = local.scope_specification_id
       scope_specification_slug               = local.scope_specification_slug
       service_path                           = "k8s"
@@ -87,6 +91,7 @@ locals {
       repository_notification_channel_branch = "main"
     }
     scheduled_task = {
+      description                            = "Scheduled task scope agent channel"
       scope_specification_id                 = local.scope_specification_id_scheduled_task
       scope_specification_slug               = local.scope_specification_slug_scheduled_task
       service_path                           = "scheduled_task"
@@ -95,6 +100,7 @@ locals {
       repository_notification_channel_branch = "main"
     }
     static_scope = {
+      description                            = "Static scope agent channel"
       scope_specification_id                 = local.scope_specification_id_static_scope
       scope_specification_slug               = local.scope_specification_slug_static_scope
       service_path                           = "static-files"
@@ -103,6 +109,7 @@ locals {
       repository_notification_channel_branch = "1.0.0"
     }
     aws_lambda = {
+      description                            = "AWS Lambda scope agent channel"
       scope_specification_id                 = local.scope_specification_id_lambda
       scope_specification_slug               = local.scope_specification_slug_lambda
       service_path                           = "lambda"
@@ -124,21 +131,31 @@ locals {
   ##############################################################################
   service_channel_associations_catalog = {
     rds_server = {
+      description                  = "RDS server service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_server
       repository_service_spec_repo = "nullplatform/services-rds"
       service_path                 = "rds-postgres-server"
     }
     rds_db = {
+      description                  = "RDS DB service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_db
       repository_service_spec_repo = "nullplatform/services-rds"
       service_path                 = "rds-postgres-db"
     }
     aws_s3_bucket = {
+      description                  = "AWS S3 bucket service agent channel"
       service_specification_slug   = local.service_specification_slug_aws_s3_bucket
       repository_service_spec_repo = "nullplatform/services-s-3"
       service_path                 = "aws-s3-bucket"
     }
+    aws_dynamodb = {
+      description                  = "AWS DynamoDB service agent channel"
+      service_specification_slug   = local.service_specification_slug_aws_dynamodb
+      repository_service_spec_repo = "nullplatform/services-dynamo-db"
+      service_path                 = "dynamodb"
+    }
     postgres_db = {
+      description                  = "Postgres DB service agent channel"
       service_specification_slug   = local.service_specification_slug_postgres_db
       repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
       service_path                 = "postgres-db"

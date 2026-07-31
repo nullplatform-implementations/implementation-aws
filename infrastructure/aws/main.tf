@@ -2,7 +2,7 @@
 # VPC
 ###############################################################################
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/vpc?ref=v6.7.2"
 
   organization = var.organization
   account      = var.account
@@ -18,7 +18,7 @@ module "vpc" {
 # aws_vpc_vpc_id / aws_subnets_private_ids references below.
 ###############################################################################
 module "eks" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v6.7.2"
 
   name                         = local.cluster_name
   aws_vpc_vpc_id               = module.vpc.vpc_id
@@ -39,7 +39,7 @@ module "eks" {
 # Route53 DNS
 ###############################################################################
 module "dns" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/dns?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/dns?ref=v6.7.2"
 
   depends_on = [module.vpc]
 
@@ -51,7 +51,7 @@ module "dns" {
 # ALB Controller
 ###############################################################################
 module "alb_controller" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/aws_load_balancer_controller?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/aws_load_balancer_controller?ref=v6.7.2"
 
   depends_on = [module.eks]
 
@@ -64,7 +64,7 @@ module "alb_controller" {
 # Istio
 ###############################################################################
 module "istio" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=v6.7.2"
 
   service_type    = "LoadBalancer"
   istiod_replicas = 2
@@ -76,14 +76,14 @@ module "istio" {
 # Prometheus
 ###############################################################################
 module "prometheus" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/prometheus?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/prometheus?ref=v6.7.2"
 }
 
 ###############################################################################
 # IAM Roles
 ###############################################################################
 module "external_dns_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/external_dns?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/external_dns?ref=v6.7.2"
 
   hosted_zone_public_id               = module.dns.public_zone_id
   hosted_zone_private_id              = module.dns.private_zone_id
@@ -92,7 +92,7 @@ module "external_dns_iam" {
 }
 
 module "cert_manager_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/cert_manager?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/cert_manager?ref=v6.7.2"
 
   hosted_zone_public_id               = module.dns.public_zone_id
   hosted_zone_private_id              = module.dns.private_zone_id
@@ -101,14 +101,14 @@ module "cert_manager_iam" {
 }
 
 module "alb_controller_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/aws_load_balancer_controller_iam?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/aws_load_balancer_controller_iam?ref=v6.7.2"
 
   cluster_name                        = module.eks.eks_cluster_name
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
 }
 
 module "agent_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v6.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v6.7.2"
 
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
   agent_namespace                     = var.agent_namespace
@@ -119,6 +119,7 @@ module "agent_iam" {
     module.scope_requirements_k8s.permissions_role_arn,
     module.scope_requirements_static_files.permissions_role_arn,
     module.service_requirements_s3.permissions_role_arn,
+    module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,
     module.service_requirements_rds_db.permissions_role_arn,
     module.parameter_store_requirements.iam_role_arn,
@@ -167,6 +168,13 @@ module "service_requirements_s3" {
   agent_role_arn = local.agent_role_arn
 }
 
+module "service_requirements_dynamodb" {
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=feature/dynamodb-service"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
 module "service_requirements_rds_server" {
   source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-server/specs/requirements/aws?ref=1.0.0"
 
@@ -183,20 +191,20 @@ module "service_requirements_rds_db" {
 
 
 module "ci_build_workflow_user" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ci-build-workflow-user?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ci-build-workflow-user?ref=v6.7.2"
 
   cluster_name = module.eks.eks_cluster_name
 }
 
 module "ecr_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ecr?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ecr?ref=v6.7.2"
 
   cluster_name              = module.eks.eks_cluster_name
   build_workflow_group_name = module.ci_build_workflow_user.group_name
 }
 
 module "s3_iam" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v6.1.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v6.7.2"
 
   cluster_name              = module.eks.eks_cluster_name
   build_workflow_group_name = module.ci_build_workflow_user.group_name
@@ -207,7 +215,7 @@ module "s3_iam" {
 # External DNS
 ###############################################################################
 module "external_dns_public" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v6.7.2"
 
   depends_on = [module.alb_controller]
 
@@ -223,7 +231,7 @@ module "external_dns_public" {
 }
 
 module "external_dns_private" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/external_dns?ref=v6.7.2"
 
   depends_on = [module.alb_controller, module.external_dns_public]
 
@@ -243,7 +251,7 @@ module "external_dns_private" {
 # Cert Manager
 ###############################################################################
 module "cert_manager" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/cert_manager?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/cert_manager?ref=v6.7.2"
 
   depends_on = [module.alb_controller]
 
@@ -259,7 +267,7 @@ module "cert_manager" {
 # Security
 ###############################################################################
 module "security" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/security?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/security?ref=v6.7.2"
 
   depends_on = [module.eks]
 
@@ -275,7 +283,7 @@ module "security" {
 # Nullplatform Agent API Key
 ###############################################################################
 module "agent_api_key" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.7.2"
 
   nrn  = var.nrn
   type = "agent"
@@ -285,7 +293,7 @@ module "agent_api_key" {
 # Nullplatform Base
 ###############################################################################
 module "base" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/base?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/base?ref=v6.7.2"
 
   np_api_key                            = module.agent_api_key.api_key
   k8s_provider                          = var.k8s_provider
@@ -304,7 +312,7 @@ module "base" {
 # Nullplatform Agent
 ###############################################################################
 module "agent" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v5.3.1"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v6.7.2"
 
   depends_on = [module.base]
 
@@ -326,7 +334,8 @@ module "agent" {
     "https://github.com/nullplatform/services-rds.git#1.0.0",
     "https://github.com/nullplatform/services-s-3.git#1.0.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#1.0.1",
+    "https://github.com/nullplatform/scopes-lambda.git#feat/update-lambda-runtimes",
+    "https://github.com/nullplatform/services-dynamo-db.git#feature/dynamodb-service",
     "https://github.com/nullplatform/scopes-networking.git#main",
     "https://github.com/nullplatform/parameters-provider.git#main"
   ]
