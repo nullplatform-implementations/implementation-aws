@@ -80,7 +80,7 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "1.0.1"
+    version                    = "0.2.0"
     create_scope_configuration = true
     action_spec_names = [
       "adjust-provisioned-concurrency",
@@ -162,7 +162,7 @@ locals {
   aws_dynamodb_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-dynamo-db"
-    repository_branch = "feature/dynamodb-service"
+    repository_branch = "0.1.0"
     service_path      = "dynamodb"
     service_name      = "AWS DynamoDB - Agustin Test"
     available_links   = ["connect", "trigger"]
