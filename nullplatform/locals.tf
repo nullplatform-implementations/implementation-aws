@@ -13,25 +13,9 @@ locals {
     service_path               = "k8s"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "main"
+    version                    = "feat/scope-definition-available-actions"
     create_scope_configuration = false
-    action_spec_names = [
-      "create-scope",
-      "delete-scope",
-      "start-initial",
-      "start-blue-green",
-      "finalize-blue-green",
-      "rollback-deployment",
-      "delete-deployment",
-      "switch-traffic",
-      "set-desired-instance-count",
-      "pause-autoscaling",
-      "resume-autoscaling",
-      "restart-pods",
-      "kill-instances",
-      "diagnose-deployment",
-      "diagnose-scope"
-    ]
+
   }
 
 
@@ -41,18 +25,9 @@ locals {
     service_path               = "scheduled_task"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "main"
+    version                    = "feat/scope-definition-available-actions"
     create_scope_configuration = false
-    action_spec_names = [
-      "create-scope",
-      "delete-scope",
-      "start-initial",
-      "start-blue-green",
-      "finalize-blue-green",
-      "rollback-deployment",
-      "delete-deployment",
-      "trigger",
-    ]
+
   }
 
   static_files_definition = {
@@ -61,17 +36,9 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "1.0.0"
+    version                    = "feat/declare-available-actions"
     create_scope_configuration = true
-    action_spec_names = [
-      "create-scope",
-      "delete-scope",
-      "start-initial",
-      "start-blue-green",
-      "finalize-blue-green",
-      "rollback-deployment",
-      "delete-deployment",
-    ]
+
   }
 
   aws_lambda_definition = {
@@ -80,24 +47,9 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "0.2.0"
+    version                    = "feat/declare-available-actions"
     create_scope_configuration = true
-    action_spec_names = [
-      "adjust-provisioned-concurrency",
-      "adjust-reserved-concurrency",
-      "create-scope",
-      "delete-deployment",
-      "delete-scope",
-      "diagnose-deployment",
-      "diagnose-scope",
-      "finalize-blue-green",
-      "invoke",
-      "rollback-deployment",
-      "start-blue-green",
-      "start-initial",
-      "switch-traffic",
-      "update-scope",
-    ]
+
   }
 
   scope_definitions_catalog = {

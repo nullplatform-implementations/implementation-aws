@@ -6,7 +6,7 @@
 # version per environment from terraform.tfvars (var.scope_definitions).
 # =============================================================================
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v6.7.2"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=feat/scope-definition-available-actions-from-spec"
   for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
@@ -15,7 +15,6 @@ module "scope_definitions" {
   service_spec_name          = each.value.service_spec_name
   service_spec_description   = each.value.service_spec_description
   service_path               = each.value.service_path
-  action_spec_names          = each.value.action_spec_names
   create_scope_configuration = each.value.create_scope_configuration
 
   repository_service_spec            = coalesce(each.value.repository_service_spec, each.value.repository_url)
