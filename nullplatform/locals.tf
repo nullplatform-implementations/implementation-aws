@@ -80,7 +80,7 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "0.2.0"
+    version                    = "0.3.0"
     create_scope_configuration = true
     action_spec_names = [
       "adjust-provisioned-concurrency",
