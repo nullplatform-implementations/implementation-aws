@@ -189,3 +189,69 @@ module "base" {
 
   metrics_server_enabled = true
 }
+
+###############################################################################
+# Cognito - solo para satisfacer AUTH_TYPE=aws-cognito del Endpoint Exposer.
+# Pool vacio: con aws-cognito el servicio no llama a la API de AWS, Istio valida
+# el JWT contra el JWKS del pool directamente.
+###############################################################################
+resource "aws_cognito_user_pool" "demo" {
+  name = "${var.name_prefix}-exposer"
+}
+
+###############################################################################
+# IAM del agente + requirements del scope k8s
+###############################################################################
+module "agent_iam" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v6.7.2"
+
+  aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
+  agent_namespace                     = "nullplatform"
+  cluster_name                        = module.eks.eks_cluster_name
+
+  assume_role_arns = [module.scope_requirements_k8s.permissions_role_arn]
+}
+
+module "scope_requirements_k8s" {
+  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=beta"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+###############################################################################
+# Agente de nullplatform, con las envs del Endpoint Exposer
+###############################################################################
+module "agent" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v6.7.2"
+
+  depends_on = [module.base]
+
+  api_key          = module.agent_api_key.api_key
+  cluster_name     = module.eks.eks_cluster_name
+  nrn              = var.nrn
+  tags_selectors   = var.tags_selectors
+  cloud_provider   = "aws"
+  dns_type         = "external_dns"
+  aws_iam_role_arn = module.agent_iam.nullplatform_agent_role_arn
+
+  # Mismo default que declara infrastructure/aws/variables.tf del layer compartido.
+  image_tag = "aws-0.7.0"
+
+  agent_repos_scope = "https://github.com/nullplatform/scopes.git#beta"
+  # NO se puede pinear a un tag ("v0.2.3"): el git manager del agente (supervisor/gitmanager) usa
+  # plumbing.NewBranchReferenceName en clone/pull/reset, siempre resuelve "refs/heads/<ref>" y nunca
+  # tags. services-endpoint-exposer usa release-please y no tiene branch de release, solo tags.
+  # Verificado 2026-08-21: main y v0.2.3 apuntan al mismo commit (1afc8e3), asi que no hay drift.
+  agent_repos_extra = [
+    "https://github.com/nullplatform/services-endpoint-exposer.git#main"
+  ]
+
+  extra_envs = {
+    INGRESS_TYPE = "istio"
+    AUTH_TYPE    = "aws-cognito"
+    # El sufijo sale de service.dimensions.environment con
+    # tr '[:lower:]' '[:upper:]' | tr '-' '_', asi que "development" -> "DEVELOPMENT".
+    COGNITO_USER_POOL_ARN_DEVELOPMENT = aws_cognito_user_pool.demo.arn
+  }
+}
