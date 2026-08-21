@@ -7,3 +7,4 @@
 *.tfstate.backup
 np-api-skill.key
 np-api-skill.token
+tfplan
