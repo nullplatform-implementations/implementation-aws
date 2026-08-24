@@ -13,7 +13,8 @@ locals {
     service_path               = "k8s"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "feat/scope-definition-available-actions"
+    version                    = "v1.15.1"
+    repository_ref_type        = "tags"
     create_scope_configuration = false
   }
 
@@ -24,7 +25,8 @@ locals {
     service_path               = "scheduled_task"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "feat/scope-definition-available-actions"
+    version                    = "v1.15.1"
+    repository_ref_type        = "tags"
     create_scope_configuration = false
   }
 
@@ -34,7 +36,8 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "1.0.1"
+    version                    = "v0.4.0"
+    repository_ref_type        = "tags"
     create_scope_configuration = true
   }
 
@@ -44,7 +47,8 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "0.4.0"
+    version                    = "v0.4.0"
+    repository_ref_type        = "tags"
     create_scope_configuration = true
   }
 
@@ -61,7 +65,7 @@ locals {
   scope_definitions_enabled = {
     for k, v in local.scope_definitions_catalog : k => merge(v, {
       version        = coalesce(try(var.scope_definitions[k].version, null), v.version)
-      repository_url = "https://raw.githubusercontent.com/${v.repository_org}/${v.repository_name}/refs/heads"
+      repository_url = "https://raw.githubusercontent.com/${v.repository_org}/${v.repository_name}/refs/${v.repository_ref_type}"
 
       repository_service_spec             = try(var.scope_definitions[k].repository_service_spec, null)
       repository_service_spec_version     = try(var.scope_definitions[k].repository_service_spec_version, null)
@@ -78,53 +82,58 @@ locals {
   ##############################################################################
 
   rds_postgres_server_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-rds"
-    repository_branch = "1.0.0"
-    service_path      = "rds-postgres-server"
-    service_name      = "RDS Postgres Server - Agustin Test"
-    available_links   = ["connect"]
-    available_actions = []
+    repository_org      = "nullplatform"
+    repository_name     = "services-rds"
+    repository_branch   = "v0.1.0"
+    repository_ref_type = "tags"
+    service_path        = "rds-postgres-server"
+    service_name        = "RDS Postgres Server - Agustin Test"
+    available_links     = ["connect"]
+    available_actions   = []
   }
 
   rds_postgres_db_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-rds"
-    repository_branch = "1.0.0"
-    service_path      = "rds-postgres-db"
-    service_name      = "RDS Postgres Database - Agustin Test"
-    available_links   = ["connect"]
-    available_actions = []
+    repository_org      = "nullplatform"
+    repository_name     = "services-rds"
+    repository_branch   = "v0.1.0"
+    repository_ref_type = "tags"
+    service_path        = "rds-postgres-db"
+    service_name        = "RDS Postgres Database - Agustin Test"
+    available_links     = ["connect"]
+    available_actions   = []
   }
 
   aws_s3_bucket_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-s-3"
-    repository_branch = "1.0.0"
-    service_path      = "aws-s3-bucket"
-    service_name      = "AWS S3 Bucket - Agent K8s"
-    available_links   = ["connect"]
-    available_actions = []
+    repository_org      = "nullplatform"
+    repository_name     = "services-s-3"
+    repository_branch   = "v0.2.0"
+    repository_ref_type = "tags"
+    service_path        = "aws-s3-bucket"
+    service_name        = "AWS S3 Bucket - Agent K8s"
+    available_links     = ["connect"]
+    available_actions   = []
   }
 
   aws_dynamodb_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-dynamo-db"
-    repository_branch = "0.1.0"
-    service_path      = "dynamodb"
-    service_name      = "AWS DynamoDB - Agustin Test"
-    available_links   = ["connect", "trigger"]
-    available_actions = []
+    repository_org      = "nullplatform"
+    repository_name     = "services-dynamo-db"
+    repository_branch   = "v0.2.0"
+    repository_ref_type = "tags"
+    service_path        = "dynamodb"
+    service_name        = "AWS DynamoDB - Agustin Test"
+    available_links     = ["connect", "trigger"]
+    available_actions   = []
   }
 
   postgres_db_k8s_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-postgresql-k-8-s"
-    repository_branch = "main"
-    service_path      = "postgres/k8s"
-    service_name      = "Postgres DB K8s - Agustin Test"
-    available_links   = ["database-user"]
-    available_actions = ["run-ddl-query", "run-dml-query"]
+    repository_org      = "nullplatform"
+    repository_name     = "services-postgresql-k-8-s"
+    repository_branch   = "main"
+    repository_ref_type = "heads"
+    service_path        = "postgres/k8s"
+    service_name        = "Postgres DB K8s - Agustin Test"
+    available_links     = ["database-user"]
+    available_actions   = ["run-ddl-query", "run-dml-query"]
   }
 
   service_definitions_catalog = {

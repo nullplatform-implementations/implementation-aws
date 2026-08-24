@@ -31,17 +31,18 @@ module "scope_definitions" {
 # One module instance per enabled entry in local.service_definitions_enabled.
 # =============================================================================
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v6.7.2"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v6.11.1"
   for_each = local.service_definitions_enabled
 
-  nrn               = var.nrn
-  repository_org    = each.value.repository_org
-  repository_name   = each.value.repository_name
-  repository_branch = each.value.repository_branch
-  service_path      = each.value.service_path
-  service_name      = each.value.service_name
-  available_links   = each.value.available_links
-  available_actions = each.value.available_actions
+  nrn                 = var.nrn
+  repository_org      = each.value.repository_org
+  repository_name     = each.value.repository_name
+  repository_branch   = each.value.repository_branch
+  repository_ref_type = each.value.repository_ref_type
+  service_path        = each.value.service_path
+  service_name        = each.value.service_name
+  available_links     = each.value.available_links
+  available_actions   = each.value.available_actions
 }
 
 # =============================================================================

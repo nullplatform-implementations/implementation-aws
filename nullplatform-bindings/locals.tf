@@ -87,8 +87,8 @@ locals {
       scope_specification_slug               = local.scope_specification_slug
       service_path                           = "k8s"
       repo_path                              = "/root/.np/nullplatform/scopes"
-      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/heads"
-      repository_notification_channel_branch = "main"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
+      repository_notification_channel_branch = "v1.15.1"
     }
     scheduled_task = {
       description                            = "Scheduled task scope agent channel"
@@ -96,8 +96,8 @@ locals {
       scope_specification_slug               = local.scope_specification_slug_scheduled_task
       service_path                           = "scheduled_task"
       repo_path                              = "/root/.np/nullplatform/scopes"
-      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/heads"
-      repository_notification_channel_branch = "main"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
+      repository_notification_channel_branch = "v1.15.1"
     }
     static_scope = {
       description                            = "Static scope agent channel"
@@ -105,8 +105,8 @@ locals {
       scope_specification_slug               = local.scope_specification_slug_static_scope
       service_path                           = "static-files"
       repo_path                              = "/root/.np/nullplatform/scopes-static-files"
-      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/heads"
-      repository_notification_channel_branch = "1.0.0"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/tags"
+      repository_notification_channel_branch = "v0.4.0"
     }
     aws_lambda = {
       description                            = "AWS Lambda scope agent channel"
@@ -114,8 +114,8 @@ locals {
       scope_specification_slug               = local.scope_specification_slug_lambda
       service_path                           = "lambda"
       repo_path                              = "/root/.np/nullplatform/scopes-lambda"
-      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/heads"
-      repository_notification_channel_branch = "1.0.1"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
+      repository_notification_channel_branch = "v0.4.0"
       # Networking overrides: the agent composes the base Lambda scope workflows
       # (scopes-lambda) with scopes-networking's setup_networking step (ALB /
       # API Gateway / Route53) during create/delete-scope. Without this the

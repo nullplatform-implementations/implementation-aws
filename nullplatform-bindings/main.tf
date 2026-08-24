@@ -88,7 +88,6 @@ module "notification_api_keys" {
   type               = each.value.type
   nrn                = var.nrn
   specification_slug = each.value.specification_slug
-  internal           = each.value.internal
 }
 
 # =============================================================================

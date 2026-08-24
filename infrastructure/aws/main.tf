@@ -128,7 +128,7 @@ module "agent_iam" {
 }
 
 module "scope_requirements_k8s" {
-  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=feat/scope-definition-available-actions"
+  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=v1.15.1"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -143,7 +143,7 @@ data "aws_acm_certificate" "wildcard" {
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=0.4.0"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=v0.4.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -155,35 +155,35 @@ module "scope_requirements_lambda" {
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=1.0.1"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v0.4.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_s3" {
-  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=1.0.0"
+  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.2.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_dynamodb" {
-  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=0.1.0"
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.2.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_rds_server" {
-  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-server/specs/requirements/aws?ref=1.0.0"
+  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.1.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_rds_db" {
-  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-db/specs/requirements/aws?ref=1.0.0"
+  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.1.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -328,16 +328,16 @@ module "agent" {
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#feat/scope-definition-available-actions"
+  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#v1.15.1"
   agent_repos_extra = [
-    "https://github.com/nullplatform/scopes-static-files.git#1.0.1",
-    "https://github.com/nullplatform/services-rds.git#1.0.0",
-    "https://github.com/nullplatform/services-s-3.git#1.0.0",
+    "https://github.com/nullplatform/scopes-static-files.git#v0.4.0",
+    "https://github.com/nullplatform/services-rds.git#v0.1.0",
+    "https://github.com/nullplatform/services-s-3.git#v0.2.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#0.4.0",
-    "https://github.com/nullplatform/services-dynamo-db.git#0.1.0",
-    "https://github.com/nullplatform/scopes-networking.git#main",
-    "https://github.com/nullplatform/parameters-provider.git#main"
+    "https://github.com/nullplatform/scopes-lambda.git#v0.4.0",
+    "https://github.com/nullplatform/services-dynamo-db.git#v0.2.0",
+    "https://github.com/nullplatform/scopes-networking.git#v0.1.0",
+    "https://github.com/nullplatform/parameters-provider.git#v0.3.0"
   ]
 }
 
