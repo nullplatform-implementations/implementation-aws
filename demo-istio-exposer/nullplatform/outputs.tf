@@ -18,3 +18,6 @@ output "service_definitions" {
     }
   }
 }
+
+output "application_id" { value = nullplatform_application.demo.id }
+output "application_nrn" { value = nullplatform_application.demo.nrn }

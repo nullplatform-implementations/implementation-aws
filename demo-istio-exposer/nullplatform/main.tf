@@ -67,3 +67,9 @@ module "service_definition_endpoint_exposer" {
   available_links   = ["connect"]
   available_actions = []
 }
+
+resource "nullplatform_application" "demo" {
+  name           = "Uala Demo API"
+  namespace_id   = nullplatform_namespace.demo.id
+  repository_url = "https://github.com/nullplatform-implementations/aws-service-uala-demo-api"
+}
