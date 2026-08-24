@@ -1,0 +1,1 @@
+tags_selectors = { owner = "uala-demo" } # identico al de infrastructure/terraform.tfvars
