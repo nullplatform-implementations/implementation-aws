@@ -72,4 +72,29 @@ resource "nullplatform_application" "demo" {
   name           = "Uala Demo API"
   namespace_id   = nullplatform_namespace.demo.id
   repository_url = "https://github.com/nullplatform-implementations/aws-service-uala-demo-api"
+
+  # Explicitos para que no haya drift entre state y API: sin esto tofu detecta un cambio en cada
+  # plan (removing settings/tags "{}"") y el PATCH resultante devuelve 404 -- reproducido dos veces.
+  settings = jsonencode({})
+  tags     = jsonencode({})
+}
+
+# La app trae auto-provisionada una api key "ci-uala-demo-..." con rol organization:machine:ci,
+# scopeada a su propia NRN -- pero nullplatform nunca re-expone el valor en texto plano despues
+# de crearla (solo masked_api_key). Se crea una propia con el mismo rol/scope para poder leer el
+# valor real y ponerlo en el secret de GitHub.
+#
+# custom_grants, NO custom_role_slugs + nrn: el modulo trunca var.nrn a "organization:account" via
+# local.nrn_without_namespace para el camino de custom_role_slugs (pensado para grants de cuenta
+# como agent/scope_notification/service_notification), asi que un nrn de aplicacion se pierde en
+# silencio. custom_grants es el unico camino que respeta la NRN completa que se le pasa.
+module "ci_api_key" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.7.2"
+
+  type        = "custom"
+  custom_name = "ci-uala-demo-api-manual"
+  custom_grants = [{
+    nrn       = nullplatform_application.demo.nrn
+    role_slug = "organization:machine:ci"
+  }]
 }

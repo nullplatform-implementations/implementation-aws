@@ -21,3 +21,8 @@ output "service_definitions" {
 
 output "application_id" { value = nullplatform_application.demo.id }
 output "application_nrn" { value = nullplatform_application.demo.nrn }
+
+output "ci_api_key" {
+  value     = module.ci_api_key.api_key
+  sensitive = true
+}
