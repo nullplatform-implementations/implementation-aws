@@ -13,10 +13,11 @@ locals {
   # compartida (domain_name = aws-services.nullapps.io, que apunta al OTRO cluster).
   namespace_nrn = "${var.nrn}:namespace=${local.namespace_id}"
 
-  domain_name     = data.terraform_remote_state.infrastructure.outputs.domain_name
-  public_zone_id  = data.terraform_remote_state.infrastructure.outputs.public_zone_id
-  private_zone_id = data.terraform_remote_state.infrastructure.outputs.private_zone_id
-  cluster_name    = data.terraform_remote_state.infrastructure.outputs.cluster_name
+  domain_name         = data.terraform_remote_state.infrastructure.outputs.domain_name
+  public_zone_id      = data.terraform_remote_state.infrastructure.outputs.public_zone_id
+  private_zone_id     = data.terraform_remote_state.infrastructure.outputs.private_zone_id
+  cluster_name        = data.terraform_remote_state.infrastructure.outputs.cluster_name
+  k8s_assume_role_arn = data.terraform_remote_state.infrastructure.outputs.k8s_assume_role_arn
 
   ecr_application_role_arn             = data.terraform_remote_state.infrastructure.outputs.ecr_application_role_arn
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure.outputs.ecr_build_workflow_access_key_id

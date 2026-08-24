@@ -206,8 +206,14 @@ module "agent_iam" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/agent?ref=v6.7.2"
 
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
-  agent_namespace                     = "nullplatform"
   cluster_name                        = module.eks.eks_cluster_name
+
+  # "nullplatform-tools", NO "nullplatform": es el namespace donde el chart despliega el agente
+  # (default de var.namespace del modulo nullplatform/agent). Este valor entra en el `sub` de la
+  # trust policy IRSA (system:serviceaccount:<ns>:nullplatform-agent); con el namespace equivocado
+  # el token nunca matchea y todo assume-role falla con AccessDenied en
+  # sts:AssumeRoleWithWebIdentity -- reproducido 2026-08-24, rompia la creacion de cualquier scope.
+  agent_namespace = "nullplatform-tools"
 
   assume_role_arns = [module.scope_requirements_k8s.permissions_role_arn]
 }
@@ -281,4 +287,41 @@ module "ecr_iam" {
 
   cluster_name              = module.eks.eks_cluster_name
   build_workflow_group_name = module.ci_build_workflow_user.group_name
+}
+
+###############################################################################
+# AuthorizationPolicy permisiva sobre el gateway publico -- SOLO PARA LA DEMO.
+#
+# El Endpoint Exposer se llama "HTTP Route Access Control" y la authz es su razon de ser:
+# build_allow_policies genera una AuthorizationPolicy ALLOW por cada ruta, y el template le
+# mete un `when` con el claim request.auth.claims[cognito:groups] apenas `groups` tiene algo
+# -- que es siempre, porque el schema del spec obliga minItems=1. No hay modo "publico".
+#
+# En Istio las policies ALLOW se UNEN: un request pasa si matchea al menos una. Esta policy
+# permisiva (sin `when`, todos los paths) hace que las restrictivas del Exposer queden como
+# no-op y los endpoints sean publicos, sin Cognito ni login.
+#
+# Para un entorno real esto NO va: ahi se configura el user pool de verdad y se deja que las
+# policies del Exposer hagan su trabajo.
+###############################################################################
+resource "kubernetes_manifest" "demo_allow_all" {
+  depends_on = [module.base]
+
+  manifest = {
+    apiVersion = "security.istio.io/v1"
+    kind       = "AuthorizationPolicy"
+    metadata = {
+      name      = "demo-allow-all-public"
+      namespace = "gateways"
+    }
+    spec = {
+      selector = {
+        matchLabels = {
+          "gateway.networking.k8s.io/gateway-name" = "gateway-public"
+        }
+      }
+      action = "ALLOW"
+      rules  = [{}]
+    }
+  }
 }

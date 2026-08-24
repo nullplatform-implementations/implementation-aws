@@ -106,3 +106,28 @@ module "eks_provider" {
   nrn          = local.namespace_nrn
   cluster_name = local.cluster_name
 }
+
+###############################################################################
+# IAM provider config -- que rol asume el agente para operar los scopes de ESTE namespace.
+#
+# Sin esto el workflow create-scope intenta asumir el rol del cluster COMPARTIDO
+# (nullplatform_aws-services-cluster_k8s_role, heredado del aws-iam-configuration de la
+# cuenta) y falla con AccessDenied en sts:AssumeRoleWithWebIdentity -- reproducido 2026-08-24
+# al crear los scopes items/users. El selector "containers" es el que usa el scope k8s.
+###############################################################################
+module "identity_access_control" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v6.7.2"
+
+  nrn = local.namespace_nrn
+
+  attributes = {
+    iam_role_arns = {
+      arns = [
+        {
+          selector = "containers"
+          arn      = local.k8s_assume_role_arn
+        }
+      ]
+    }
+  }
+}
