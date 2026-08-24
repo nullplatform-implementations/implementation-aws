@@ -92,3 +92,17 @@ module "cloud_provider" {
   hosted_public_zone_id  = local.public_zone_id
   hosted_private_zone_id = local.private_zone_id
 }
+
+###############################################################################
+# EKS provider config -- que cluster usan los scopes de ESTE namespace.
+#
+# Sin esto un scope k8s del namespace de la demo hereda el "eks-configuration" de la cuenta
+# compartida (clusterId=aws-services-cluster) -- verificado 2026-08-24 al crear el scope de
+# prueba: su runtime_configuration resuelto apuntaba al cluster VIEJO, no al de la demo.
+###############################################################################
+module "eks_provider" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/container_orchestration/eks?ref=v6.7.2"
+
+  nrn          = local.namespace_nrn
+  cluster_name = local.cluster_name
+}

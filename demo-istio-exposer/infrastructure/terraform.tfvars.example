@@ -3,6 +3,9 @@ aws_region            = "us-east-1"
 name_prefix           = "uala-demo"
 parent_public_zone_id = "Z0000000000000000000" # zone id de aws-services.nullapps.io
 
+# Explicito para no heredar el tags_selectors de common.tfvars (compartido con otros layers).
+tags_selectors = { owner = "uala-demo" }
+
 vpc = {
   cidr_block      = "10.40.0.0/16"
   azs             = ["us-east-1a", "us-east-1b"]

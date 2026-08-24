@@ -16,6 +16,7 @@ locals {
   domain_name     = data.terraform_remote_state.infrastructure.outputs.domain_name
   public_zone_id  = data.terraform_remote_state.infrastructure.outputs.public_zone_id
   private_zone_id = data.terraform_remote_state.infrastructure.outputs.private_zone_id
+  cluster_name    = data.terraform_remote_state.infrastructure.outputs.cluster_name
 
   ecr_application_role_arn             = data.terraform_remote_state.infrastructure.outputs.ecr_application_role_arn
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure.outputs.ecr_build_workflow_access_key_id

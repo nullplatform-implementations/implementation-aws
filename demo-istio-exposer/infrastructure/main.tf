@@ -238,6 +238,14 @@ module "agent" {
   # Mismo default que declara infrastructure/aws/variables.tf del layer compartido.
   image_tag = "aws-0.7.0"
 
+  # INGRESS_TYPE=istio por si solo NO alcanza: el workflow initial.yaml del scope k8s lee
+  # INGRESS_TEMPLATE de la env var INITIAL_INGRESS_PATH (default "" en el modulo agent), y sin
+  # esto cae al template ALB clasico -- reproducido 2026-08-24 (creo un objeto "ingress.networking.k8s.io"
+  # en vez de una HTTPRoute). Mismos valores que usa el layer compartido (que si corre sobre Istio).
+  service_template        = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/service.yaml.tpl"
+  initial_ingress_path    = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
+  blue_green_ingress_path = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
+
   agent_repos_scope = "https://github.com/nullplatform/scopes.git#beta"
   # NO se puede pinear a un tag ("v0.2.3"): el git manager del agente (supervisor/gitmanager) usa
   # plumbing.NewBranchReferenceName en clone/pull/reset, siempre resuelve "refs/heads/<ref>" y nunca

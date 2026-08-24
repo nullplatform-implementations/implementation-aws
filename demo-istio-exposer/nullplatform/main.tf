@@ -55,6 +55,13 @@ module "scope_definition_containers" {
 # http-route-access-control) -- service_name lo renombra para que en la UI diga algo reconocible.
 # Branch "main": no se puede pinear al tag v0.2.3 (el git manager del agente solo resuelve
 # refs/heads/*, ver comentario en infrastructure/aws/main.tf). main == v0.2.3 al mismo commit.
+#
+# service_name = "HTTP Route Access Control" (el nombre canonico del repo, NO un nombre mas
+# lindo): container-scope-override/values.yaml hardcodea
+# SERVICE_SPECIFICATION_SLUG=http-route-access-control, y el slug se auto-deriva del name. Con
+# "Endpoint Exposer" el slug queda "endpoint-exposer" y sync_exposer nunca encuentra el spec
+# -- reproducido 2026-08-24: "Could not find service specification with slug
+# 'http-route-access-control'", delete-deployment reintentando en loop.
 module "service_definition_endpoint_exposer" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v6.7.2"
 
@@ -63,7 +70,7 @@ module "service_definition_endpoint_exposer" {
   repository_name   = "services-endpoint-exposer"
   repository_branch = "main"
   service_path      = ""
-  service_name      = "Endpoint Exposer"
+  service_name      = "HTTP Route Access Control"
   available_links   = ["connect"]
   available_actions = []
 }
