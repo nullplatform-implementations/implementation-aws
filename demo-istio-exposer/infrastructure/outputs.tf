@@ -10,3 +10,12 @@ output "private_gateway_sg_id" { value = module.security.private_gateway_securit
 
 output "k8s_assume_role_arn" { value = module.scope_requirements_k8s.permissions_role_arn }
 output "cognito_user_pool_arn" { value = aws_cognito_user_pool.demo.arn }
+
+output "ecr_application_role_arn" { value = module.ecr_iam.application_role_arn }
+output "ecr_build_workflow_access_key_id" {
+  value = module.ci_build_workflow_user.build_workflow_access_key_id
+}
+output "ecr_build_workflow_access_key_secret" {
+  value     = module.ci_build_workflow_user.build_workflow_access_key_secret
+  sensitive = true
+}

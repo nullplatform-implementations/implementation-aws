@@ -255,3 +255,22 @@ module "agent" {
     COGNITO_USER_POOL_ARN_DEVELOPMENT = aws_cognito_user_pool.demo.arn
   }
 }
+
+###############################################################################
+# ECR + usuario de CI para la app de demo
+#
+# El binding de ECR del cluster compartido no sirve: su rol de pull confia en el
+# OIDC provider de ese cluster especifico. La demo necesita el suyo.
+###############################################################################
+module "ci_build_workflow_user" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ci-build-workflow-user?ref=v6.7.2"
+
+  cluster_name = module.eks.eks_cluster_name
+}
+
+module "ecr_iam" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/ecr?ref=v6.7.2"
+
+  cluster_name              = module.eks.eks_cluster_name
+  build_workflow_group_name = module.ci_build_workflow_user.group_name
+}
