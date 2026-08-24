@@ -20,9 +20,11 @@ module "eks" {
   aws_subnets_private_ids      = module.vpc.private_subnets
   endpoint_public_access_cidrs = var.endpoint_public_access_cidrs
 
-  # 2 nodos alcanzan: istiod sin HA, un agente, y los pods de la app de demo.
-  node_group_min_size     = 2
-  node_group_desired_size = 2
+  # 3 nodos: con 2 no entraba el blue/green -- levanta un pod nuevo conviviendo con el viejo, y
+  # el scope users quedo sin schedulear ("Insufficient memory / Too many pods") hasta liberar
+  # capacidad. El tercero da el margen para el switch de trafico.
+  node_group_min_size     = 3
+  node_group_desired_size = 3
 }
 
 ###############################################################################
