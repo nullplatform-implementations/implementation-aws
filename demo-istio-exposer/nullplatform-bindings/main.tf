@@ -61,3 +61,34 @@ module "service_channel_exposer" {
   repository_service_spec_repo = "nullplatform/services-endpoint-exposer"
   service_path                 = ""
 }
+
+###############################################################################
+# Asset Repository (ECR) -- necesario para que np asset push funcione
+###############################################################################
+# nrn acotada al namespace: la cuenta ya tiene un asset_repository (ECR) registrado por el layer
+# compartido a nivel account, y este provider_config es unico por NRN+type -- usar var.nrn (account)
+# choca 400 "The provider already exists". Namespace-scoped coexiste y gana por especificidad.
+module "asset_repository" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v6.7.2"
+
+  nrn                              = local.namespace_nrn
+  application_role_arn             = local.ecr_application_role_arn
+  build_workflow_access_key_id     = local.ecr_build_workflow_access_key_id
+  build_workflow_access_key_secret = local.ecr_build_workflow_access_key_secret
+}
+
+###############################################################################
+# Cloud provider (AWS) -- domain_name + hosted zones para ESTE namespace.
+#
+# nrn acotada al namespace (no a la account): sin esto el scope hereda el
+# aws-configuration de la cuenta compartida, cuyo domain_name (aws-services.nullapps.io)
+# apunta al cluster viejo, no al de la demo.
+###############################################################################
+module "cloud_provider" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v6.7.2"
+
+  nrn                    = local.namespace_nrn
+  domain_name            = local.domain_name
+  hosted_public_zone_id  = local.public_zone_id
+  hosted_private_zone_id = local.private_zone_id
+}
