@@ -105,3 +105,21 @@ module "ci_api_key" {
     role_slug = "organization:machine:ci"
   }]
 }
+
+###############################################################################
+# La INSTANCIA del servicio Endpoint Exposer (la que crea la HTTPRoute +
+# AuthorizationPolicy + RequestAuthentication sobre el scope de la demo) NO se crea aca.
+#
+# El recurso nullplatform_service del provider define `attributes` como Map(String) a nivel de
+# Go schema (resource_service.go: Elem: &schema.Schema{Type: schema.TypeString}), y lo manda
+# tal cual -- como STRING -- al campo `attributes` del body JSON (service.go:
+# Attributes map[string]interface{}, json.Marshal directo, sin reinterpretar valores). El schema
+# de este spec exige que `routes` sea un array real de objetos; con jsonencode(...) el provider
+# manda "routes" como *string* JSON-encodeado, y la API devuelve 400
+# "body/attributes/routes/0 must be object" -- reproducido 2026-08-24. No hay forma de expresar
+# un atributo array/objeto anidado con este resource tal como esta hoy.
+#
+# Mismo patron que el scope (Task 10): la instancia se crea por API/CLI (np service create),
+# no por Terraform. Lo que si queda 100% en Terraform es todo el setup (este archivo): el spec,
+# el canal con el override, la dimension, Cognito, el dominio/DNS y el provider config de EKS.
+###############################################################################
