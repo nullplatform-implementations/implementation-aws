@@ -53,6 +53,15 @@ variable "tags_selectors" {
   default     = { owner = "uala-demo" }
 }
 
+variable "demo_public_routes" {
+  description = "Rutas que el gateway sirve sin autenticacion. Acota la AuthorizationPolicy de la demo a estos (hosts, metodos, paths); todo lo que no matchee queda en 403."
+  type = list(object({
+    hosts   = list(string)
+    methods = list(string)
+    paths   = list(string)
+  }))
+}
+
 variable "endpoint_public_access_cidrs" {
   description = "CIDRs permitidos contra el endpoint publico del API server de EKS."
   type        = list(string)

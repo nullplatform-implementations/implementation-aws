@@ -247,9 +247,11 @@ module "ecr_iam" {
   build_workflow_group_name = module.ci_build_workflow_user.group_name
 }
 
-# Policy permisiva SOLO PARA LA DEMO. El Exposer genera una ALLOW por ruta con un `when` sobre el
-# claim de Cognito y no tiene modo publico (`groups` es minItems=1). En Istio las ALLOW se unen,
-# asi que esta sin `when` vuelve no-op a las restrictivas. En un entorno real no va.
+# Policy sin `when` SOLO PARA LA DEMO: el Exposer exige el claim de Cognito y no tiene modo
+# publico (`groups` es minItems=1). En Istio las ALLOW se unen, asi que esta abre los paths
+# declarados en var.demo_public_routes sin token. Lo que no matchee ninguna ALLOW queda en 403,
+# incluida la ruta catch-all `PathPrefix /` que cada scope publica en su propio hostname.
+# En un entorno real no va: se configura el user pool y las policies del Exposer hacen su trabajo.
 resource "kubernetes_manifest" "demo_allow_all" {
   depends_on = [module.base]
 
@@ -267,7 +269,15 @@ resource "kubernetes_manifest" "demo_allow_all" {
         }
       }
       action = "ALLOW"
-      rules  = [{}]
+      rules = [for r in var.demo_public_routes : {
+        to = [{
+          operation = {
+            hosts   = r.hosts
+            methods = r.methods
+            paths   = r.paths
+          }
+        }]
+      }]
     }
   }
 }
