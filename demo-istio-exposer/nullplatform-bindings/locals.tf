@@ -8,9 +8,8 @@ locals {
 
   namespace_id = data.terraform_remote_state.nullplatform.outputs.namespace_id
 
-  # NRN acotada al namespace de la demo: el provider_config de dominio/DNS se resuelve por
-  # especificidad de NRN, y sin esto el scope heredaria el "aws-configuration" de la cuenta
-  # compartida (domain_name = aws-services.nullapps.io, que apunta al OTRO cluster).
+  # Los provider_config se resuelven por especificidad de NRN: acotar al namespace evita heredar
+  # el de la cuenta.
   namespace_nrn = "${var.nrn}:namespace=${local.namespace_id}"
 
   domain_name         = data.terraform_remote_state.infrastructure.outputs.domain_name

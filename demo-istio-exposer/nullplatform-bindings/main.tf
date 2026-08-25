@@ -1,6 +1,3 @@
-###############################################################################
-# Notification API Keys
-###############################################################################
 module "api_key_scope_containers" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.7.2"
 
@@ -17,15 +14,10 @@ module "api_key_service_exposer" {
   specification_slug = local.service_specification_slug_exposer
 }
 
-###############################################################################
-# Canal del scope Containers, CON el override del Endpoint Exposer
-#
-# Los tres inputs de override inyectan el step sync_exposer en los workflows de deploy
-# (initial, blue_green, switch_traffic, finalize, rollback, delete): sin eso el HTTPRoute del
-# Exposer sigue apuntando al Service del deployment viejo despues de un blue/green.
-# UNA sola association por scope spec -- dos canales con los mismos filters corren el
-# entrypoint dos veces (ver README de services-endpoint-exposer).
-###############################################################################
+# Canal del scope, con el override del Exposer: los tres inputs de override inyectan el step
+# sync_exposer en los workflows de deploy, sin el cual el HTTPRoute queda apuntando al Service
+# viejo despues de un blue/green. UNA sola association por spec: dos canales con los mismos
+# filters corren el entrypoint dos veces.
 module "scope_channel_containers" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v6.7.2"
 
@@ -38,8 +30,7 @@ module "scope_channel_containers" {
   service_path             = "k8s"
   repo_path                = "/root/.np/nullplatform/scopes"
 
-  # Mismo branch "beta" que agent_repos_scope y el registro del spec (Task 5 y 6): agente,
-  # templates de registro y template del canal, todo consistente.
+  # Mismo branch que el agente y el registro del spec.
   repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/heads"
   repository_notification_channel_branch = "beta"
 
@@ -48,9 +39,6 @@ module "scope_channel_containers" {
   overrides_service_path = "/container-scope-override"
 }
 
-###############################################################################
-# Canal del servicio Endpoint Exposer
-###############################################################################
 module "service_channel_exposer" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v6.7.2"
 
@@ -62,12 +50,7 @@ module "service_channel_exposer" {
   service_path                 = ""
 }
 
-###############################################################################
-# Asset Repository (ECR) -- necesario para que np asset push funcione
-###############################################################################
-# nrn acotada al namespace: la cuenta ya tiene un asset_repository (ECR) registrado por el layer
-# compartido a nivel account, y este provider_config es unico por NRN+type -- usar var.nrn (account)
-# choca 400 "The provider already exists". Namespace-scoped coexiste y gana por especificidad.
+# nrn de namespace: el provider_config es unico por NRN+type y a nivel cuenta ya hay uno.
 module "asset_repository" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v6.7.2"
 
@@ -77,13 +60,8 @@ module "asset_repository" {
   build_workflow_access_key_secret = local.ecr_build_workflow_access_key_secret
 }
 
-###############################################################################
-# Cloud provider (AWS) -- domain_name + hosted zones para ESTE namespace.
-#
-# nrn acotada al namespace (no a la account): sin esto el scope hereda el
-# aws-configuration de la cuenta compartida, cuyo domain_name (aws-services.nullapps.io)
-# apunta al cluster viejo, no al de la demo.
-###############################################################################
+# Dominio y hosted zones de ESTE namespace: sin esto el scope hereda el aws-configuration de la
+# cuenta, que apunta al otro cluster.
 module "cloud_provider" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v6.7.2"
 
@@ -93,13 +71,7 @@ module "cloud_provider" {
   hosted_private_zone_id = local.private_zone_id
 }
 
-###############################################################################
-# EKS provider config -- que cluster usan los scopes de ESTE namespace.
-#
-# Sin esto un scope k8s del namespace de la demo hereda el "eks-configuration" de la cuenta
-# compartida (clusterId=aws-services-cluster) -- verificado 2026-08-24 al crear el scope de
-# prueba: su runtime_configuration resuelto apuntaba al cluster VIEJO, no al de la demo.
-###############################################################################
+# Que cluster usan los scopes de este namespace: sin esto heredan el eks-configuration de la cuenta.
 module "eks_provider" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/container_orchestration/eks?ref=v6.7.2"
 
@@ -107,14 +79,8 @@ module "eks_provider" {
   cluster_name = local.cluster_name
 }
 
-###############################################################################
-# IAM provider config -- que rol asume el agente para operar los scopes de ESTE namespace.
-#
-# Sin esto el workflow create-scope intenta asumir el rol del cluster COMPARTIDO
-# (nullplatform_aws-services-cluster_k8s_role, heredado del aws-iam-configuration de la
-# cuenta) y falla con AccessDenied en sts:AssumeRoleWithWebIdentity -- reproducido 2026-08-24
-# al crear los scopes items/users. El selector "containers" es el que usa el scope k8s.
-###############################################################################
+# Que rol asume el agente para los scopes de este namespace: sin esto intenta el del cluster
+# compartido y create-scope falla con AccessDenied. El selector "containers" es el del scope k8s.
 module "identity_access_control" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v6.7.2"
 
