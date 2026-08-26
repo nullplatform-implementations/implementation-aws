@@ -8,8 +8,7 @@ locals {
 
   namespace_id = data.terraform_remote_state.nullplatform.outputs.namespace_id
 
-  # Los provider_config se resuelven por especificidad de NRN: acotar al namespace evita heredar
-  # el de la cuenta.
+  # Los provider_config se resuelven por especificidad de NRN: acotar al namespace evita el de la cuenta.
   namespace_nrn = "${var.nrn}:namespace=${local.namespace_id}"
 
   domain_name         = data.terraform_remote_state.infrastructure.outputs.domain_name

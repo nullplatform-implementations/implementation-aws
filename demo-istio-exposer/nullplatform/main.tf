@@ -3,8 +3,8 @@ resource "nullplatform_namespace" "demo" {
   account_id = var.account_id
 }
 
-# Scope Containers dedicado: el canal le cuelga el override del Exposer sin tocar el compartido.
-# Branch "beta" porque la que referencia el catalogo compartido ya no existe en nullplatform/scopes.
+# Scope Containers dedicado: el canal le cuelga el override sin tocar el compartido. Branch "beta"
+# porque la que referencia el catalogo compartido ya no existe.
 module "scope_definition_containers" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v6.7.2"
 
@@ -41,10 +41,8 @@ module "scope_definition_containers" {
   ]
 }
 
-# service_name tiene que ser el nombre canonico del repo, no uno mas lindo: el slug se deriva del
-# name y el override hardcodea SERVICE_SPECIFICATION_SLUG=http-route-access-control. Con otro
-# nombre, sync_exposer no encuentra el spec y delete-deployment reintenta en loop.
-# Branch "main" y no el tag v0.2.3 por la limitacion del git manager (mismo commit igual).
+# service_name tiene que ser el nombre canonico: el slug se deriva de el y el override hardcodea
+# SERVICE_SPECIFICATION_SLUG=http-route-access-control. Con otro, sync_exposer no encuentra el spec.
 module "service_definition_endpoint_exposer" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v6.7.2"
 
@@ -68,10 +66,8 @@ resource "nullplatform_application" "demo" {
   tags     = jsonencode({})
 }
 
-# La api key que auto-provisiona la app nunca re-expone su valor en texto plano, asi que se crea
-# una propia con el mismo rol para poder ponerla en el secret de GitHub.
-# custom_grants y no custom_role_slugs: ese camino trunca la nrn a "organization:account" y una
-# nrn de aplicacion se pierde en silencio.
+# La api key auto-provisionada nunca re-expone su valor, asi que se crea una propia para el secret
+# de GitHub. custom_grants y no custom_role_slugs: ese camino trunca la nrn a "organization:account".
 module "ci_api_key" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v6.7.2"
 
@@ -83,7 +79,5 @@ module "ci_api_key" {
   }]
 }
 
-# La INSTANCIA del Exposer se crea por API/CLI, no aca: nullplatform_service tipa `attributes`
-# como map(string), y este spec exige que `routes` sea un array de objetos. Con jsonencode el
-# provider lo manda como string y la API devuelve 400 "routes/0 must be object".
-# El resto del setup (spec, canal con el override, Cognito, DNS, provider config) si queda en TF.
+# La instancia del Exposer se crea por API/CLI: nullplatform_service tipa `attributes` como
+# map(string) y este spec exige que `routes` sea un array de objetos (la API responde 400).

@@ -118,7 +118,7 @@ module "external_dns_private" {
 module "cert_manager" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/cert_manager?ref=v6.7.2"
 
-  # cert_manager_config necesita el namespace "gateways" que crea module.base; sin esto corren en paralelo.
+  # cert_manager_config necesita el namespace que crea module.base; sin esto corren en paralelo.
   depends_on = [module.alb_controller, module.base]
 
   cloud_provider      = "aws"
@@ -171,8 +171,7 @@ module "base" {
   metrics_server_enabled = true
 }
 
-# Solo para satisfacer AUTH_TYPE=aws-cognito del Exposer. Pool vacio: Istio valida el JWT contra
-# el JWKS del pool, el servicio nunca llama a la API de AWS.
+# Solo para satisfacer AUTH_TYPE=aws-cognito del Exposer. Pool vacio: Istio valida contra el JWKS.
 resource "aws_cognito_user_pool" "demo" {
   name = "${var.name_prefix}-exposer"
 }
@@ -183,8 +182,7 @@ module "agent_iam" {
   aws_iam_openid_connect_provider_arn = module.eks.eks_oidc_provider_arn
   cluster_name                        = module.eks.eks_cluster_name
 
-  # "nullplatform-tools", NO "nullplatform": entra en el `sub` de la trust policy IRSA
-  # (system:serviceaccount:<ns>:nullplatform-agent). Con el valor equivocado todo assume-role falla.
+  # "nullplatform-tools", NO "nullplatform": va en el `sub` del IRSA; con otro valor falla todo assume-role.
   agent_namespace = "nullplatform-tools"
 
   assume_role_arns = [module.scope_requirements_k8s.permissions_role_arn]
@@ -212,15 +210,13 @@ module "agent" {
 
   image_tag = "aws-0.7.0"
 
-  # INGRESS_TYPE=istio no alcanza: initial.yaml lee INGRESS_TEMPLATE de INITIAL_INGRESS_PATH y sin
-  # estos paths crea un Ingress de ALB en vez de una HTTPRoute.
+  # INGRESS_TYPE=istio no alcanza: sin estos paths se crea un Ingress de ALB, no una HTTPRoute.
   service_template        = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/service.yaml.tpl"
   initial_ingress_path    = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
   blue_green_ingress_path = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
 
   agent_repos_scope = "https://github.com/nullplatform/scopes.git#beta"
-  # No se puede pinear a un tag: el git manager del agente solo resuelve refs/heads/*.
-  # main y v0.2.3 apuntan al mismo commit.
+  # No se puede pinear a un tag: el git manager solo resuelve refs/heads/*. main == v0.2.3.
   agent_repos_extra = [
     "https://github.com/nullplatform/services-endpoint-exposer.git#main"
   ]
@@ -247,11 +243,8 @@ module "ecr_iam" {
   build_workflow_group_name = module.ci_build_workflow_user.group_name
 }
 
-# Policy sin `when` SOLO PARA LA DEMO: el Exposer exige el claim de Cognito y no tiene modo
-# publico (`groups` es minItems=1). En Istio las ALLOW se unen, asi que esta abre los paths
-# declarados en var.demo_public_routes sin token. Lo que no matchee ninguna ALLOW queda en 403,
-# incluida la ruta catch-all `PathPrefix /` que cada scope publica en su propio hostname.
-# En un entorno real no va: se configura el user pool y las policies del Exposer hacen su trabajo.
+# ALLOW sin `when` SOLO PARA LA DEMO: abre var.demo_public_routes sin token. Las ALLOW de Istio se
+# unen y lo no matcheado da 403, lo que ademas cierra el catch-all del scope. No va en un entorno real.
 resource "kubernetes_manifest" "demo_allow_all" {
   depends_on = [module.base]
 

@@ -14,10 +14,8 @@ module "api_key_service_exposer" {
   specification_slug = local.service_specification_slug_exposer
 }
 
-# Canal del scope, con el override del Exposer: los tres inputs de override inyectan el step
-# sync_exposer en los workflows de deploy, sin el cual el HTTPRoute queda apuntando al Service
-# viejo despues de un blue/green. UNA sola association por spec: dos canales con los mismos
-# filters corren el entrypoint dos veces.
+# Los inputs de override inyectan sync_exposer en los workflows de deploy; sin eso el HTTPRoute
+# queda en el Service viejo tras un blue/green. UNA association por spec: dos corren el entrypoint dos veces.
 module "scope_channel_containers" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v6.7.2"
 
@@ -60,8 +58,7 @@ module "asset_repository" {
   build_workflow_access_key_secret = local.ecr_build_workflow_access_key_secret
 }
 
-# Dominio y hosted zones de ESTE namespace: sin esto el scope hereda el aws-configuration de la
-# cuenta, que apunta al otro cluster.
+# Dominio y hosted zones de este namespace: sin esto hereda el de la cuenta, que apunta al otro cluster.
 module "cloud_provider" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v6.7.2"
 
@@ -79,8 +76,7 @@ module "eks_provider" {
   cluster_name = local.cluster_name
 }
 
-# Que rol asume el agente para los scopes de este namespace: sin esto intenta el del cluster
-# compartido y create-scope falla con AccessDenied. El selector "containers" es el del scope k8s.
+# Rol que asume el agente en este namespace: sin esto usa el del cluster compartido y falla create-scope.
 module "identity_access_control" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v6.7.2"
 
