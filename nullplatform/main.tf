@@ -31,8 +31,7 @@ module "scope_definitions" {
   repository_action_templates        = coalesce(each.value.repository_action_templates, each.value.repository_url)
   repository_action_templates_branch = coalesce(each.value.repository_action_templates_version, each.value.version)
 
-  # slug is omitted on purpose: the module defaults it to the service
-  # specification slug, so package and spec always agree.
+
   package = {
     version   = each.value.package_version
     artifacts = each.value.package_artifacts
@@ -59,12 +58,6 @@ module "service_definitions" {
   available_links     = each.value.available_links
   available_actions   = each.value.available_actions
 
-  # `default` promotes each published revision to the package's DEFAULT
-  # revision, which is the one the platform resolves when a service is created
-  # (not the latest, not the published one). With default = false every apply
-  # publishes correctly but new services keep resolving the first revision ever
-  # published, and `tofu plan` shows no diff at all. Leave it true unless you
-  # deliberately want to stage a revision for a manual cutover.
   package = {
     version   = each.value.package_version
     artifacts = each.value.package_artifacts

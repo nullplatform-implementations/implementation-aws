@@ -191,20 +191,22 @@ locals {
   aws_s3_bucket_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-s-3"
-    repository_branch   = "v0.2.0"
+    repository_branch   = "v0.3.1"
     repository_ref_type = "tags"
     service_path        = "aws-s3-bucket"
     service_name        = "AWS S3 Bucket - Agent K8s"
     available_links     = ["connect"]
     available_actions   = []
 
-    package_version = "0.0.1"
+    # Worker image published by the services-s-3 release.
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "impl"
-      type = "git_repository"
+      name = "worker-image"
+      type = "oci_image"
       meta = {
-        url       = "https://github.com/nullplatform/services-s-3.git"
-        reference = "v0.2.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/s3"
+        digest     = "sha256:891ba116475760a230cd715b789d94bf7e186d0923c203addbbad6a489759b33" # v0.3.1
       }
     }]
   }
