@@ -47,3 +47,16 @@
 #   region      = { enabled = true }
 #   cloud       = { enabled = false }                # example: turn one off
 # }
+
+# --- Packages ----------------------------------------------------------------
+# Every scope and service is also published as a versioned nullplatform package.
+# Package versions and artifact references (git tag / image digest) are part of
+# the code-owned catalog in locals.tf and are NOT overridable from tfvars: a
+# `version` override above changes which spec templates are read, but not the
+# artifact the package pins. Change both in the catalog, together, and bump
+# package_version.
+#
+# The one per-environment knob is the Containers worker image digest (default:
+# the digest of public.ecr.aws/nullplatform/scopes/containers:v1.15.1):
+#
+# worker_image_digest = "sha256:<64 hex chars>"

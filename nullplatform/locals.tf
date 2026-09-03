@@ -5,6 +5,20 @@ locals {
   # Static, code-owned description of every scope this organization can register.
   # The per-environment toggles (enabled / version / repo overrides) live in
   # var.scope_definitions and are merged in below.
+  #
+  # Each entry's version must stay in lockstep with the ?ref= of the matching
+  # requirements module in infrastructure/aws AND with the ref in that layer's
+  # agent_repos_scope / agent_repos_extra. Nothing fails at plan time if they
+  # drift; the first deploy inside the agent does.
+  #
+  # Packages: package_version is the semver of the package revision THIS
+  # configuration publishes. It is independent from the upstream scope version
+  # and must be bumped together with `version`, the worker image digest, or any
+  # change to the action set - anything that alters the bill of materials.
+  # package_artifacts are declared literally per entry because OCI and git
+  # artifacts carry different `meta` shapes. Consequence: a `version` override
+  # from tfvars does NOT update the artifact reference; versions are changed
+  # here, in the catalog.
   ##############################################################################
 
   containers_definition = {
@@ -16,8 +30,18 @@ locals {
     version                    = "v1.15.1"
     repository_ref_type        = "tags"
     create_scope_configuration = false
-  }
 
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "worker-image"
+      type = "oci_image"
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/containers"
+        digest     = var.worker_image_digest # v1.15.1
+      }
+    }]
+  }
 
   scheduled_tasks_definition = {
     service_spec_name          = "Scheduled Task"
@@ -28,6 +52,16 @@ locals {
     version                    = "v1.15.1"
     repository_ref_type        = "tags"
     create_scope_configuration = false
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "scope-source"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/scopes.git"
+        reference = "v1.15.1"
+      }
+    }]
   }
 
   static_files_definition = {
@@ -39,6 +73,16 @@ locals {
     version                    = "v0.4.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "scope-source"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/scopes-static-files.git"
+        reference = "v0.4.0"
+      }
+    }]
   }
 
   aws_lambda_definition = {
@@ -50,6 +94,16 @@ locals {
     version                    = "v0.4.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "scope-source"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/scopes-lambda.git"
+        reference = "v0.4.0"
+      }
+    }]
   }
 
   scope_definitions_catalog = {
@@ -79,6 +133,15 @@ locals {
 
   ##############################################################################
   # Service definitions catalog
+  #
+  # Same package rules as the scopes above: package_version is bumped together
+  # with repository_branch (which is also the artifact reference) or any change
+  # to the actions/links set. The `impl` artifact points at the service's own
+  # implementation repository, which is what the agent runs.
+  #
+  # repository_branch must be an immutable ref (tofu-modules >= v7.2.0 rejects
+  # main/master/head/latest): a tag with repository_ref_type = "tags", or a
+  # commit SHA with repository_ref_type = "".
   ##############################################################################
 
   rds_postgres_server_definition = {
@@ -90,6 +153,16 @@ locals {
     service_name        = "RDS Postgres Server - Agustin Test"
     available_links     = ["connect"]
     available_actions   = []
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "impl"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/services-rds.git"
+        reference = "v0.1.0"
+      }
+    }]
   }
 
   rds_postgres_db_definition = {
@@ -101,6 +174,16 @@ locals {
     service_name        = "RDS Postgres Database - Agustin Test"
     available_links     = ["connect"]
     available_actions   = []
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "impl"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/services-rds.git"
+        reference = "v0.1.0"
+      }
+    }]
   }
 
   aws_s3_bucket_definition = {
@@ -112,6 +195,16 @@ locals {
     service_name        = "AWS S3 Bucket - Agent K8s"
     available_links     = ["connect"]
     available_actions   = []
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "impl"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/services-s-3.git"
+        reference = "v0.2.0"
+      }
+    }]
   }
 
   aws_dynamodb_definition = {
@@ -123,17 +216,43 @@ locals {
     service_name        = "AWS DynamoDB - Agustin Test"
     available_links     = ["connect", "trigger"]
     available_actions   = []
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "impl"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/services-dynamo-db.git"
+        reference = "v0.2.0"
+      }
+    }]
   }
 
+  # services-postgresql-k-8-s publishes no tags, so this is pinned to a commit
+  # SHA (HEAD of main on 2026-09-03) with repository_ref_type = "" - the module
+  # then reads raw.githubusercontent.com/<org>/<repo>/<sha>/... directly.
+  # Replace with a tag as soon as upstream publishes one. Note the agent in
+  # infrastructure/aws still clones the proposal/align-with-services-s-3 branch
+  # for this repo; the two are not in lockstep today.
   postgres_db_k8s_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-k-8-s"
-    repository_branch   = "main"
-    repository_ref_type = "heads"
+    repository_branch   = "1118803b7afd44fa4eb00fd23179a5bd07bd4e6c"
+    repository_ref_type = ""
     service_path        = "postgres/k8s"
     service_name        = "Postgres DB K8s - Agustin Test"
     available_links     = ["database-user"]
     available_actions   = ["run-ddl-query", "run-dml-query"]
+
+    package_version = "0.0.1"
+    package_artifacts = [{
+      name = "impl"
+      type = "git_repository"
+      meta = {
+        url       = "https://github.com/nullplatform/services-postgresql-k-8-s.git"
+        reference = "1118803b7afd44fa4eb00fd23179a5bd07bd4e6c"
+      }
+    }]
   }
 
   service_definitions_catalog = {
@@ -145,7 +264,8 @@ locals {
   }
 
   # version (when provided) overrides the catalog branch; otherwise the catalog
-  # branch is kept so service-specific branches (e.g. postgres proposal) survive.
+  # branch is kept. The package artifact reference is NOT touched by the
+  # override (see the catalog header).
   service_definitions_enabled = {
     for k, v in local.service_definitions_catalog : k => merge(v, {
       repository_branch = coalesce(try(var.service_definitions[k].version, null), v.repository_branch)

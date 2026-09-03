@@ -4,9 +4,16 @@
 # One module instance per enabled entry in local.scope_definitions_enabled.
 # Add/remove a scope by editing the catalog in locals.tf; toggle or pin a
 # version per environment from terraform.tfvars (var.scope_definitions).
+#
+# Every scope is also published as a versioned PACKAGE: one revision whose bill
+# of materials pins the service specification, every action specification and
+# the artifacts declared in the catalog (worker image by digest, or the scope
+# repository at a tag). Bump package_version in the catalog whenever any of
+# those change; re-applying the same version with the same components is a
+# no-op.
 # =============================================================================
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v6.8.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v7.2.1"
   for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
@@ -23,6 +30,14 @@ module "scope_definitions" {
   repository_scope_template_branch   = coalesce(each.value.repository_scope_template_version, each.value.version)
   repository_action_templates        = coalesce(each.value.repository_action_templates, each.value.repository_url)
   repository_action_templates_branch = coalesce(each.value.repository_action_templates_version, each.value.version)
+
+  # slug is omitted on purpose: the module defaults it to the service
+  # specification slug, so package and spec always agree.
+  package = {
+    version   = each.value.package_version
+    artifacts = each.value.package_artifacts
+    default   = true
+  }
 }
 
 # =============================================================================
@@ -31,7 +46,7 @@ module "scope_definitions" {
 # One module instance per enabled entry in local.service_definitions_enabled.
 # =============================================================================
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v6.11.1"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v7.2.1"
   for_each = local.service_definitions_enabled
 
   nrn                 = var.nrn
@@ -43,6 +58,18 @@ module "service_definitions" {
   service_name        = each.value.service_name
   available_links     = each.value.available_links
   available_actions   = each.value.available_actions
+
+  # `default` promotes each published revision to the package's DEFAULT
+  # revision, which is the one the platform resolves when a service is created
+  # (not the latest, not the published one). With default = false every apply
+  # publishes correctly but new services keep resolving the first revision ever
+  # published, and `tofu plan` shows no diff at all. Leave it true unless you
+  # deliberately want to stage a revision for a manual cutover.
+  package = {
+    version   = each.value.package_version
+    artifacts = each.value.package_artifacts
+    default   = true
+  }
 }
 
 # =============================================================================
@@ -53,7 +80,7 @@ module "service_definitions" {
 # environment from terraform.tfvars (var.dimensions).
 # =============================================================================
 module "dimensions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v6.7.2"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v7.2.1"
   for_each = local.dimensions_enabled
 
   nrn    = var.nrn
@@ -64,7 +91,7 @@ module "dimensions" {
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v6.7.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v7.2.1"
 
   dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"

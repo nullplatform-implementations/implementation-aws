@@ -13,6 +13,16 @@ variable "np_api_key" {
   sensitive   = true
 }
 
+# Declared but NOT read by this layer. common.tfvars is shared by every layer,
+# so a variable it sets that this layer does not declare produces a "Value for
+# undeclared variable" warning on every plan. Declaring it keeps the shared file
+# applying cleanly.
+variable "organization_slug" {
+  description = "Nullplatform organization slug. Not read by this layer - declared only so the shared common.tfvars applies without warnings. Used by infrastructure/aws for resource naming."
+  type        = string
+  default     = null
+}
+
 ################################################################################
 # Scope definitions
 ################################################################################
@@ -75,4 +85,28 @@ variable "dimensions" {
 variable "tags_selectors" {
   description = "Map of tags used to select and filter channels and agents"
   type        = map(string)
+}
+
+################################################################################
+# Packages
+################################################################################
+
+variable "worker_image_digest" {
+  description = <<-EOT
+    Digest of the Containers worker image published at
+    public.ecr.aws/nullplatform/scopes/containers, registered as the `worker-image`
+    artifact of the containers scope package.
+
+    A digest rather than a tag on purpose: the artifact is what the platform pins
+    for the scope, and a tag would let an upstream re-push change behaviour with no
+    change here. Bump it deliberately, together with `version` and `package_version`
+    of local.containers_definition. The default is the digest of tag v1.15.1.
+  EOT
+  type        = string
+  default     = "sha256:f5f26ffd6f2d423224463669536ab3d2526467695edfd50222941b86486504e2"
+
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.worker_image_digest))
+    error_message = "worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
+  }
 }
