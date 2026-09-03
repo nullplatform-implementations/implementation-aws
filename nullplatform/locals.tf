@@ -175,10 +175,12 @@ locals {
     available_links     = ["connect"]
     available_actions   = []
 
+    # Reuses the artifact registered by rds_postgres_server (same repo and tag).
     package_version = "0.0.1"
     package_artifacts = [{
-      name = "impl"
-      type = "git_repository"
+      name   = "impl"
+      type   = "git_repository"
+      lookup = true
       meta = {
         url       = "https://github.com/nullplatform/services-rds.git"
         reference = "v0.1.0"
