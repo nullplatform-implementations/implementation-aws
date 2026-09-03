@@ -312,24 +312,45 @@ module "base" {
 # Nullplatform Agent
 ###############################################################################
 module "agent" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v6.7.2"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/agent?ref=v7.2.1"
 
   depends_on = [module.base]
 
-  api_key          = module.agent_api_key.api_key
-  cluster_name     = module.eks.eks_cluster_name
-  nrn              = var.nrn
-  tags_selectors   = var.tags_selectors
-  image_tag        = var.image_tag
-  cloud_provider   = var.cloud_provider
-  aws_iam_role_arn = module.agent_iam.nullplatform_agent_role_arn
-  dns_type         = var.dns_type
+  api_key                         = module.agent_api_key.api_key
+  tags_selectors                  = var.tags_selectors
+  image_tag                       = var.image_tag
+  nullplatform_agent_helm_version = var.agent_helm_version
+  agent_traffic_manager_tag       = var.traffic_manager_tag
+  cloud_provider                  = var.cloud_provider
+  aws_iam_role_arn                = module.agent_iam.nullplatform_agent_role_arn
+  dns_type                        = var.dns_type
 
   service_template        = var.service_template
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
-  agent_repos_scope       = "https://github.com/nullplatform/scopes.git#v1.15.1"
-  agent_repos_extra = [
+
+  # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
+  # enough memory for tofu. Slugs, not catalog keys.
+  worker_orchestrated_packages = ["containers", "aws-s3-bucket-agent-k8s"]
+
+  # v7.2 sets these only on worker pods. Scopes still running through the
+  # legacy exec flow inside the agent pod (containers, until its channel moves
+  # to package-exec) read them from the agent env, so keep them there too.
+  extra_envs = {
+    CLUSTER_NAME            = module.eks.eks_cluster_name
+    NAMESPACE               = "nullplatform-tools"
+    DNS_TYPE                = var.dns_type
+    DOMAIN                  = ""
+    USE_ACCOUNT_SLUG        = ""
+    IMAGE_PULL_SECRETS      = ""
+    SERVICE_TEMPLATE        = var.service_template
+    INITIAL_INGRESS_PATH    = var.initial_ingress_path
+    BLUE_GREEN_INGRESS_PATH = var.blue_green_ingress_path
+  }
+
+  # Repositories cloned for the legacy exec flow.
+  agent_repo = [
+    "https://github.com/nullplatform/scopes.git#v1.15.1",
     "https://github.com/nullplatform/scopes-static-files.git#v0.4.0",
     "https://github.com/nullplatform/services-rds.git#v0.1.0",
     "https://github.com/nullplatform/services-s-3.git#v0.2.0",

@@ -83,9 +83,21 @@ EOF
 }
 
 variable "image_tag" {
-  description = "Docker image tag for the Nullplatform agent"
+  description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator."
   type        = string
-  default     = "alpha-tags-fix-1.1.0"
+  default     = "aws-0.11.0"
+}
+
+variable "agent_helm_version" {
+  description = "nullplatform-agent Helm chart version. 2.37.0+ ships the worker orchestrator."
+  type        = string
+  default     = "2.37.0"
+}
+
+variable "traffic_manager_tag" {
+  description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE."
+  type        = string
+  default     = "1.8.0"
 }
 
 variable "tags_selectors" {
