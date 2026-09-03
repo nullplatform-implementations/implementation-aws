@@ -86,7 +86,7 @@ locals {
       scope_specification_id                 = local.scope_specification_id
       scope_specification_slug               = local.scope_specification_slug
       service_path                           = "k8s"
-      repo_path                              = "/root/.np/nullplatform/scopes"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
       repository_notification_channel_branch = "v1.15.1"
     }
@@ -95,7 +95,7 @@ locals {
       scope_specification_id                 = local.scope_specification_id_scheduled_task
       scope_specification_slug               = local.scope_specification_slug_scheduled_task
       service_path                           = "scheduled_task"
-      repo_path                              = "/root/.np/nullplatform/scopes"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
       repository_notification_channel_branch = "v1.15.1"
     }
@@ -104,7 +104,7 @@ locals {
       scope_specification_id                 = local.scope_specification_id_static_scope
       scope_specification_slug               = local.scope_specification_slug_static_scope
       service_path                           = "static-files"
-      repo_path                              = "/root/.np/nullplatform/scopes-static-files"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes-static-files"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/tags"
       repository_notification_channel_branch = "v0.4.0"
     }
@@ -113,7 +113,7 @@ locals {
       scope_specification_id                 = local.scope_specification_id_lambda
       scope_specification_slug               = local.scope_specification_slug_lambda
       service_path                           = "lambda"
-      repo_path                              = "/root/.np/nullplatform/scopes-lambda"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
       repository_notification_channel_branch = "v0.4.0"
       # Networking overrides: the agent composes the base Lambda scope workflows
@@ -121,7 +121,7 @@ locals {
       # API Gateway / Route53) during create/delete-scope. Without this the
       # scope never wires the ALB (target group + listener rule).
       enabled_override       = true
-      override_repo_path     = "/root/.np/nullplatform/scopes-networking/"
+      override_repo_path     = "/home/agent/.np/nullplatform/scopes-networking/"
       overrides_service_path = "lambda"
     }
   }
@@ -147,6 +147,9 @@ locals {
       service_specification_slug   = local.service_specification_slug_aws_s3_bucket
       repository_service_spec_repo = "nullplatform/services-s-3"
       service_path                 = "aws-s3-bucket"
+      # Runs from the package worker image (services-s-3 v0.3.1), not the clone.
+      worker_orchestrator = true
+      package_slug        = local.service_specification_slug_aws_s3_bucket
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"
