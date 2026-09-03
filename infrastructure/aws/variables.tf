@@ -83,9 +83,9 @@ EOF
 }
 
 variable "image_tag" {
-  description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator."
+  description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator; the -nonroot variant runs as uid 1001 and clones repositories under /home/agent/.np."
   type        = string
-  default     = "aws-0.11.0"
+  default     = "aws-0.11.0-nonroot"
 }
 
 variable "agent_helm_version" {
@@ -113,19 +113,19 @@ variable "dns_type" {
 variable "service_template" {
   description = "Path to the service template for Istio"
   type        = string
-  default     = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/service.yaml.tpl"
+  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/service.yaml.tpl"
 }
 
 variable "initial_ingress_path" {
   description = "Path to the initial ingress template for Istio"
   type        = string
-  default     = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
+  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
 }
 
 variable "blue_green_ingress_path" {
   description = "Path to the blue-green ingress template for Istio"
   type        = string
-  default     = "/root/.np/nullplatform/scopes/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
+  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
 }
 
 ################################################################################
