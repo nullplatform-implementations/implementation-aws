@@ -298,8 +298,23 @@ module "agent_api_key" {
 ###############################################################################
 # Nullplatform Base
 ###############################################################################
+
+# The base chart (2.40.0) only renders the gateways Namespace when it does not
+# exist yet (`lookup`), so the first upgrade after the install drops it from
+# the release and Helm deletes it, taking the Gateways, their pods and load
+# balancers with it (2026-09-03). Owning the namespace here keeps it out of
+# the release for good.
+resource "kubernetes_namespace" "gateways" {
+  metadata {
+    name   = "gateways"
+    labels = { name = "gateways" }
+  }
+}
+
 module "base" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/base?ref=v7.2.1"
+
+  depends_on = [kubernetes_namespace.gateways]
 
   np_api_key                            = module.agent_api_key.api_key
   k8s_provider                          = var.k8s_provider
@@ -318,6 +333,10 @@ module "base" {
   nullplatform_base_helm_version = "2.40.0"
   logging_controller_image_tag   = "1.6.0"
   control_plane_agent_image_tag  = "0.9.2"
+
+  # Chart 2.40.0's CRD job is a no-op once the CRDs exist; keep it off, as the
+  # release ran before v7.2.1, until the fixed chart lands (helm-charts#183).
+  install_gateway_v2_crd = false
 }
 
 ###############################################################################
@@ -348,6 +367,17 @@ module "agent" {
   worker = {
     idleTTL  = "15m"
     security = "mtls"
+
+    # The agent takes a worker's image from the package revision attached to the
+    # action. Scopes created before the containers package existed carry none,
+    # so the containers worker is pinned here to the same image the package
+    # publishes. A pin is trusted and matched by package slug.
+    pins = [
+      {
+        package = "containers"
+        image   = "public.ecr.aws/nullplatform/scopes/containers@${var.containers_worker_image_digest}"
+      }
+    ]
   }
 
   # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
