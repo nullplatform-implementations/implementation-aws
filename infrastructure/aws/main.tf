@@ -359,19 +359,17 @@ module "agent" {
     "rds-postgres-database-agustin-test",
   ]
 
-  # v7.2 sets these only on worker pods. Scopes still running through the
-  # legacy exec flow inside the agent pod (containers, until its channel moves
-  # to package-exec) read them from the agent env, so keep them there too.
+  # Reaches both the agent pod (legacy exec flow: scheduled_task, static files,
+  # lambda) and every worker. The istio template paths are NOT here: they only
+  # matter to the containers worker, which gets them from the variables above
+  # with paths inside its own image.
   extra_envs = {
-    CLUSTER_NAME            = module.eks.eks_cluster_name
-    NAMESPACE               = "nullplatform-tools"
-    DNS_TYPE                = var.dns_type
-    DOMAIN                  = ""
-    USE_ACCOUNT_SLUG        = ""
-    IMAGE_PULL_SECRETS      = ""
-    SERVICE_TEMPLATE        = var.service_template
-    INITIAL_INGRESS_PATH    = var.initial_ingress_path
-    BLUE_GREEN_INGRESS_PATH = var.blue_green_ingress_path
+    CLUSTER_NAME       = module.eks.eks_cluster_name
+    NAMESPACE          = "nullplatform-tools"
+    DNS_TYPE           = var.dns_type
+    DOMAIN             = ""
+    USE_ACCOUNT_SLUG   = ""
+    IMAGE_PULL_SECRETS = ""
   }
 
   # Repositories cloned for the legacy exec flow.

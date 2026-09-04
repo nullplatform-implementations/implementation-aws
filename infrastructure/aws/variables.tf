@@ -110,22 +110,24 @@ variable "dns_type" {
   type        = string
 }
 
+# The three istio template paths are read by the containers WORKER, whose image
+# bakes the scopes repository under /app/pkg.
 variable "service_template" {
   description = "Path to the service template for Istio"
   type        = string
-  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/service.yaml.tpl"
+  default     = "/app/pkg/k8s/deployment/templates/istio/service.yaml.tpl"
 }
 
 variable "initial_ingress_path" {
   description = "Path to the initial ingress template for Istio"
   type        = string
-  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
+  default     = "/app/pkg/k8s/deployment/templates/istio/initial-httproute.yaml.tpl"
 }
 
 variable "blue_green_ingress_path" {
   description = "Path to the blue-green ingress template for Istio"
   type        = string
-  default     = "/home/agent/.np/nullplatform/scopes/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
+  default     = "/app/pkg/k8s/deployment/templates/istio/blue-green-httproute.yaml.tpl"
 }
 
 ################################################################################

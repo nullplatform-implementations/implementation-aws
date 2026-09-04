@@ -116,6 +116,11 @@ module "scope_channel_associations" {
   enabled_override       = try(each.value.enabled_override, false)
   override_repo_path     = try(each.value.override_repo_path, "")
   overrides_service_path = try(each.value.overrides_service_path, "")
+
+  # package-exec: the agent runs the scope from its package worker image
+  # instead of the clone above. Off unless the catalog entry enables it.
+  worker_orchestrator = try(each.value.worker_orchestrator, false)
+  package_slug        = try(each.value.package_slug, "")
 }
 
 # =============================================================================

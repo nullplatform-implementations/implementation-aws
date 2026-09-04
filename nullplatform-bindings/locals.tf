@@ -89,6 +89,9 @@ locals {
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
       repository_notification_channel_branch = "v1.15.1"
+      # Runs from the package worker image (scopes/containers v1.15.1).
+      worker_orchestrator = true
+      package_slug        = local.scope_specification_slug
     }
     scheduled_task = {
       description                            = "Scheduled task scope agent channel"
