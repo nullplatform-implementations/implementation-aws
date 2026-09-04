@@ -341,6 +341,12 @@ module "agent" {
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
 
+  # Reap a package's worker pod after 15 minutes without commands; the agent
+  # recreates it on the next package-exec.
+  worker = {
+    idleTTL = "15m"
+  }
+
   # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
   # enough memory for tofu. Slugs, not catalog keys.
   worker_orchestrated_packages = [
