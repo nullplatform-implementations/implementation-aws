@@ -89,7 +89,9 @@ locals {
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
       repository_notification_channel_branch = "v1.15.1"
-      # Runs from the package worker image (scopes/containers v1.15.1).
+      # Runs from the containers worker image, pinned in infrastructure/aws
+      # (agent worker.pins) so scopes created before the package existed
+      # resolve it too.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug
     }

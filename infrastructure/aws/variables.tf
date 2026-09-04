@@ -94,6 +94,17 @@ variable "agent_helm_version" {
   default     = "2.37.0"
 }
 
+variable "containers_worker_image_digest" {
+  description = "Digest of public.ecr.aws/nullplatform/scopes/containers the agent pins as the containers worker image (NP_WORKERS). Must match worker_image_digest in nullplatform/, the digest the containers package publishes. Default: tag v1.15.1."
+  type        = string
+  default     = "sha256:f5f26ffd6f2d423224463669536ab3d2526467695edfd50222941b86486504e2"
+
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.containers_worker_image_digest))
+    error_message = "containers_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
+  }
+}
+
 variable "traffic_manager_tag" {
   description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE."
   type        = string
