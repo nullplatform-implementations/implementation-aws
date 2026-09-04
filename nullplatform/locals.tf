@@ -144,46 +144,48 @@ locals {
   # commit SHA with repository_ref_type = "".
   ##############################################################################
 
+  # Both RDS services come from services-postgresql-rds, which publishes one
+  # worker image per service on release.
   rds_postgres_server_definition = {
     repository_org      = "nullplatform"
-    repository_name     = "services-rds"
-    repository_branch   = "v0.1.0"
+    repository_name     = "services-postgresql-rds"
+    repository_branch   = "v0.2.0"
     repository_ref_type = "tags"
     service_path        = "rds-postgres-server"
     service_name        = "RDS Postgres Server - Agustin Test"
     available_links     = ["connect"]
     available_actions   = []
 
-    package_version = "0.0.1"
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "impl"
-      type = "git_repository"
+      name = "worker-image"
+      type = "oci_image"
       meta = {
-        url       = "https://github.com/nullplatform/services-rds.git"
-        reference = "v0.1.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/rds-postgres-server"
+        digest     = "sha256:55677841280a10d70d95fc28b784daff5d1e7158ff781df66ff1c3fae278e3c7" # v0.2.0
       }
     }]
   }
 
   rds_postgres_db_definition = {
     repository_org      = "nullplatform"
-    repository_name     = "services-rds"
-    repository_branch   = "v0.1.0"
+    repository_name     = "services-postgresql-rds"
+    repository_branch   = "v0.2.0"
     repository_ref_type = "tags"
     service_path        = "rds-postgres-db"
     service_name        = "RDS Postgres Database - Agustin Test"
     available_links     = ["connect"]
     available_actions   = []
 
-    # Reuses the artifact registered by rds_postgres_server (same repo and tag).
-    package_version = "0.0.1"
+    package_version = "0.0.2"
     package_artifacts = [{
-      name   = "impl"
-      type   = "git_repository"
-      lookup = true
+      name = "worker-image"
+      type = "oci_image"
       meta = {
-        url       = "https://github.com/nullplatform/services-rds.git"
-        reference = "v0.1.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/rds-postgres-db"
+        digest     = "sha256:ee22c80583794e7781361e7767f13c5cb196894ec77b164f43eef614bb8187c2" # v0.2.0
       }
     }]
   }

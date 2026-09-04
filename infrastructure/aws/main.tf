@@ -179,14 +179,14 @@ module "service_requirements_dynamodb" {
 }
 
 module "service_requirements_rds_server" {
-  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.1.0"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.2.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
 }
 
 module "service_requirements_rds_db" {
-  source = "git::https://github.com/nullplatform/services-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.1.0"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.2.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -343,7 +343,12 @@ module "agent" {
 
   # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
   # enough memory for tofu. Slugs, not catalog keys.
-  worker_orchestrated_packages = ["containers", "aws-s3-bucket-agent-k8s"]
+  worker_orchestrated_packages = [
+    "containers",
+    "aws-s3-bucket-agent-k8s",
+    "rds-postgres-server-agustin-test",
+    "rds-postgres-database-agustin-test",
+  ]
 
   # v7.2 sets these only on worker pods. Scopes still running through the
   # legacy exec flow inside the agent pod (containers, until its channel moves

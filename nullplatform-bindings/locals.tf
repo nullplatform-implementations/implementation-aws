@@ -133,14 +133,18 @@ locals {
     rds_server = {
       description                  = "RDS server service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_server
-      repository_service_spec_repo = "nullplatform/services-rds"
+      repository_service_spec_repo = "nullplatform/services-postgresql-rds"
       service_path                 = "rds-postgres-server"
+      worker_orchestrator          = true
+      package_slug                 = local.service_specification_slug_rds_server
     }
     rds_db = {
       description                  = "RDS DB service agent channel"
       service_specification_slug   = local.service_specification_slug_rds_db
-      repository_service_spec_repo = "nullplatform/services-rds"
+      repository_service_spec_repo = "nullplatform/services-postgresql-rds"
       service_path                 = "rds-postgres-db"
+      worker_orchestrator          = true
+      package_slug                 = local.service_specification_slug_rds_db
     }
     aws_s3_bucket = {
       description                  = "AWS S3 bucket service agent channel"
