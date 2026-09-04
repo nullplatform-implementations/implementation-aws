@@ -341,10 +341,13 @@ module "agent" {
   initial_ingress_path    = var.initial_ingress_path
   blue_green_ingress_path = var.blue_green_ingress_path
 
-  # Reap a package's worker pod after 15 minutes without commands; the agent
-  # recreates it on the next package-exec.
+  # Reap a package's worker pod after 15 minutes without commands (the agent
+  # recreates it on the next package-exec), and require mTLS between the agent
+  # and its workers: the chart defaults to plaintext, which lets any pod that
+  # reaches a worker run commands with the agent's IAM identity.
   worker = {
-    idleTTL = "15m"
+    idleTTL  = "15m"
+    security = "mtls"
   }
 
   # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
