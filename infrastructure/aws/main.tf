@@ -410,9 +410,6 @@ module "agent" {
   # Repositories cloned for the legacy exec flow.
   agent_repo = [
     "https://github.com/nullplatform/scopes.git#v1.15.1",
-    "https://github.com/nullplatform/scopes-static-files.git#v0.5.0",
-    "https://github.com/nullplatform/services-rds.git#v0.1.0",
-    "https://github.com/nullplatform/services-s-3.git#v0.2.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
     "https://github.com/nullplatform/scopes-lambda.git#v0.4.0",
     "https://github.com/nullplatform/services-dynamo-db.git#v0.2.0",
