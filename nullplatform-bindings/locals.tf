@@ -124,13 +124,10 @@ locals {
       repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
       repository_notification_channel_branch = "v0.4.0"
-      # Networking overrides: the agent composes the base Lambda scope workflows
-      # (scopes-lambda) with scopes-networking's setup_networking step (ALB /
-      # API Gateway / Route53) during create/delete-scope. Without this the
-      # scope never wires the ALB (target group + listener rule).
-      enabled_override       = true
-      override_repo_path     = "/home/agent/.np/nullplatform/scopes-networking/"
-      overrides_service_path = "lambda"
+      # The scopes-networking overrides (ALB / Route53) reach the worker through
+      # NP_OVERRIDES_PATH, set by the agent's worker patch in infrastructure/aws.
+      worker_orchestrator = true
+      package_slug        = local.scope_specification_slug_lambda
     }
   }
 

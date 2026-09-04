@@ -380,6 +380,45 @@ module "agent" {
       {
         package = "static-scope"
         image   = "public.ecr.aws/nullplatform/scopes/static-files@${var.static_files_worker_image_digest}"
+      },
+      {
+        package = "aws-lambda-agustin"
+        image   = "public.ecr.aws/nullplatform/scopes/lambda@${var.lambda_worker_image_digest}"
+      }
+    ]
+
+    # The lambda image ships scopes-lambda alone; the ALB and Route53 steps live
+    # in scopes-networking, which the legacy channel passed as --overrides-path.
+    # worker-bridge derives that flag from NP_OVERRIDES_PATH, so an init
+    # container fetches the pinned tag into a volume shared with the worker.
+    patches = [
+      {
+        target = { package = "aws-lambda-agustin" }
+        merge = {
+          spec = {
+            volumes = [{ name = "overrides", emptyDir = {} }]
+            # Keep every string here short: the agent module re-indents the
+            # yamlencode output line by line, and a folded long string ends up
+            # with a literal newline inside it.
+            initContainers = [{
+              name         = "fetch-overrides"
+              image        = "public.ecr.aws/docker/library/alpine:3.20"
+              env          = [{ name = "SRC", value = "https://github.com/nullplatform/scopes-networking/archive/refs/tags/${var.scopes_networking_version}.tar.gz" }]
+              command      = ["sh", "-c", "wget -qO- \"$SRC\" | tar -xzC /overrides --strip-components=1"]
+              volumeMounts = [{ name = "overrides", mountPath = "/overrides" }]
+            }]
+            containers = [{
+              name         = "worker"
+              volumeMounts = [{ name = "overrides", mountPath = "/app/overrides", readOnly = true }]
+              # scopes-lambda v0.4.0 looks the role up with a provider filter
+              # the API ignores, so the fallback default carries the scope role.
+              env = [
+                { name = "NP_OVERRIDES_PATH", value = "/app/overrides/lambda" },
+                { name = "ASSUME_ROLE_ARN_DEFAULT", value = module.scope_requirements_lambda.permissions_role_arn },
+              ]
+            }]
+          }
+        }
       }
     ]
   }
@@ -392,10 +431,11 @@ module "agent" {
     "aws-s3-bucket-agent-k8s",
     "rds-postgres-server-agustin-test",
     "rds-postgres-database-agustin-test",
+    "aws-lambda-agustin",
   ]
 
-  # Reaches both the agent pod (legacy exec flow: scheduled_task, static files,
-  # lambda) and every worker. The istio template paths are NOT here: they only
+  # Reaches both the agent pod (legacy exec flow: scheduled_task) and every
+  # worker. The istio template paths are NOT here: they only
   # matter to the containers worker, which gets them from the variables above
   # with paths inside its own image.
   extra_envs = {

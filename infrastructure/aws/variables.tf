@@ -116,6 +116,23 @@ variable "static_files_worker_image_digest" {
   }
 }
 
+variable "lambda_worker_image_digest" {
+  description = "Digest of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the digest the aws_lambda package publishes in nullplatform/. Default: tag v0.4.0."
+  type        = string
+  default     = "sha256:aefed6168b7d07d83f1d765a14f164f5d80b73743ed3b35af621d368446c0bfd"
+
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.lambda_worker_image_digest))
+    error_message = "lambda_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
+  }
+}
+
+variable "scopes_networking_version" {
+  description = "Tag of nullplatform/scopes-networking fetched into the lambda worker as its overrides overlay (ALB target group / listener rule, Route53)."
+  type        = string
+  default     = "v0.1.0"
+}
+
 variable "traffic_manager_tag" {
   description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE."
   type        = string

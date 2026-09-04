@@ -97,13 +97,15 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.1"
+    # Worker image published by the scopes-lambda release.
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "scope-source"
-      type = "git_repository"
+      name = "worker-image"
+      type = "oci_image"
       meta = {
-        url       = "https://github.com/nullplatform/scopes-lambda.git"
-        reference = "v0.4.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/lambda"
+        digest     = "sha256:aefed6168b7d07d83f1d765a14f164f5d80b73743ed3b35af621d368446c0bfd" # v0.4.0
       }
     }]
   }
