@@ -158,7 +158,7 @@ module "scope_requirements_lambda" {
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v0.4.0"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v0.5.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -376,6 +376,10 @@ module "agent" {
       {
         package = "containers"
         image   = "public.ecr.aws/nullplatform/scopes/containers@${var.containers_worker_image_digest}"
+      },
+      {
+        package = "static-scope"
+        image   = "public.ecr.aws/nullplatform/scopes/static-files@${var.static_files_worker_image_digest}"
       }
     ]
   }
@@ -384,6 +388,7 @@ module "agent" {
   # enough memory for tofu. Slugs, not catalog keys.
   worker_orchestrated_packages = [
     "containers",
+    "static-scope",
     "aws-s3-bucket-agent-k8s",
     "rds-postgres-server-agustin-test",
     "rds-postgres-database-agustin-test",
@@ -405,7 +410,7 @@ module "agent" {
   # Repositories cloned for the legacy exec flow.
   agent_repo = [
     "https://github.com/nullplatform/scopes.git#v1.15.1",
-    "https://github.com/nullplatform/scopes-static-files.git#v0.4.0",
+    "https://github.com/nullplatform/scopes-static-files.git#v0.5.0",
     "https://github.com/nullplatform/services-rds.git#v0.1.0",
     "https://github.com/nullplatform/services-s-3.git#v0.2.0",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",

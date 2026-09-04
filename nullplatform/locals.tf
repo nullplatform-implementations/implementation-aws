@@ -70,17 +70,19 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "v0.4.0"
+    version                    = "v0.5.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.1"
+    # Worker image published by the scopes-static-files release.
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "scope-source"
-      type = "git_repository"
+      name = "worker-image"
+      type = "oci_image"
       meta = {
-        url       = "https://github.com/nullplatform/scopes-static-files.git"
-        reference = "v0.4.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/static-files"
+        digest     = "sha256:00cef1dba2f91f99ffc5ab1849dc4fa18d6769cc544865e072a7fea8544df85d" # v0.5.0
       }
     }]
   }

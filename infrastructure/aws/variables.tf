@@ -105,6 +105,17 @@ variable "containers_worker_image_digest" {
   }
 }
 
+variable "static_files_worker_image_digest" {
+  description = "Digest of public.ecr.aws/nullplatform/scopes/static-files the agent pins as the static-files worker image (NP_WORKERS). Must match the digest the static_files package publishes in nullplatform/. Default: tag v0.5.0."
+  type        = string
+  default     = "sha256:00cef1dba2f91f99ffc5ab1849dc4fa18d6769cc544865e072a7fea8544df85d"
+
+  validation {
+    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.static_files_worker_image_digest))
+    error_message = "static_files_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
+  }
+}
+
 variable "traffic_manager_tag" {
   description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE."
   type        = string

@@ -111,7 +111,10 @@ locals {
       service_path                           = "static-files"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-static-files"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/tags"
-      repository_notification_channel_branch = "v0.4.0"
+      repository_notification_channel_branch = "v0.5.0"
+      # Runs from the static-files worker image, pinned in infrastructure/aws.
+      worker_orchestrator = true
+      package_slug        = local.scope_specification_slug_static_scope
     }
     aws_lambda = {
       description                            = "AWS Lambda scope agent channel"
