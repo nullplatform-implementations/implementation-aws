@@ -123,7 +123,7 @@ locals {
       service_path                           = "lambda"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
-      repository_notification_channel_branch = "v0.4.0"
+      repository_notification_channel_branch = "v0.5.0"
       # The scopes-networking overrides (ALB / Route53) reach the worker through
       # NP_OVERRIDES_PATH, set by the agent's worker patch in infrastructure/aws.
       worker_orchestrator = true

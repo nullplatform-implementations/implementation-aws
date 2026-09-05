@@ -93,19 +93,19 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "v0.4.0"
+    version                    = "v0.5.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
     # Worker image published by the scopes-lambda release.
-    package_version = "0.0.2"
+    package_version = "0.0.3"
     package_artifacts = [{
       name = "worker-image"
       type = "oci_image"
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/lambda"
-        digest     = "sha256:aefed6168b7d07d83f1d765a14f164f5d80b73743ed3b35af621d368446c0bfd" # v0.4.0
+        digest     = "sha256:a53b20894da567ff242815566503f8d653d821f51cde97654e597e40aad1c212" # v0.5.0
       }
     }]
   }

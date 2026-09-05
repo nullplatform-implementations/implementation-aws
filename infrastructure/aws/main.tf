@@ -146,7 +146,7 @@ data "aws_acm_certificate" "wildcard" {
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=v0.4.0"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=v0.5.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -410,12 +410,7 @@ module "agent" {
             containers = [{
               name         = "worker"
               volumeMounts = [{ name = "overrides", mountPath = "/app/overrides", readOnly = true }]
-              # scopes-lambda v0.4.0 looks the role up with a provider filter
-              # the API ignores, so the fallback default carries the scope role.
-              env = [
-                { name = "NP_OVERRIDES_PATH", value = "/app/overrides/lambda" },
-                { name = "ASSUME_ROLE_ARN_DEFAULT", value = module.scope_requirements_lambda.permissions_role_arn },
-              ]
+              env          = [{ name = "NP_OVERRIDES_PATH", value = "/app/overrides/lambda" }]
             }]
           }
         }
@@ -451,9 +446,7 @@ module "agent" {
   agent_repo = [
     "https://github.com/nullplatform/scopes.git#v1.15.1",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
-    "https://github.com/nullplatform/scopes-lambda.git#v0.4.0",
     "https://github.com/nullplatform/services-dynamo-db.git#v0.2.0",
-    "https://github.com/nullplatform/scopes-networking.git#v0.1.0",
     "https://github.com/nullplatform/parameters-provider.git#v0.3.0"
   ]
 }

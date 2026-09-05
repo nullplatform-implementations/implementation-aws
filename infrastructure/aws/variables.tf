@@ -117,9 +117,9 @@ variable "static_files_worker_image_digest" {
 }
 
 variable "lambda_worker_image_digest" {
-  description = "Digest of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the digest the aws_lambda package publishes in nullplatform/. Default: tag v0.4.0."
+  description = "Digest of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the digest the aws_lambda package publishes in nullplatform/. Default: tag v0.5.0."
   type        = string
-  default     = "sha256:aefed6168b7d07d83f1d765a14f164f5d80b73743ed3b35af621d368446c0bfd"
+  default     = "sha256:a53b20894da567ff242815566503f8d653d821f51cde97654e597e40aad1c212"
 
   validation {
     condition     = can(regex("^sha256:[0-9a-f]{64}$", var.lambda_worker_image_digest))
