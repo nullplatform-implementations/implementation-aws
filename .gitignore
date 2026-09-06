@@ -7,3 +7,6 @@
 *.tfstate.backup
 np-api-skill.key
 np-api-skill.token
+
+# OpenTofu saved plans carry variable values and state snapshots
+*.tfplan
