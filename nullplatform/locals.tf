@@ -53,13 +53,18 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = false
 
-    package_version = "0.0.1"
+    # Same image as containers: the scheduled task is the k8s scope with the
+    # scheduled_task overlay, which the worker receives as NP_OVERRIDES_PATH.
+    # lookup reuses the artifact the containers package registers.
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "scope-source"
-      type = "git_repository"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
       meta = {
-        url       = "https://github.com/nullplatform/scopes.git"
-        reference = "v1.15.1"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/containers"
+        digest     = var.worker_image_digest # v1.15.1
       }
     }]
   }

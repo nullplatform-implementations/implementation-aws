@@ -384,6 +384,10 @@ module "agent" {
       {
         package = "aws-lambda-agustin"
         image   = "public.ecr.aws/nullplatform/scopes/lambda@${var.lambda_worker_image_digest}"
+      },
+      {
+        package = "scheduled-task"
+        image   = "public.ecr.aws/nullplatform/scopes/containers@${var.containers_worker_image_digest}"
       }
     ]
 
@@ -392,6 +396,23 @@ module "agent" {
     # worker-bridge derives that flag from NP_OVERRIDES_PATH, so an init
     # container fetches the pinned tag into a volume shared with the worker.
     patches = [
+      # The scheduled task runs the k8s scope with the scheduled_task overlay
+      # from the containers image, so it needs the same deploy/DNS env the
+      # module only gives the "containers" worker.
+      {
+        target = { package = "scheduled-task" }
+        merge = {
+          spec = {
+            containers = [{
+              name = "worker"
+              env = concat(
+                [{ name = "NP_OVERRIDES_PATH", value = "/app/pkg/scheduled_task" }],
+                [for k, v in local.worker_k8s_env : { name = k, value = v }],
+              )
+            }]
+          }
+        }
+      },
       {
         target = { package = "aws-lambda-agustin" }
         merge = {
@@ -427,24 +448,17 @@ module "agent" {
     "rds-postgres-server-agustin-test",
     "rds-postgres-database-agustin-test",
     "aws-lambda-agustin",
+    "scheduled-task",
   ]
 
-  # Reaches both the agent pod (legacy exec flow: scheduled_task) and every
-  # worker. The istio template paths are NOT here: they only
+  # Reaches both the agent pod (legacy exec flow: dynamodb, postgres k8s) and
+  # every worker. The istio template paths are NOT here: they only
   # matter to the containers worker, which gets them from the variables above
   # with paths inside its own image.
-  extra_envs = {
-    CLUSTER_NAME       = module.eks.eks_cluster_name
-    NAMESPACE          = "nullplatform-tools"
-    DNS_TYPE           = var.dns_type
-    DOMAIN             = ""
-    USE_ACCOUNT_SLUG   = ""
-    IMAGE_PULL_SECRETS = ""
-  }
+  extra_envs = local.agent_extra_envs
 
   # Repositories cloned for the legacy exec flow.
   agent_repo = [
-    "https://github.com/nullplatform/scopes.git#v1.15.1",
     "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
     "https://github.com/nullplatform/services-dynamo-db.git#v0.2.0",
     "https://github.com/nullplatform/parameters-provider.git#v0.3.0"
