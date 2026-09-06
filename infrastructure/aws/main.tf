@@ -330,7 +330,7 @@ module "base" {
   # v7.2 requires every version pinned. Chart: what is already deployed.
   # Images were running :latest (unresolvable to a tag), so they take the
   # versions VERSIONS.md documents; the logs controller DaemonSet rolls once.
-  nullplatform_base_helm_version = "2.40.0"
+  nullplatform_base_helm_version = "2.44.2"
   logging_controller_image_tag   = "1.6.0"
   control_plane_agent_image_tag  = "0.9.2"
 
