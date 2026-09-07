@@ -13,12 +13,14 @@ locals {
   #
   # Packages: package_version is the semver of the package revision THIS
   # configuration publishes. It is independent from the upstream scope version
-  # and must be bumped together with `version`, the worker image digest, or any
-  # change to the action set - anything that alters the bill of materials.
-  # package_artifacts are declared literally per entry because OCI and git
-  # artifacts carry different `meta` shapes. Consequence: a `version` override
-  # from tfvars does NOT update the artifact reference; versions are changed
-  # here, in the catalog.
+  # and must be bumped together with `version` or any change to the action set
+  # - anything that alters the bill of materials. Worker images are resolved by
+  # lookup against the artifact each upstream release registers (visible to
+  # every organization): by tag where the release registers one, by digest for
+  # the scopes repository, which registers digests only. A tag re-registered
+  # against a new image drifts to it on the next plan, by design.
+  # Consequence: a `version` override from tfvars does NOT update the artifact
+  # reference; versions are changed here, in the catalog.
   ##############################################################################
 
   containers_definition = {
@@ -38,7 +40,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/containers"
-        digest     = var.worker_image_digest # v1.15.1
+        digest     = var.worker_image_digest # v1.15.1; scopes publishes no artifact for this tag
       }
     }]
   }
@@ -55,8 +57,10 @@ locals {
 
     # Same image as containers: the scheduled task is the k8s scope with the
     # scheduled_task overlay, which the worker receives as NP_OVERRIDES_PATH.
-    # lookup reuses the artifact the containers package registers.
-    package_version = "0.0.2"
+    # lookup reuses the artifact the containers package registers. The dedicated
+    # scopes/scheduled-task image is not usable yet (wrong NP_SERVICE_PATH, no
+    # aws-cli; fix in nullplatform/scopes); 0.0.3 pointed at it and was reverted.
+    package_version = "0.0.4"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -79,16 +83,16 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    # Worker image published by the scopes-static-files release.
-    package_version = "0.0.2"
+    package_version = "0.0.3"
+    # Pinned by id to the artifact nullplatform registers on release. A lookup by
+    # tag is blocked while our old digest-only artifact exists: the provider
+    # prefers an owned artifact over the global one even when it has no
+    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/scopes/static-files"
-        digest     = "sha256:00cef1dba2f91f99ffc5ab1849dc4fa18d6769cc544865e072a7fea8544df85d" # v0.5.0
-      }
+      name                 = "worker-image"
+      type                 = "oci_image"
+      resource_id          = "209834bd-f009-4ead-bfbe-047c32264927" # scopes-static-files v0.5.0, digest sha256:00cef1…
+      resource_revision_id = "9eaab220-8b68-410c-b389-b65cb655ae1d"
     }]
   }
 
@@ -102,16 +106,16 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    # Worker image published by the scopes-lambda release.
-    package_version = "0.0.3"
+    package_version = "0.0.4"
+    # Pinned by id to the artifact nullplatform registers on release. A lookup by
+    # tag is blocked while our old digest-only artifact exists: the provider
+    # prefers an owned artifact over the global one even when it has no
+    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/scopes/lambda"
-        digest     = "sha256:a53b20894da567ff242815566503f8d653d821f51cde97654e597e40aad1c212" # v0.5.0
-      }
+      name                 = "worker-image"
+      type                 = "oci_image"
+      resource_id          = "49ec8214-dc2d-4e6e-96a7-84c38a4c3bee" # scopes-lambda v0.5.0
+      resource_revision_id = "66013688-74ad-4fe4-9fc1-b77f396d01e1"
     }]
   }
 
@@ -165,15 +169,16 @@ locals {
     available_links     = ["connect"]
     available_actions   = []
 
-    package_version = "0.0.2"
+    package_version = "0.0.3"
+    # Pinned by id to the artifact nullplatform registers on release. A lookup by
+    # tag is blocked while our old digest-only artifact exists: the provider
+    # prefers an owned artifact over the global one even when it has no
+    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/services/rds-postgres-server"
-        digest     = "sha256:55677841280a10d70d95fc28b784daff5d1e7158ff781df66ff1c3fae278e3c7" # v0.2.0
-      }
+      name                 = "worker-image"
+      type                 = "oci_image"
+      resource_id          = "005c7db5-7375-48f2-b3bc-4ffce50dc922" # services-postgresql-rds v0.2.0
+      resource_revision_id = "ab00fcf6-1dee-4ac1-a45b-5c3c330f9d51"
     }]
   }
 
@@ -187,15 +192,16 @@ locals {
     available_links     = ["connect"]
     available_actions   = []
 
-    package_version = "0.0.2"
+    package_version = "0.0.3"
+    # Pinned by id to the artifact nullplatform registers on release. A lookup by
+    # tag is blocked while our old digest-only artifact exists: the provider
+    # prefers an owned artifact over the global one even when it has no
+    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/services/rds-postgres-db"
-        digest     = "sha256:ee22c80583794e7781361e7767f13c5cb196894ec77b164f43eef614bb8187c2" # v0.2.0
-      }
+      name                 = "worker-image"
+      type                 = "oci_image"
+      resource_id          = "c31fed66-15fa-4d75-9321-6aea19eb1013" # services-postgresql-rds v0.2.0
+      resource_revision_id = "4ebccab1-b98d-42cd-a724-94c3bca063c3"
     }]
   }
 
@@ -209,16 +215,16 @@ locals {
     available_links     = ["connect"]
     available_actions   = []
 
-    # Worker image published by the services-s-3 release.
-    package_version = "0.0.2"
+    package_version = "0.0.3"
+    # Pinned by id to the artifact nullplatform registers on release. A lookup by
+    # tag is blocked while our old digest-only artifact exists: the provider
+    # prefers an owned artifact over the global one even when it has no
+    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/services/s3"
-        digest     = "sha256:891ba116475760a230cd715b789d94bf7e186d0923c203addbbad6a489759b33" # v0.3.1
-      }
+      name                 = "worker-image"
+      type                 = "oci_image"
+      resource_id          = "fa5b569c-80da-4d6c-836c-4fdb0670c67d" # services-s-3 v0.3.1
+      resource_revision_id = "71694e3a-5637-4ba6-840e-2436c2eecb02"
     }]
   }
 

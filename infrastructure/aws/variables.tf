@@ -85,52 +85,37 @@ EOF
 variable "image_tag" {
   description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator; the -nonroot variant runs as uid 1001 and clones repositories under /home/agent/.np."
   type        = string
-  default     = "aws-0.11.0-nonroot"
+  default     = "aws-0.11.1-nonroot"
 }
 
 variable "agent_helm_version" {
-  description = "nullplatform-agent Helm chart version. 2.37.0+ ships the worker orchestrator."
+  description = "nullplatform-agent Helm chart version. 2.37.0+ ships the worker orchestrator; 3.0.0 only drops githubTokenInit, which this install never used."
   type        = string
-  default     = "2.37.0"
-}
-
-variable "containers_worker_image_digest" {
-  description = "Digest of public.ecr.aws/nullplatform/scopes/containers the agent pins as the containers worker image (NP_WORKERS). Must match worker_image_digest in nullplatform/, the digest the containers package publishes. Default: tag v1.15.1."
-  type        = string
-  default     = "sha256:f5f26ffd6f2d423224463669536ab3d2526467695edfd50222941b86486504e2"
-
-  validation {
-    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.containers_worker_image_digest))
-    error_message = "containers_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
-  }
-}
-
-variable "static_files_worker_image_digest" {
-  description = "Digest of public.ecr.aws/nullplatform/scopes/static-files the agent pins as the static-files worker image (NP_WORKERS). Must match the digest the static_files package publishes in nullplatform/. Default: tag v0.5.0."
-  type        = string
-  default     = "sha256:00cef1dba2f91f99ffc5ab1849dc4fa18d6769cc544865e072a7fea8544df85d"
-
-  validation {
-    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.static_files_worker_image_digest))
-    error_message = "static_files_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
-  }
-}
-
-variable "lambda_worker_image_digest" {
-  description = "Digest of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the digest the aws_lambda package publishes in nullplatform/. Default: tag v0.5.0."
-  type        = string
-  default     = "sha256:a53b20894da567ff242815566503f8d653d821f51cde97654e597e40aad1c212"
-
-  validation {
-    condition     = can(regex("^sha256:[0-9a-f]{64}$", var.lambda_worker_image_digest))
-    error_message = "lambda_worker_image_digest must be an OCI digest formatted as sha256:<64 hex chars>."
-  }
+  default     = "3.0.0"
 }
 
 variable "scopes_networking_version" {
   description = "Tag of nullplatform/scopes-networking fetched into the lambda worker as its overrides overlay (ALB target group / listener rule, Route53)."
   type        = string
   default     = "v0.1.0"
+}
+
+variable "containers_worker_image_tag" {
+  description = "Tag of public.ecr.aws/nullplatform/scopes/containers the agent pins as the containers and scheduled task worker image (NP_WORKERS). Must be the release whose artifact the containers package resolves in nullplatform/."
+  type        = string
+  default     = "v1.15.1"
+}
+
+variable "static_files_worker_image_tag" {
+  description = "Tag of public.ecr.aws/nullplatform/scopes/static-files the agent pins as the static files worker image (NP_WORKERS). Must match the tag the static_files package resolves in nullplatform/."
+  type        = string
+  default     = "v0.5.0"
+}
+
+variable "lambda_worker_image_tag" {
+  description = "Tag of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the tag the aws_lambda package resolves in nullplatform/."
+  type        = string
+  default     = "v0.5.0"
 }
 
 variable "traffic_manager_tag" {
