@@ -353,22 +353,3 @@ module "scope_configuration_lambda" {
 }
 
 
-# =============================================================================
-# State moves: parameter_storage_configuration < v6.9.0 delegated to a nested
-# scope_configuration module ("config"); from v6.9.0 it declares the resource
-# itself. Same provider config, new address.
-# =============================================================================
-moved {
-  from = module.parameter_store_configuration["parameter-store-aws-services"].module.config.nullplatform_provider_config.scope_configuration
-  to   = module.parameter_store_configuration["parameter-store-aws-services"].nullplatform_provider_config.parameter_store_configuration
-}
-
-moved {
-  from = module.parameter_store_configuration["parameter-store-aws-services-staging"].module.config.nullplatform_provider_config.scope_configuration
-  to   = module.parameter_store_configuration["parameter-store-aws-services-staging"].nullplatform_provider_config.parameter_store_configuration
-}
-
-moved {
-  from = module.secrets_manager_configuration["secrets-manager-aws-services"].module.config.nullplatform_provider_config.scope_configuration
-  to   = module.secrets_manager_configuration["secrets-manager-aws-services"].nullplatform_provider_config.parameter_store_configuration
-}
