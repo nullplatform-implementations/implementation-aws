@@ -83,16 +83,16 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.3"
-    # Pinned by id to the artifact nullplatform registers on release. A lookup by
-    # tag is blocked while our old digest-only artifact exists: the provider
-    # prefers an owned artifact over the global one even when it has no
-    # matching revision, and artifact deletion is a no-op in the provider.
+    package_version = "0.0.4"
     package_artifacts = [{
-      name                 = "worker-image"
-      type                 = "oci_image"
-      resource_id          = "209834bd-f009-4ead-bfbe-047c32264927" # scopes-static-files v0.5.0, digest sha256:00cef1…
-      resource_revision_id = "9eaab220-8b68-410c-b389-b65cb655ae1d"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/static-files"
+        tag        = "v0.5.0"
+      }
     }]
   }
 
@@ -107,15 +107,15 @@ locals {
     create_scope_configuration = true
 
     package_version = "0.0.4"
-    # Pinned by id to the artifact nullplatform registers on release. A lookup by
-    # tag is blocked while our old digest-only artifact exists: the provider
-    # prefers an owned artifact over the global one even when it has no
-    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name                 = "worker-image"
-      type                 = "oci_image"
-      resource_id          = "49ec8214-dc2d-4e6e-96a7-84c38a4c3bee" # scopes-lambda v0.5.0
-      resource_revision_id = "66013688-74ad-4fe4-9fc1-b77f396d01e1"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/scopes/lambda"
+        tag        = "v0.5.0"
+      }
     }]
   }
 
@@ -170,15 +170,15 @@ locals {
     available_actions   = []
 
     package_version = "0.0.3"
-    # Pinned by id to the artifact nullplatform registers on release. A lookup by
-    # tag is blocked while our old digest-only artifact exists: the provider
-    # prefers an owned artifact over the global one even when it has no
-    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name                 = "worker-image"
-      type                 = "oci_image"
-      resource_id          = "005c7db5-7375-48f2-b3bc-4ffce50dc922" # services-postgresql-rds v0.2.0
-      resource_revision_id = "ab00fcf6-1dee-4ac1-a45b-5c3c330f9d51"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/rds-postgres-server"
+        tag        = "v0.2.0"
+      }
     }]
   }
 
@@ -193,15 +193,15 @@ locals {
     available_actions   = []
 
     package_version = "0.0.3"
-    # Pinned by id to the artifact nullplatform registers on release. A lookup by
-    # tag is blocked while our old digest-only artifact exists: the provider
-    # prefers an owned artifact over the global one even when it has no
-    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name                 = "worker-image"
-      type                 = "oci_image"
-      resource_id          = "c31fed66-15fa-4d75-9321-6aea19eb1013" # services-postgresql-rds v0.2.0
-      resource_revision_id = "4ebccab1-b98d-42cd-a724-94c3bca063c3"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/rds-postgres-db"
+        tag        = "v0.2.0"
+      }
     }]
   }
 
@@ -216,15 +216,15 @@ locals {
     available_actions   = []
 
     package_version = "0.0.3"
-    # Pinned by id to the artifact nullplatform registers on release. A lookup by
-    # tag is blocked while our old digest-only artifact exists: the provider
-    # prefers an owned artifact over the global one even when it has no
-    # matching revision, and artifact deletion is a no-op in the provider.
     package_artifacts = [{
-      name                 = "worker-image"
-      type                 = "oci_image"
-      resource_id          = "fa5b569c-80da-4d6c-836c-4fdb0670c67d" # services-s-3 v0.3.1
-      resource_revision_id = "71694e3a-5637-4ba6-840e-2436c2eecb02"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/s3"
+        tag        = "v0.3.1"
+      }
     }]
   }
 
