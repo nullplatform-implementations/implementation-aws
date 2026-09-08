@@ -140,8 +140,12 @@ variable "dns_type" {
   type        = string
 }
 
-# The three istio template paths are read by the containers WORKER, whose image
-# bakes the scopes repository under /app/pkg.
+# The three template paths below are what switches the k8s scope from its
+# default ALB Ingress templates to the Istio Gateway API ones. They are paths
+# inside the scopes/containers image (the repository is baked under /app/pkg),
+# so a bump of containers_worker_image_tag must be checked against the image
+# layout; nothing in plan or apply catches a moved template. Upstream proposal:
+# a worker_ingress = "istio" | "alb" input on the agent module deriving them.
 variable "service_template" {
   description = "Path to the service template for Istio"
   type        = string
