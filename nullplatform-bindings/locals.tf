@@ -88,7 +88,7 @@ locals {
       service_path                           = "k8s"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.15.1"
+      repository_notification_channel_branch = "v1.16.2"
       # Runs from the containers worker image, pinned in infrastructure/aws
       # (agent worker.pins) so scopes created before the package existed
       # resolve it too.
@@ -102,7 +102,7 @@ locals {
       service_path                           = "scheduled_task"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.15.1"
+      repository_notification_channel_branch = "v1.16.2"
       worker_orchestrator                    = true
       package_slug                           = local.scope_specification_slug_scheduled_task
     }

@@ -8,7 +8,7 @@
 ###############################################################################
 
 module "scope_requirements_k8s" {
-  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=v1.15.1"
+  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=v1.16.2"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn

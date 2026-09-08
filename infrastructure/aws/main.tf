@@ -325,7 +325,7 @@ module "agent" {
       },
       {
         package = "scheduled-task"
-        image   = "public.ecr.aws/nullplatform/scopes/containers:${var.containers_worker_image_tag}"
+        image   = "public.ecr.aws/nullplatform/scopes/scheduled-task:${var.scheduled_task_worker_image_tag}"
       }
     ]
 
@@ -334,19 +334,16 @@ module "agent" {
     # worker-bridge derives that flag from NP_OVERRIDES_PATH, so an init
     # container fetches the pinned tag into a volume shared with the worker.
     patches = [
-      # The scheduled task runs the k8s scope with the scheduled_task overlay
-      # from the containers image, so it needs the same deploy/DNS env the
-      # module only gives the "containers" worker.
+      # The scheduled task is the k8s scope with the scheduled_task overlay, so
+      # its worker needs the same deploy/DNS env the module only gives the
+      # "containers" worker.
       {
         target = { package = "scheduled-task" }
         merge = {
           spec = {
             containers = [{
               name = "worker"
-              env = concat(
-                [{ name = "NP_OVERRIDES_PATH", value = "/app/pkg/scheduled_task" }],
-                [for k, v in local.worker_k8s_env : { name = k, value = v }],
-              )
+              env  = [for k, v in local.worker_k8s_env : { name = k, value = v }]
             }]
           }
         }

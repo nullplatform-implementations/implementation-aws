@@ -101,9 +101,15 @@ variable "scopes_networking_version" {
 }
 
 variable "containers_worker_image_tag" {
-  description = "Tag of public.ecr.aws/nullplatform/scopes/containers the agent pins as the containers and scheduled task worker image (NP_WORKERS). Must be the release whose artifact the containers package resolves in nullplatform/."
+  description = "Tag of public.ecr.aws/nullplatform/scopes/containers the agent pins as the containers worker image (NP_WORKERS). Must match the tag the containers package resolves in nullplatform/."
   type        = string
-  default     = "v1.15.1"
+  default     = "v1.16.2"
+}
+
+variable "scheduled_task_worker_image_tag" {
+  description = "Tag of public.ecr.aws/nullplatform/scopes/scheduled-task the agent pins as the scheduled task worker image (NP_WORKERS). Must match the tag the scheduled_tasks package resolves in nullplatform/."
+  type        = string
+  default     = "v1.16.2"
 }
 
 variable "static_files_worker_image_tag" {

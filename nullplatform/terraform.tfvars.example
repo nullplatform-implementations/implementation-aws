@@ -59,4 +59,3 @@
 # The one per-environment knob is the Containers worker image digest (default:
 # the digest of public.ecr.aws/nullplatform/scopes/containers:v1.15.1):
 #
-# worker_image_digest = "sha256:<64 hex chars>"

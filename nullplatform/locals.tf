@@ -16,9 +16,8 @@ locals {
   # and must be bumped together with `version` or any change to the action set
   # - anything that alters the bill of materials. Worker images are resolved by
   # lookup against the artifact each upstream release registers (visible to
-  # every organization): by tag where the release registers one, by digest for
-  # the scopes repository, which registers digests only. A tag re-registered
-  # against a new image drifts to it on the next plan, by design.
+  # every organization) by release tag. A tag re-registered against a new image
+  # drifts to it on the next plan, by design.
   # Consequence: a `version` override from tfvars does NOT update the artifact
   # reference; versions are changed here, in the catalog.
   ##############################################################################
@@ -29,18 +28,19 @@ locals {
     service_path               = "k8s"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "v1.15.1"
+    version                    = "v1.16.2"
     repository_ref_type        = "tags"
     create_scope_configuration = false
 
-    package_version = "0.0.1"
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "worker-image"
-      type = "oci_image"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/containers"
-        digest     = var.worker_image_digest # v1.15.1; scopes publishes no artifact for this tag
+        tag        = "v1.16.2"
       }
     }]
   }
@@ -51,24 +51,19 @@ locals {
     service_path               = "scheduled_task"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "v1.15.1"
+    version                    = "v1.16.2"
     repository_ref_type        = "tags"
     create_scope_configuration = false
 
-    # Same image as containers: the scheduled task is the k8s scope with the
-    # scheduled_task overlay, which the worker receives as NP_OVERRIDES_PATH.
-    # lookup reuses the artifact the containers package registers. The dedicated
-    # scopes/scheduled-task image is not usable yet (wrong NP_SERVICE_PATH, no
-    # aws-cli; fix in nullplatform/scopes); 0.0.3 pointed at it and was reverted.
-    package_version = "0.0.4"
+    package_version = "0.0.5"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
       lookup = true
       meta = {
         registry   = "public.ecr.aws"
-        repository = "nullplatform/scopes/containers"
-        digest     = var.worker_image_digest # v1.15.1
+        repository = "nullplatform/scopes/scheduled-task"
+        tag        = "v1.16.2"
       }
     }]
   }
