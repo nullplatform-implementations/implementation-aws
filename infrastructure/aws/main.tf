@@ -334,16 +334,22 @@ module "agent" {
     # worker-bridge derives that flag from NP_OVERRIDES_PATH, so an init
     # container fetches the pinned tag into a volume shared with the worker.
     patches = [
-      # The scheduled task is the k8s scope with the scheduled_task overlay, so
-      # its worker needs the same deploy/DNS env the module only gives the
-      # "containers" worker.
+      # The scheduled task is the k8s scope with the scheduled_task overlay. Of
+      # the env the module gives the "containers" worker it needs two:
+      # CLUSTER_NAME (scope/iam/create_role reads it from the env) and DNS_TYPE
+      # (wait_for_alb only skips the ALB wait when it is not route53, the
+      # default). The overlay skips the rest of networking and ingress, and the
+      # namespace comes from the container-orchestration provider.
       {
         target = { package = "scheduled-task" }
         merge = {
           spec = {
             containers = [{
               name = "worker"
-              env  = [for k, v in local.worker_k8s_env : { name = k, value = v }]
+              env = [
+                { name = "CLUSTER_NAME", value = module.eks.eks_cluster_name },
+                { name = "DNS_TYPE", value = var.dns_type },
+              ]
             }]
           }
         }
