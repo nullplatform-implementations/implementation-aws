@@ -49,7 +49,7 @@ module "service_requirements_s3" {
 }
 
 module "service_requirements_dynamodb" {
-  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.2.0"
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.3.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn

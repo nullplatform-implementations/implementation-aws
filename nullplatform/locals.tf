@@ -226,20 +226,22 @@ locals {
   aws_dynamodb_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-dynamo-db"
-    repository_branch   = "v0.2.0"
+    repository_branch   = "v0.3.0"
     repository_ref_type = "tags"
     service_path        = "dynamodb"
     service_name        = "AWS DynamoDB - Agustin Test"
     available_links     = ["connect", "trigger"]
     available_actions   = []
 
-    package_version = "0.0.1"
+    package_version = "0.0.2"
     package_artifacts = [{
-      name = "impl"
-      type = "git_repository"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
       meta = {
-        url       = "https://github.com/nullplatform/services-dynamo-db.git"
-        reference = "v0.2.0"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/dynamo-db"
+        tag        = "v0.3.0"
       }
     }]
   }

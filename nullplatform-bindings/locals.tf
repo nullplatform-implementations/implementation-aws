@@ -167,6 +167,9 @@ locals {
       service_specification_slug   = local.service_specification_slug_aws_dynamodb
       repository_service_spec_repo = "nullplatform/services-dynamo-db"
       service_path                 = "dynamodb"
+      # Runs from the package worker image (services-dynamo-db v0.3.0), not the clone.
+      worker_orchestrator = true
+      package_slug        = local.service_specification_slug_aws_dynamodb
     }
     postgres_db = {
       description                  = "Postgres DB service agent channel"
