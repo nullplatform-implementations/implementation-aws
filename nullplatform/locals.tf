@@ -246,20 +246,20 @@ locals {
     }]
   }
 
-  # services-postgresql-k-8-s v1.0.1 is the first working release with the s3-aligned
+  # services-postgresql-k-8-s v1.0.2 is the first fully working release with the s3-aligned
   # layout (service under postgres-db/) and a worker image; the specs and the
   # code running in the worker come from the same tag.
   postgres_db_k8s_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-k-8-s"
-    repository_branch   = "v1.0.1"
+    repository_branch   = "v1.0.2"
     repository_ref_type = "tags"
     service_path        = "postgres-db"
     service_name        = "Postgres DB K8s - Agustin Test"
     available_links     = ["database-user"]
     available_actions   = ["run-ddl-query", "run-dml-query"]
 
-    package_version = "0.0.5"
+    package_version = "0.0.6"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -267,7 +267,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/services/postgresql-k8s"
-        tag        = "v1.0.1"
+        tag        = "v1.0.2"
       }
     }]
   }
