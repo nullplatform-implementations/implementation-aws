@@ -367,6 +367,7 @@ module "agent" {
     "aws-lambda-agustin",
     "scheduled-task",
     "aws-dynamodb-agustin-test",
+    "postgres-db-k8s-agustin-test",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
@@ -377,7 +378,6 @@ module "agent" {
 
   # Repositories cloned for the legacy exec flow.
   agent_repo = [
-    "https://github.com/nullplatform/services-postgresql-k-8-s.git#proposal/align-with-services-s-3",
     "https://github.com/nullplatform/parameters-provider.git#v0.3.0"
   ]
 }

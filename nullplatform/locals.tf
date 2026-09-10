@@ -78,7 +78,7 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.4"
+    package_version = "0.0.5"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -101,7 +101,7 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.4"
+    package_version = "0.0.5"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -246,29 +246,28 @@ locals {
     }]
   }
 
-  # services-postgresql-k-8-s publishes no tags, so this is pinned to a commit
-  # SHA (HEAD of main on 2026-09-03) with repository_ref_type = "" - the module
-  # then reads raw.githubusercontent.com/<org>/<repo>/<sha>/... directly.
-  # Replace with a tag as soon as upstream publishes one. Note the agent in
-  # infrastructure/aws still clones the proposal/align-with-services-s-3 branch
-  # for this repo; the two are not in lockstep today.
+  # services-postgresql-k-8-s v1.0.1 is the first working release with the s3-aligned
+  # layout (service under postgres-db/) and a worker image; the specs and the
+  # code running in the worker come from the same tag.
   postgres_db_k8s_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-k-8-s"
-    repository_branch   = "1118803b7afd44fa4eb00fd23179a5bd07bd4e6c"
-    repository_ref_type = ""
-    service_path        = "postgres/k8s"
+    repository_branch   = "v1.0.1"
+    repository_ref_type = "tags"
+    service_path        = "postgres-db"
     service_name        = "Postgres DB K8s - Agustin Test"
     available_links     = ["database-user"]
     available_actions   = ["run-ddl-query", "run-dml-query"]
 
-    package_version = "0.0.1"
+    package_version = "0.0.5"
     package_artifacts = [{
-      name = "impl"
-      type = "git_repository"
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
       meta = {
-        url       = "https://github.com/nullplatform/services-postgresql-k-8-s.git"
-        reference = "1118803b7afd44fa4eb00fd23179a5bd07bd4e6c"
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/postgresql-k8s"
+        tag        = "v1.0.1"
       }
     }]
   }

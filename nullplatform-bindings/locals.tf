@@ -176,6 +176,9 @@ locals {
       service_specification_slug   = local.service_specification_slug_postgres_db
       repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
       service_path                 = "postgres-db"
+      # Runs from the package worker image (services-postgresql-k-8-s v1.0.1), not the clone.
+      worker_orchestrator = true
+      package_slug        = local.service_specification_slug_postgres_db
     }
   }
 
