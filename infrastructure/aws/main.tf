@@ -9,14 +9,8 @@ module "vpc" {
   vpc          = var.vpc
 }
 
-###############################################################################
-# EKS
-# v1.54.0 adds the aws-ebs-csi-driver addon + gp3 StorageClass (default),
-# demoting the legacy gp2 in-tree class. The module now ships its own
-# kubernetes provider internally, which forbids depends_on/count/for_each on
-# the caller block — ordering vs. module.vpc is already guaranteed by the
-# aws_vpc_vpc_id / aws_subnets_private_ids references below.
-###############################################################################
+# EKS. The module carries its own kubernetes provider, so this block cannot
+# take depends_on/count/for_each; the vpc references below already order it.
 module "eks" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/eks?ref=v7.8.0"
 
@@ -35,11 +29,8 @@ module "eks" {
   ami_release_version            = "1.34.6-20260415"
   use_latest_ami_release_version = false
 
-  # Same reason for the cluster addons: unpinned they resolve to whatever is
-  # newest, so every build AWS publishes shows up as drift in an unrelated
-  # plan. Read the current values with:
-  #   aws eks describe-addon --cluster-name <cluster> --addon-name <addon> \
-  #     --query addon.addonVersion --output text
+  # Same reason for the addons: unpinned they follow whatever AWS publishes.
+  # Current values: aws eks describe-addon --cluster-name <c> --addon-name <a>
   addon_versions = {
     aws-ebs-csi-driver     = "v1.65.0-eksbuild.2"
     coredns                = "v1.13.2-eksbuild.24"
@@ -252,11 +243,9 @@ module "agent_api_key" {
 # Nullplatform Base
 ###############################################################################
 
-# The base chart (2.40.0) only renders the gateways Namespace when it does not
-# exist yet (`lookup`), so the first upgrade after the install drops it from
-# the release and Helm deletes it, taking the Gateways, their pods and load
-# balancers with it (2026-09-03). Owning the namespace here keeps it out of
-# the release for good.
+# Owned here, not by the base chart: its template only renders this namespace
+# when it does not exist, so an upgrade dropped it and Helm deleted the
+# Gateways with it (2026-09-03).
 resource "kubernetes_namespace" "gateways" {
   metadata {
     name   = "gateways"
@@ -279,14 +268,12 @@ module "base" {
 
   metrics_server_enabled = true
 
-  # v7.2 requires every version pinned. Chart: what is already deployed.
-  # Images were running :latest (unresolvable to a tag), so they take the
-  # versions VERSIONS.md documents; the logs controller DaemonSet rolls once.
+  # Everything pinned: the chart to what is deployed, the images to the
+  # versions VERSIONS.md documents (they were running :latest).
   nullplatform_base_helm_version = "2.44.5"
   logging_controller_image_tag   = "1.6.0"
 
-  # Chart 2.40.0's CRD job is a no-op once the CRDs exist; keep it off, as the
-  # release ran before v7.2.1, until the fixed chart lands (helm-charts#183).
+  # The chart's CRD job is a no-op once the CRDs exist (helm-charts#183).
   install_gateway_v2_crd = false
 }
 
@@ -311,18 +298,16 @@ module "agent" {
   # bakes in, instead of the k8s scope's default ALB Ingress ones.
   worker_ingress = "istio"
 
-  # Reap a package's worker pod after 15 minutes without commands (the agent
-  # recreates it on the next package-exec), and require mTLS between the agent
-  # and its workers: the chart defaults to plaintext, which lets any pod that
+  # Reap idle worker pods after 15m (the agent recreates them on demand) and
+  # require mTLS: the chart default is plaintext, which would let any pod that
   # reaches a worker run commands with the agent's IAM identity.
   worker = {
     idleTTL  = "15m"
     security = "mtls"
 
-    # The agent takes a worker's image from the package revision attached to the
-    # action. Scopes created before the containers package existed carry none,
-    # so the containers worker is pinned here to the same image the package
-    # publishes. A pin is trusted and matched by package slug.
+    # A worker's image normally comes from the package revision attached to the
+    # action, but entities created before their package existed carry none.
+    # These pins cover them and are matched by package slug.
     pins = [
       {
         package = "containers"
@@ -342,10 +327,9 @@ module "agent" {
       }
     ]
 
-    # The lambda image ships scopes-lambda alone; the ALB and Route53 steps live
-    # in scopes-networking, which the legacy channel passed as --overrides-path.
-    # worker-bridge derives that flag from NP_OVERRIDES_PATH, so an init
-    # container fetches the pinned tag into a volume shared with the worker.
+    # The lambda image ships scopes-lambda alone, so an init container fetches
+    # the ALB/Route53 steps from scopes-networking into a shared volume and
+    # NP_OVERRIDES_PATH points the worker at them.
     patches = [
       {
         target = { package = "aws-lambda-agustin" }
@@ -369,8 +353,8 @@ module "agent" {
     ]
   }
 
-  # Packages whose worker pods run with the agent's ServiceAccount (IRSA) and
-  # enough memory for tofu. Slugs, not catalog keys.
+  # Packages run as workers: they get the agent's ServiceAccount (IRSA) and
+  # enough memory for tofu. These are package slugs, not catalog keys.
   worker_orchestrated_packages = [
     "containers",
     "static-scope",

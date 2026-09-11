@@ -1,10 +1,7 @@
 ###############################################################################
-# Scope, service and parameter provider requirements
-#
-# Cloud-side prerequisites each scope/service/parameter provider needs before the
-# agent can run its actions: IAM roles the agent assumes, plus whatever the
-# module provisions (the Lambda ALB, KMS policies, ...). Each ref must match the
-# version the same entry pins in nullplatform/locals.tf.
+# Cloud-side prerequisites every scope, service and parameter provider needs
+# before the agent can run its actions: IAM roles to assume, the Lambda ALB,
+# KMS policies. Each ref must match the version pinned in nullplatform/locals.tf.
 ###############################################################################
 
 module "scope_requirements_k8s" {

@@ -44,14 +44,9 @@ module "cloud_provider" {
   hosted_private_zone_id = local.private_zone_id
 }
 
-# =============================================================================
-# Identity & Access Control (AWS IAM provider)
-#
-# Publishes assumable role ARNs keyed by selector. The Lambda scope resolves
-# its role here (selector "lambda") via the provider — replacing the
-# ASSUME_ROLE_ARN_DEFAULT env var on the agent. The ARN comes from the Lambda
-# assume-role created in infrastructure/aws (read via remote state).
-# =============================================================================
+# Assumable role ARNs keyed by selector, so each scope resolves its own role
+# from the provider instead of an env var on the agent. ARNs come from
+# infrastructure/aws via remote state.
 module "identity_access_control" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v7.8.0"
 
@@ -75,12 +70,7 @@ module "identity_access_control" {
   }
 }
 
-# =============================================================================
-# Notification API Keys
-#
-# One module instance per entry in local.notification_api_keys_catalog
-# (scope_notification and service_notification keys, keyed by scope/service slug).
-# =============================================================================
+# Notification API keys: one per entry in the catalog, keyed by scope/service slug.
 module "notification_api_keys" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v7.8.0"
   for_each = local.notification_api_keys_catalog
@@ -90,12 +80,7 @@ module "notification_api_keys" {
   specification_slug = each.value.specification_slug
 }
 
-# =============================================================================
-# Channel Associations - Scope to Agent
-#
-# One module instance per entry in local.scope_channel_associations_catalog.
-# api_key wires by each.key to module.notification_api_keys.
-# =============================================================================
+# Scope channels: one per catalog entry; api_key wires by each.key.
 module "scope_channel_associations" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v7.8.0"
   for_each = local.scope_channel_associations_catalog
@@ -123,13 +108,9 @@ module "scope_channel_associations" {
   package_slug        = try(each.value.package_slug, "")
 }
 
-# =============================================================================
-# Channel Associations - Service to Agent
-#
-# One module instance per entry in local.service_channel_associations_catalog.
-# The agent resolves the entrypoint from:
-#   <base_clone_path>/<repository_service_spec_repo>/<service_path>/entrypoint/entrypoint
-# =============================================================================
+# Service channels: one per catalog entry. Channels marked worker_orchestrator
+# run the package image; the rest are resolved from the agent's clone at
+# <base_clone_path>/<repo>/<service_path>/entrypoint/entrypoint.
 module "service_channel_associations" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v7.8.0"
   for_each = local.service_channel_associations_catalog
@@ -159,11 +140,8 @@ module "vpc" {
   vpc_security_groups = local.vpc_security_groups_ids
   vpc_subnets         = local.vpc_subnets_ids
 
-  # Lambda ALB listener published under load_balancer.{public,private} so the
-  # Lambda scope workflow resolves ALB_PUBLIC_LISTENER_ARN / ALB_PRIVATE_LISTENER_ARN
-  # and attaches per-scope target groups + rules at runtime. Same ALB for both
-  # sides here (the ALB is public); a dedicated internal ALB can be added later
-  # for true private scopes.
+  # The Lambda scope reads these listeners to attach its target groups. Public
+  # and private point at the same (public) ALB until an internal one exists.
   load_balancer = {
     public = {
       arn          = local.lambda_alb_arn
@@ -188,14 +166,8 @@ module "monitoring_provider" {
 
 
 
-# =============================================================================
-# PARAMETER STORE VIA AGENT
-#
-# Migrated from inline resources to the dedicated parameter-storage modules
-# (tofu-modules v6.2.0 / api_key v6.1.0). The provider spec is now fetched
-# remotely from the parameters-provider repo (data.http + gomplate) instead of
-# the local .tpl.
-# =============================================================================
+# Parameter Store, served by the agent. The provider spec is fetched from the
+# parameters-provider repo, not from a local template.
 
 # Provider specification (replaces nullplatform_provider_specification.this).
 module "parameter_store_spec" {
@@ -249,13 +221,8 @@ module "parameter_store_channels" {
   depends_on = [module.parameter_store_spec]
 }
 
-# =============================================================================
-# SECRETS MANAGER VIA AGENT
-#
-# Same parameter-storage modules as Parameter Store (the modules are generic).
-# The provider differs only in the remote spec template (slug aws-secrets-manager,
-# schema without `tier`), fetched from the same parameters-provider repo.
-# =============================================================================
+# Secrets Manager, same modules as Parameter Store; only the remote spec
+# template differs (no `tier` in the schema).
 
 # Provider specification.
 module "secrets_manager_spec" {
@@ -308,12 +275,8 @@ module "secrets_manager_channels" {
 }
 
 
-# =============================================================================
-# Scope Configuration - Static Scope
-#
-# Moved here from nullplatform/. provider_specification_slug comes from the
-# nullplatform remote_state (already read as local.scope_specs).
-# =============================================================================
+# Static scope configuration; the provider slug comes from the nullplatform
+# layer via remote state.
 module "scope_configuration_static_scope" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v7.8.0"
 

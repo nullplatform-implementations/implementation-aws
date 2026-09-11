@@ -13,10 +13,8 @@ variable "np_api_key" {
   sensitive   = true
 }
 
-# Declared but NOT read by this layer. common.tfvars is shared by every layer,
-# so a variable it sets that this layer does not declare produces a "Value for
-# undeclared variable" warning on every plan. Declaring it keeps the shared file
-# applying cleanly.
+# Declared but unused here: common.tfvars is shared by every layer and an
+# undeclared variable warns on every plan.
 variable "organization_slug" {
   description = "Nullplatform organization slug. Not read by this layer - declared only so the shared common.tfvars applies without warnings. Used by infrastructure/aws for resource naming."
   type        = string

@@ -5,9 +5,7 @@ locals {
   cluster_name    = var.cluster_name != null ? var.cluster_name : data.terraform_remote_state.infrastructure[0].outputs.cluster_name
   domain_name     = var.domain_name != null ? var.domain_name : data.terraform_remote_state.infrastructure[0].outputs.domain_name
 
-  # Nullplatform specs — read from the remote state maps (keyed by catalog slug,
-  # only enabled entries present). Mapped explicitly to the per-entry locals the
-  # catalogs below already consume, so the catalogs stay untouched.
+  # Spec slugs from the nullplatform layer's remote state, one local per entry.
   scope_specs   = data.terraform_remote_state.nullplatform.outputs.scope_definitions
   service_specs = data.terraform_remote_state.nullplatform.outputs.service_definitions
 
@@ -30,9 +28,8 @@ locals {
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
   vpc_security_groups_ids = data.terraform_remote_state.infrastructure[0].outputs.vpc_security_groups_ids
 
-  # Public Lambda ALB (created in infrastructure/aws when install_alb=true),
-  # published to the aws-networking-configuration provider so the Lambda scope
-  # workflow resolves load_balancer.public.listener_arn.
+  # Public Lambda ALB from infrastructure/aws, published to the networking
+  # provider so the Lambda scope finds its listener.
   lambda_alb_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_arn
   lambda_alb_listener_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_listener_arn
 
@@ -41,8 +38,7 @@ locals {
   ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
   ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
 
-  # Lambda assume-role ARN (created in infrastructure/aws), published to the AWS
-  # IAM provider below so the Lambda scope resolves it by selector "lambda".
+  # Lambda assume-role from infrastructure/aws, published under selector "lambda".
   lambda_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
   k8s_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
   static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
@@ -54,13 +50,8 @@ locals {
   rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 
 
-  ##############################################################################
-  # Notification API keys catalog
-  #
-  # One nullplatform notification api_key per scope/service, keyed by slug.
-  # 'type' selects scope vs service notification; 'specification_slug' is the
-  # spec the key is scoped to (resolved from the nullplatform remote state).
-  ##############################################################################
+  # One notification api_key per scope/service, keyed by slug. The spec slugs
+  # come from the nullplatform layer via remote state.
   notification_api_keys_catalog = {
     containers     = { type = "scope_notification", specification_slug = local.scope_specification_slug }
     scheduled_task = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
@@ -73,13 +64,8 @@ locals {
     postgres_db    = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
   }
 
-  ##############################################################################
-  # Scope channel associations catalog (scope_definition_agent_association)
-  #
-  # Optional fields (service_path, repo_path, repository_notification_channel*)
-  # are null when the scope relies on the module defaults. Keys match
-  # notification_api_keys_catalog so api_key wires by each.key.
-  ##############################################################################
+  # Scope channels. Keys match notification_api_keys_catalog so api_key wires
+  # by each.key; optional fields are null when the module default is fine.
   scope_channel_associations_catalog = {
     containers = {
       description                            = "Containers scope agent channel"
@@ -89,9 +75,8 @@ locals {
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
       repository_notification_channel_branch = "v1.16.2"
-      # Runs from the containers worker image, pinned in infrastructure/aws
-      # (agent worker.pins) so scopes created before the package existed
-      # resolve it too.
+      # Runs from the containers worker image, pinned in infrastructure/aws so
+      # scopes created before the package existed also resolve it.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug
     }

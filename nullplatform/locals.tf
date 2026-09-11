@@ -1,26 +1,11 @@
 locals {
-  ##############################################################################
-  # Scope definitions catalog
-  #
-  # Static, code-owned description of every scope this organization can register.
-  # The per-environment toggles (enabled / version / repo overrides) live in
-  # var.scope_definitions and are merged in below.
-  #
-  # Each entry's version must stay in lockstep with the ?ref= of the matching
-  # requirements module in infrastructure/aws AND with the ref in that layer's
-  # agent_repos_scope / agent_repos_extra. Nothing fails at plan time if they
-  # drift; the first deploy inside the agent does.
-  #
-  # Packages: package_version is the semver of the package revision THIS
-  # configuration publishes. It is independent from the upstream scope version
-  # and must be bumped together with `version` or any change to the action set
-  # - anything that alters the bill of materials. Worker images are resolved by
-  # lookup against the artifact each upstream release registers (visible to
-  # every organization) by release tag. A tag re-registered against a new image
-  # drifts to it on the next plan, by design.
-  # Consequence: a `version` override from tfvars does NOT update the artifact
-  # reference; versions are changed here, in the catalog.
-  ##############################################################################
+  # Scope definitions catalog; per-environment toggles live in
+  # var.scope_definitions and are merged below. Two rules:
+  #   - version must match the requirements module ref in infrastructure/aws
+  #     (a mismatch only shows up at deploy time, never at plan time)
+  #   - package_version is the revision published here: bump it with any change
+  #     to version, actions or artifacts, and change tags in this catalog
+  #     (a version override from tfvars does not move the artifact tag)
 
   containers_definition = {
     service_spec_name          = "Containers"
@@ -121,9 +106,7 @@ locals {
     aws_lambda      = local.aws_lambda_definition
   }
 
-  # Merge the catalog with per-environment overrides from var.scope_definitions
-  # and keep only the entries toggled on. The repository_* fields fall back to
-  # the catalog-derived raw.githubusercontent.com URL unless an override is set.
+  # Catalog + per-environment overrides, keeping only the entries toggled on.
   scope_definitions_enabled = {
     for k, v in local.scope_definitions_catalog : k => merge(v, {
       version        = coalesce(try(var.scope_definitions[k].version, null), v.version)
@@ -139,21 +122,11 @@ locals {
     if try(var.scope_definitions[k].enabled, true)
   }
 
-  ##############################################################################
-  # Service definitions catalog
-  #
-  # Same package rules as the scopes above: package_version is bumped together
-  # with repository_branch (which is also the artifact reference) or any change
-  # to the actions/links set. The `impl` artifact points at the service's own
-  # implementation repository, which is what the agent runs.
-  #
-  # repository_branch must be an immutable ref (tofu-modules >= v7.2.0 rejects
-  # main/master/head/latest): a tag with repository_ref_type = "tags", or a
-  # commit SHA with repository_ref_type = "".
-  ##############################################################################
+  # Service definitions catalog. Same package rules as the scopes above.
+  # repository_branch must be immutable: a tag with repository_ref_type = "tags"
+  # or a SHA with "" (the module rejects main/master/head/latest).
 
-  # Both RDS services come from services-postgresql-rds, which publishes one
-  # worker image per service on release.
+  # Both RDS services live in services-postgresql-rds, one worker image each.
   rds_postgres_server_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-rds"
@@ -246,9 +219,8 @@ locals {
     }]
   }
 
-  # services-postgresql-k-8-s v1.0.2 is the first fully working release with the s3-aligned
-  # layout (service under postgres-db/) and a worker image; the specs and the
-  # code running in the worker come from the same tag.
+  # v1.0.2 is the first release with the s3-aligned layout (service under
+  # postgres-db/) and a worker image.
   postgres_db_k8s_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-k-8-s"
@@ -280,9 +252,7 @@ locals {
     postgres_db_k8s     = local.postgres_db_k8s_definition
   }
 
-  # version (when provided) overrides the catalog branch; otherwise the catalog
-  # branch is kept. The package artifact reference is NOT touched by the
-  # override (see the catalog header).
+  # version overrides the catalog branch, but not the artifact reference.
   service_definitions_enabled = {
     for k, v in local.service_definitions_catalog : k => merge(v, {
       repository_branch = coalesce(try(var.service_definitions[k].version, null), v.repository_branch)
@@ -300,8 +270,7 @@ locals {
     cloud       = { name = "Cloud", order = 3, values = ["ORACLE", "GCP"] }
   }
 
-  # Per-environment overrides from var.dimensions: 'enabled' toggles the
-  # dimension, 'values' overrides the catalog value list when provided.
+  # Per-environment overrides: 'enabled' toggles it, 'values' replaces the list.
   dimensions_enabled = {
     for k, v in local.dimensions_catalog : k => merge(v, {
       values = coalesce(try(var.dimensions[k].values, null), v.values)

@@ -1,17 +1,6 @@
-# =============================================================================
-# Scope definitions
-#
-# One module instance per enabled entry in local.scope_definitions_enabled.
-# Add/remove a scope by editing the catalog in locals.tf; toggle or pin a
-# version per environment from terraform.tfvars (var.scope_definitions).
-#
-# Every scope is also published as a versioned PACKAGE: one revision whose bill
-# of materials pins the service specification, every action specification and
-# the artifacts declared in the catalog (worker image by digest, or the scope
-# repository at a tag). Bump package_version in the catalog whenever any of
-# those change; re-applying the same version with the same components is a
-# no-op.
-# =============================================================================
+# Scope definitions: one module instance per enabled catalog entry (locals.tf).
+# Each one also publishes a package revision pinning its spec, actions and
+# artifacts; re-applying the same package_version with the same content is a no-op.
 module "scope_definitions" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v7.8.0"
   for_each = local.scope_definitions_enabled
@@ -39,11 +28,7 @@ module "scope_definitions" {
   }
 }
 
-# =============================================================================
-# Service definitions
-#
-# One module instance per enabled entry in local.service_definitions_enabled.
-# =============================================================================
+# Service definitions: one module instance per enabled catalog entry.
 module "service_definitions" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v7.8.0"
   for_each = local.service_definitions_enabled
@@ -65,13 +50,7 @@ module "service_definitions" {
   }
 }
 
-# =============================================================================
-# Dimensions
-#
-# One module instance per enabled entry in local.dimensions_enabled. Add/remove
-# a dimension by editing the catalog in locals.tf; toggle or override values per
-# environment from terraform.tfvars (var.dimensions).
-# =============================================================================
+# Dimensions: one module instance per enabled catalog entry.
 module "dimensions" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v7.8.0"
   for_each = local.dimensions_enabled
