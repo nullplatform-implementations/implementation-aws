@@ -13,7 +13,7 @@
 # no-op.
 # =============================================================================
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v7.7.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v7.8.0"
   for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
@@ -45,7 +45,7 @@ module "scope_definitions" {
 # One module instance per enabled entry in local.service_definitions_enabled.
 # =============================================================================
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v7.7.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v7.8.0"
   for_each = local.service_definitions_enabled
 
   nrn                 = var.nrn
@@ -73,7 +73,7 @@ module "service_definitions" {
 # environment from terraform.tfvars (var.dimensions).
 # =============================================================================
 module "dimensions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v7.7.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v7.8.0"
   for_each = local.dimensions_enabled
 
   nrn    = var.nrn
@@ -84,7 +84,7 @@ module "dimensions" {
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v7.7.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v7.8.0"
 
   dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"
