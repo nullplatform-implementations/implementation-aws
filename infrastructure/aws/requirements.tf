@@ -32,7 +32,7 @@ module "scope_requirements_lambda" {
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v0.5.0"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v1.0.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
