@@ -298,12 +298,21 @@ module "agent" {
   # bakes in, instead of the k8s scope's default ALB Ingress ones.
   worker_ingress = "istio"
 
+  # The k8s scope defaults to asking every pod for an "ecr-secret" it never
+  # creates, and the kubelet warns on each one. Images come from the node role
+  # here, so no pull secret is needed. Drop this once scopes ships #256, which
+  # turns the default off and makes the provider setting work.
+  image_pull_secrets = jsonencode({ ENABLED = false })
+
   # Reap idle worker pods after 15m (the agent recreates them on demand) and
   # require mTLS: the chart default is plaintext, which would let any pod that
   # reaches a worker run commands with the agent's IAM identity.
   worker = {
     idleTTL  = "15m"
     security = "mtls"
+
+    # Concatenated with the module's default (public.ecr.aws/nullplatform/*).
+    allowedRegistries = ["${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/scopes/*"]
 
     # A worker's image normally comes from the package revision attached to the
     # action, but entities created before their package existed carry none.
@@ -312,10 +321,6 @@ module "agent" {
       {
         package = "containers"
         image   = "public.ecr.aws/nullplatform/scopes/containers:${var.containers_worker_image_tag}"
-      },
-      {
-        package = "static-scope"
-        image   = "public.ecr.aws/nullplatform/scopes/static-files:${var.static_files_worker_image_tag}"
       },
       {
         package = "aws-lambda-agustin"

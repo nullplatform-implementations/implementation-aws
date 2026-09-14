@@ -112,12 +112,6 @@ variable "scheduled_task_worker_image_tag" {
   default     = "v1.16.2"
 }
 
-variable "static_files_worker_image_tag" {
-  description = "Tag of public.ecr.aws/nullplatform/scopes/static-files the agent pins as the static files worker image (NP_WORKERS). Must match the tag the static_files package resolves in nullplatform/."
-  type        = string
-  default     = "v0.5.0"
-}
-
 variable "lambda_worker_image_tag" {
   description = "Tag of public.ecr.aws/nullplatform/scopes/lambda the agent pins as the lambda worker image (NP_WORKERS). Must match the tag the aws_lambda package resolves in nullplatform/."
   type        = string
