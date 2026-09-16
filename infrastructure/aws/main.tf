@@ -314,23 +314,6 @@ module "agent" {
     # Concatenated with the module's default (public.ecr.aws/nullplatform/*).
     allowedRegistries = ["${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/scopes/*"]
 
-    # A worker's image normally comes from the package revision attached to the
-    # action, but entities created before their package existed carry none.
-    # These pins cover them and are matched by package slug.
-    pins = [
-      {
-        package = "containers"
-        image   = "public.ecr.aws/nullplatform/scopes/containers:${var.containers_worker_image_tag}"
-      },
-      {
-        package = "aws-lambda-agustin"
-        image   = "public.ecr.aws/nullplatform/scopes/lambda:${var.lambda_worker_image_tag}"
-      },
-      {
-        package = "scheduled-task"
-        image   = "public.ecr.aws/nullplatform/scopes/scheduled-task:${var.scheduled_task_worker_image_tag}"
-      }
-    ]
 
     # The lambda image ships scopes-lambda alone, so an init container fetches
     # the ALB/Route53 steps from scopes-networking into a shared volume and
