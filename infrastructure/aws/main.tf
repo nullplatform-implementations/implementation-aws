@@ -304,12 +304,15 @@ module "agent" {
   # turns the default off and makes the provider setting work.
   image_pull_secrets = jsonencode({ ENABLED = false })
 
-  # Reap idle worker pods after 15m (the agent recreates them on demand) and
-  # require mTLS: the chart default is plaintext, which would let any pod that
-  # reaches a worker run commands with the agent's IAM identity.
+  # Reap idle worker pods after 15m (the agent recreates them on demand).
+  # security is plaintext ("insecure" before chart 3.1.0 renamed it): the agent
+  # reaches its workers unencrypted, so any pod that can reach one runs commands
+  # with the agent's IAM identity. Nothing currently narrows that — this
+  # namespace has no NetworkPolicy — so the mitigations are "mtls" here or an
+  # ingress policy on the worker pods.
   worker = {
     idleTTL  = "15m"
-    security = "mtls"
+    security = "plaintext"
 
     # Concatenated with the module's default (public.ecr.aws/nullplatform/*).
     allowedRegistries = ["${data.aws_caller_identity.current.account_id}.dkr.ecr.${var.aws_region}.amazonaws.com/scopes/*"]

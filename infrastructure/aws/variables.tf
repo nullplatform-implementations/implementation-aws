@@ -85,13 +85,13 @@ EOF
 variable "image_tag" {
   description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator; the -nonroot variant runs as uid 1001 and clones repositories under /home/agent/.np."
   type        = string
-  default     = "aws-0.11.1-nonroot"
+  default     = "aws-0.12.0-nonroot"
 }
 
 variable "agent_helm_version" {
   description = "nullplatform-agent Helm chart version. 2.37.0+ ships the worker orchestrator; 3.0.0 only drops githubTokenInit, which this install never used."
   type        = string
-  default     = "3.0.0"
+  default     = "3.1.0"
 }
 
 variable "scopes_networking_version" {
