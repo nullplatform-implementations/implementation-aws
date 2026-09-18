@@ -59,11 +59,11 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "v1.0.0"
+    version                    = "v1.1.4"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "1.0.0"
+    package_version = "1.1.4"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -71,7 +71,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/static-files"
-        tag        = "v1.0.0"
+        tag        = "v1.1.4"
       }
     }]
   }
