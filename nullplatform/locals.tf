@@ -59,11 +59,11 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "v1.1.4"
+    version                    = "v1.1.5"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "1.1.4"
+    package_version = "1.1.5"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -71,7 +71,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/static-files"
-        tag        = "v1.1.4"
+        tag        = "v1.1.5"
       }
     }]
   }
@@ -82,11 +82,11 @@ locals {
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "v0.5.0"
+    version                    = "v0.7.2"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "0.0.5"
+    package_version = "0.7.2"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -94,7 +94,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/lambda"
-        tag        = "v0.5.0"
+        tag        = "v0.7.2"
       }
     }]
   }

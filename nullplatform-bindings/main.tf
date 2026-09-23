@@ -303,11 +303,91 @@ module "scope_configuration_static_scope" {
     { error_code = 404, response_code = 200, response_page_path = "/index.html" },
     { error_code = 403, response_code = 200, response_page_path = "/index.html" },
   ]
+
+  # Ordered behaviors, evaluated before the default one and in this order.
+  # Hashed assets can be cached hard; an API path must never be cached.
+  aws_behaviors = [
+    {
+      path_pattern = "/api/*"
+      cache_mode   = "policy"
+      cache_policy = "CachingDisabled"
+    },
+    {
+      path_pattern = "/static/*"
+      cache_mode   = "policy"
+      cache_policy = "CachingOptimized"
+      compress     = true
+    },
+  ]
+
+  aws_price_class = "PriceClass_200"
 }
 
 # =============================================================================
-# Scope Configuration - Lambda
+# Scope Configuration - Static Files (staging)
 # =============================================================================
+# Mirrors what staging already runs: a policy-based default behavior with
+# security headers, an uncached CORS-enabled /api/* and a cached /static/*.
+module "scope_configuration_static_scope_staging" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v7.14.0"
+
+  nrn  = var.nrn
+  type = "static-files"
+  dimensions = {
+    environment = "staging"
+  }
+
+  cloud_provider            = "aws"
+  aws_region                = "us-east-1"
+  aws_state_bucket          = "tf-state-0269fb2df210b43c"
+  aws_hosted_public_zone_id = "Z08274782HV2M61TD1NFE"
+
+  aws_default_cache_mode              = "policy"
+  aws_default_cache_policy            = "CachingOptimized"
+  aws_default_origin_request_policy   = "AllViewerExceptHostHeader"
+  aws_default_response_headers_policy = "CORS-and-SecurityHeadersPolicy"
+  aws_price_class                     = "PriceClass_All"
+
+  aws_default_invocations = [
+    {
+      event_type   = "Lambda@Edge - viewer response"
+      function_arn = "arn:aws:lambda:us-east-1:235494813897:function:edge-test-header:1"
+    }
+  ]
+
+  aws_custom_error_responses = [
+    { error_code = 404, response_code = 200, response_page_path = "/index.html" },
+    { error_code = 403, response_code = 200, response_page_path = "/index.html" },
+  ]
+
+  aws_behaviors = [
+    {
+      path_pattern            = "/api/*"
+      cache_mode              = "policy"
+      cache_policy            = "CachingDisabled"
+      compress                = false
+      origin_request_policy   = "AllViewer"
+      response_headers_policy = "SimpleCORS"
+      viewer_protocol_policy  = "https-only"
+    },
+    {
+      path_pattern            = "/static/*"
+      cache_mode              = "legacy"
+      cache_policy            = "CachingOptimized"
+      compress                = true
+      origin_request_policy   = "AllViewerExceptHostHeader"
+      response_headers_policy = "SecurityHeadersPolicy"
+      viewer_protocol_policy  = "redirect-to-https"
+    },
+    {
+      path_pattern = "/assets/*"
+      cache_mode   = "policy"
+      cache_policy = "CachingOptimizedForUncompressedObjects"
+      compress     = false
+    },
+  ]
+}
+
 module "scope_configuration_lambda" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v7.14.0"
 
@@ -321,5 +401,3 @@ module "scope_configuration_lambda" {
   # Used verbatim by scopes-lambda when set (no architecture suffix appended).
   lambda_placeholder_image_uri = "235494813897.dkr.ecr.us-east-1.amazonaws.com/aws-lambda/nullplatform-lambda-placeholder:latest-amd64"
 }
-
-
