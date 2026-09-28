@@ -63,7 +63,7 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "1.1.5"
+    package_version = "1.1.7"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
