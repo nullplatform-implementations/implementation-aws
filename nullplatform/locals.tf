@@ -105,14 +105,14 @@ locals {
     service_path               = "mobile-store"
     repository_org             = "nullplatform"
     repository_name            = "scopes-mobile-store"
-    version                    = "v0.4.0"
+    version                    = "v0.4.1"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
     # Must match worker_orchestrated_packages (infrastructure/aws) and the
     # "mobile-store" IAM selector (nullplatform-bindings).
     package_slug    = "mobile-store"
-    package_version = "0.1.0"
+    package_version = "0.1.1"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -120,7 +120,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/agent-plugins/scopes/mobile-store"
-        tag        = "v0.4.0"
+        tag        = "v0.4.1"
       }
     }]
   }
