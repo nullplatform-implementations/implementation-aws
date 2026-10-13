@@ -147,3 +147,27 @@ resource "aws_s3_bucket_policy" "static" {
 #   validation_record_fqdns = [for record in aws_route53_record.wildcard_validation : record.fqdn]
 # }
 
+
+###############################################################################
+# S3 Bucket - Mobile binaries (mobile-store scope POC)
+# Private: the CI writes it through the build workflow group (module.s3_iam_mobile)
+# and the mobile-store scope reads it with its own requirements role.
+###############################################################################
+resource "aws_s3_bucket" "assets_mobile" {
+  bucket = "assets-aws-mobile"
+}
+
+resource "aws_s3_bucket_public_access_block" "assets_mobile" {
+  bucket                  = aws_s3_bucket.assets_mobile.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "assets_mobile" {
+  bucket = aws_s3_bucket.assets_mobile.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}

@@ -158,6 +158,15 @@ module "s3_iam" {
   bucket                    = "lambda-files-aws-services"
 }
 
+# Lets the CI build workflow user publish mobile binaries (mobile-store scope POC).
+module "s3_iam_mobile" {
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/aws/iam/s3?ref=v8.0.0"
+
+  cluster_name              = "${module.eks.eks_cluster_name}-mobile"
+  build_workflow_group_name = module.ci_build_workflow_user.group_name
+  bucket                    = aws_s3_bucket.assets_mobile.bucket
+}
+
 ###############################################################################
 # External DNS
 ###############################################################################
