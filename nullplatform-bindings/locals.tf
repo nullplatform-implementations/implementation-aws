@@ -127,7 +127,7 @@ locals {
       service_path                           = "mobile-store"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-mobile-store"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-mobile-store/refs/tags"
-      repository_notification_channel_branch = "v0.3.0"
+      repository_notification_channel_branch = "v0.4.0"
       # Runs from the mobile-store worker image, pinned in infrastructure/aws.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_mobile_store

@@ -105,7 +105,7 @@ locals {
     service_path               = "mobile-store"
     repository_org             = "nullplatform"
     repository_name            = "scopes-mobile-store"
-    version                    = "v0.3.0"
+    version                    = "v0.4.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
@@ -120,7 +120,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/agent-plugins/scopes/mobile-store"
-        tag        = "v0.3.0"
+        tag        = "v0.4.0"
       }
     }]
   }

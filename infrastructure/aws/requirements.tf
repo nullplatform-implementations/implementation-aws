@@ -42,7 +42,7 @@ module "scope_requirements_static_files" {
 # Keep this ref equal to version/tag of mobile_store_definition in
 # nullplatform/locals.tf: both pin the same scopes-mobile-store release.
 module "scope_requirements_mobile_store" {
-  source = "git::https://github.com/nullplatform/scopes-mobile-store.git//mobile-store/specs/requirements/aws?ref=v0.3.0"
+  source = "git::https://github.com/nullplatform/scopes-mobile-store.git//mobile-store/specs/requirements/aws?ref=v0.4.0"
 
   cluster_name       = module.eks.eks_cluster_name
   agent_role_arn     = local.agent_role_arn
