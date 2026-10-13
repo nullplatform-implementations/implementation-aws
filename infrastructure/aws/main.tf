@@ -128,6 +128,7 @@ module "agent_iam" {
     module.scope_requirements_lambda.permissions_role_arn,
     module.scope_requirements_k8s.permissions_role_arn,
     module.scope_requirements_static_files.permissions_role_arn,
+    module.scope_requirements_mobile_store.permissions_role_arn,
     module.service_requirements_s3.permissions_role_arn,
     module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,

@@ -38,6 +38,18 @@ module "scope_requirements_static_files" {
   agent_role_arn = local.agent_role_arn
 }
 
+# Read-only access to the mobile binaries bucket and the mobile/ secrets.
+# The tag is cut when the requirements module lands in scopes-mobile-store:
+# v0.2.0 already exists without it, so move this ref, and the version/tag of
+# mobile_store_definition in nullplatform/locals.tf, to that release.
+module "scope_requirements_mobile_store" {
+  source = "git::https://github.com/nullplatform/scopes-mobile-store.git//mobile-store/specs/requirements/aws?ref=v0.2.0"
+
+  cluster_name       = module.eks.eks_cluster_name
+  agent_role_arn     = local.agent_role_arn
+  assets_bucket_name = aws_s3_bucket.assets_mobile.bucket
+}
+
 module "service_requirements_s3" {
   source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.2.0"
 

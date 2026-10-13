@@ -99,11 +99,35 @@ locals {
     }]
   }
 
+  mobile_store_definition = {
+    service_spec_name          = "Mobile store"
+    service_spec_description   = "Publishes mobile app binaries to distribution channels"
+    service_path               = "mobile-store"
+    repository_org             = "nullplatform"
+    repository_name            = "scopes-mobile-store"
+    version                    = "v0.2.0"
+    repository_ref_type        = "tags"
+    create_scope_configuration = true
+
+    package_version = "0.1.0"
+    package_artifacts = [{
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/agent-plugins/scopes/mobile-store"
+        tag        = "v0.2.0"
+      }
+    }]
+  }
+
   scope_definitions_catalog = {
     containers      = local.containers_definition
     scheduled_tasks = local.scheduled_tasks_definition
     static_files    = local.static_files_definition
     aws_lambda      = local.aws_lambda_definition
+    mobile_store    = local.mobile_store_definition
   }
 
   # Catalog + per-environment overrides, keeping only the entries toggled on.
