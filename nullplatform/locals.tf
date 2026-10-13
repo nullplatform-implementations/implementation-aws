@@ -109,6 +109,9 @@ locals {
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
+    # Must match worker_orchestrated_packages (infrastructure/aws) and the
+    # "mobile-store" IAM selector (nullplatform-bindings).
+    package_slug    = "mobile-store"
     package_version = "0.1.0"
     package_artifacts = [{
       name   = "worker-image"

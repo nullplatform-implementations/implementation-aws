@@ -25,6 +25,9 @@ module "scope_definitions" {
     version   = each.value.package_version
     artifacts = each.value.package_artifacts
     default   = true
+    # Pins the package slug when a scope's worker wiring depends on it
+    # (worker_orchestrated_packages, IAM selector); null keeps the spec slug.
+    slug = try(each.value.package_slug, null)
   }
 }
 
