@@ -364,6 +364,7 @@ module "agent" {
   worker_orchestrated_packages = [
     "containers",
     "static-scope",
+    "mobile-store",
     "aws-s3-bucket-agent-k8s",
     "rds-postgres-server-agustin-test",
     "rds-postgres-database-agustin-test",

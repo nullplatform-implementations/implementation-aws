@@ -42,6 +42,7 @@ variable "scope_definitions" {
     scheduled_tasks = { enabled = true }
     static_files    = { enabled = true }
     aws_lambda      = { enabled = true }
+    mobile_store    = { enabled = true }
   }
 }
 

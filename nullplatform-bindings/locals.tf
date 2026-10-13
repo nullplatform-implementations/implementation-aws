@@ -17,6 +17,8 @@ locals {
   scope_specification_slug_static_scope   = local.scope_specs["static_files"].slug
   scope_specification_id_lambda           = local.scope_specs["aws_lambda"].id
   scope_specification_slug_lambda         = local.scope_specs["aws_lambda"].slug
+  scope_specification_id_mobile_store     = local.scope_specs["mobile_store"].id
+  scope_specification_slug_mobile_store   = local.scope_specs["mobile_store"].slug
 
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
@@ -42,6 +44,7 @@ locals {
   lambda_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
   k8s_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
   static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
+  mobile_store_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.mobile_store_assume_role_arn
   parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
   secret_manager_assume_role_arn  = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
@@ -57,6 +60,7 @@ locals {
     scheduled_task = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
     static_scope   = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
     aws_lambda     = { type = "scope_notification", specification_slug = local.scope_specification_slug_lambda }
+    mobile_store   = { type = "scope_notification", specification_slug = local.scope_specification_slug_mobile_store }
     rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
     rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
     aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
@@ -115,6 +119,18 @@ locals {
       # NP_OVERRIDES_PATH, set by the agent's worker patch in infrastructure/aws.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_lambda
+    }
+    mobile_store = {
+      description                            = "Mobile store agent channel"
+      scope_specification_id                 = local.scope_specification_id_mobile_store
+      scope_specification_slug               = local.scope_specification_slug_mobile_store
+      service_path                           = "mobile-store"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes-mobile-store"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-mobile-store/refs/tags"
+      repository_notification_channel_branch = "v0.3.0"
+      # Runs from the mobile-store worker image, pinned in infrastructure/aws.
+      worker_orchestrator = true
+      package_slug        = local.scope_specification_slug_mobile_store
     }
   }
 
