@@ -9,16 +9,18 @@ locals {
   scope_specs   = data.terraform_remote_state.nullplatform.outputs.scope_definitions
   service_specs = data.terraform_remote_state.nullplatform.outputs.service_definitions
 
-  scope_specification_id                  = local.scope_specs["containers"].id
-  scope_specification_slug                = local.scope_specs["containers"].slug
-  scope_specification_id_scheduled_task   = local.scope_specs["scheduled_tasks"].id
-  scope_specification_slug_scheduled_task = local.scope_specs["scheduled_tasks"].slug
-  scope_specification_id_static_scope     = local.scope_specs["static_files"].id
-  scope_specification_slug_static_scope   = local.scope_specs["static_files"].slug
-  scope_specification_id_lambda           = local.scope_specs["aws_lambda"].id
-  scope_specification_slug_lambda         = local.scope_specs["aws_lambda"].slug
-  scope_specification_id_mobile_store     = local.scope_specs["mobile_store"].id
-  scope_specification_slug_mobile_store   = local.scope_specs["mobile_store"].slug
+  scope_specification_id                      = local.scope_specs["containers"].id
+  scope_specification_slug                    = local.scope_specs["containers"].slug
+  scope_specification_id_scheduled_task       = local.scope_specs["scheduled_tasks"].id
+  scope_specification_slug_scheduled_task     = local.scope_specs["scheduled_tasks"].slug
+  scope_specification_id_static_scope         = local.scope_specs["static_files"].id
+  scope_specification_slug_static_scope       = local.scope_specs["static_files"].slug
+  scope_specification_id_lambda               = local.scope_specs["aws_lambda"].id
+  scope_specification_slug_lambda             = local.scope_specs["aws_lambda"].slug
+  scope_specification_id_mobile_store         = local.scope_specs["mobile_store"].id
+  scope_specification_slug_mobile_store       = local.scope_specs["mobile_store"].slug
+  scope_specification_id_voltmx_foundry_app   = local.scope_specs["voltmx_foundry_app"].id
+  scope_specification_slug_voltmx_foundry_app = local.scope_specs["voltmx_foundry_app"].slug
 
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
@@ -41,31 +43,33 @@ locals {
   ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
 
   # Lambda assume-role from infrastructure/aws, published under selector "lambda".
-  lambda_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
-  k8s_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
-  static_files_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
-  mobile_store_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.mobile_store_assume_role_arn
-  parameter_store_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
-  secret_manager_assume_role_arn  = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
-  s3_assume_role_arn              = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
-  dynamodb_assume_role_arn        = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
-  rds_server_assume_role_arn      = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
-  rds_db_assume_role_arn          = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
+  lambda_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
+  k8s_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
+  static_files_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
+  mobile_store_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.mobile_store_assume_role_arn
+  voltmx_foundry_app_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.voltmx_foundry_app_assume_role_arn
+  parameter_store_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
+  secret_manager_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
+  s3_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  dynamodb_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
+  rds_server_assume_role_arn         = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
+  rds_db_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 
 
   # One notification api_key per scope/service, keyed by slug. The spec slugs
   # come from the nullplatform layer via remote state.
   notification_api_keys_catalog = {
-    containers     = { type = "scope_notification", specification_slug = local.scope_specification_slug }
-    scheduled_task = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
-    static_scope   = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
-    aws_lambda     = { type = "scope_notification", specification_slug = local.scope_specification_slug_lambda }
-    mobile_store   = { type = "scope_notification", specification_slug = local.scope_specification_slug_mobile_store }
-    rds_server     = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
-    rds_db         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
-    aws_s3_bucket  = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
-    aws_dynamodb   = { type = "service_notification", specification_slug = local.service_specification_slug_aws_dynamodb }
-    postgres_db    = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
+    containers         = { type = "scope_notification", specification_slug = local.scope_specification_slug }
+    scheduled_task     = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
+    static_scope       = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
+    aws_lambda         = { type = "scope_notification", specification_slug = local.scope_specification_slug_lambda }
+    mobile_store       = { type = "scope_notification", specification_slug = local.scope_specification_slug_mobile_store }
+    voltmx_foundry_app = { type = "scope_notification", specification_slug = local.scope_specification_slug_voltmx_foundry_app }
+    rds_server         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
+    rds_db             = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
+    aws_s3_bucket      = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
+    aws_dynamodb       = { type = "service_notification", specification_slug = local.service_specification_slug_aws_dynamodb }
+    postgres_db        = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
   }
 
   # Scope channels. Keys match notification_api_keys_catalog so api_key wires
@@ -131,6 +135,21 @@ locals {
       # Runs from the mobile-store worker image, pinned in infrastructure/aws.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_mobile_store
+    }
+    voltmx_foundry_app = {
+      description                            = "Volt MX Foundry app agent channel"
+      scope_specification_id                 = local.scope_specification_id_voltmx_foundry_app
+      scope_specification_slug               = local.scope_specification_slug_voltmx_foundry_app
+      service_path                           = "voltmx-foundry-app"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes-voltmx-foundry-app"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-voltmx-foundry-app/refs/tags"
+      repository_notification_channel_branch = "v0.1.2"
+      # Runs from the voltmx-foundry-app worker image, pinned in infrastructure/aws.
+      # The service spec slug is "volt-mx-foundry-app" (derived from its name) but
+      # the package slug is "voltmx-foundry-app": the agent matches
+      # worker_orchestrated_packages (infrastructure/aws) against this value.
+      worker_orchestrator = true
+      package_slug        = "voltmx-foundry-app"
     }
   }
 
