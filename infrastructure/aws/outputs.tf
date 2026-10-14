@@ -112,3 +112,8 @@ output "secret_manager_iam_role_arn" {
   value       = module.secrets_manager_requirements.iam_role_arn
 }
 
+
+output "voltmx_foundry_app_assume_role_arn" {
+  description = "ARN of the voltmx-foundry-app assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"voltmx-foundry-app\")"
+  value       = module.scope_requirements_voltmx_foundry_app.permissions_role_arn
+}

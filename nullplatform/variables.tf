@@ -38,11 +38,12 @@ variable "scope_definitions" {
     repository_action_templates_version = optional(string)
   }))
   default = {
-    containers      = { enabled = true }
-    scheduled_tasks = { enabled = true }
-    static_files    = { enabled = true }
-    aws_lambda      = { enabled = true }
-    mobile_store    = { enabled = true }
+    containers         = { enabled = true }
+    scheduled_tasks    = { enabled = true }
+    static_files       = { enabled = true }
+    aws_lambda         = { enabled = true }
+    mobile_store       = { enabled = true }
+    voltmx_foundry_app = { enabled = true }
   }
 }
 

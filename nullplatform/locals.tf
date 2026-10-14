@@ -125,12 +125,39 @@ locals {
     }]
   }
 
+  voltmx_foundry_app_definition = {
+    service_spec_name          = "Volt MX Foundry app"
+    service_spec_description   = "Publishes a Volt MX Foundry app to a Foundry environment"
+    service_path               = "voltmx-foundry-app"
+    repository_org             = "nullplatform"
+    repository_name            = "scopes-voltmx-foundry-app"
+    version                    = "v0.1.2"
+    repository_ref_type        = "tags"
+    create_scope_configuration = true
+
+    # Must match worker_orchestrated_packages (infrastructure/aws) and the
+    # "voltmx-foundry-app" IAM selector (nullplatform-bindings).
+    package_slug    = "voltmx-foundry-app"
+    package_version = "0.1.2"
+    package_artifacts = [{
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/agent-plugins/scopes/voltmx-foundry-app"
+        tag        = "v0.1.2"
+      }
+    }]
+  }
+
   scope_definitions_catalog = {
-    containers      = local.containers_definition
-    scheduled_tasks = local.scheduled_tasks_definition
-    static_files    = local.static_files_definition
-    aws_lambda      = local.aws_lambda_definition
-    mobile_store    = local.mobile_store_definition
+    containers         = local.containers_definition
+    scheduled_tasks    = local.scheduled_tasks_definition
+    static_files       = local.static_files_definition
+    aws_lambda         = local.aws_lambda_definition
+    mobile_store       = local.mobile_store_definition
+    voltmx_foundry_app = local.voltmx_foundry_app_definition
   }
 
   # Catalog + per-environment overrides, keeping only the entries toggled on.

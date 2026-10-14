@@ -49,6 +49,17 @@ module "scope_requirements_mobile_store" {
   assets_bucket_name = aws_s3_bucket.assets_mobile.bucket
 }
 
+# Read-only access to the exported Foundry apps (foundry/ prefix of the mobile
+# bucket) and the voltmx/ secrets. Keep this ref equal to version/tag of
+# voltmx_foundry_app_definition in nullplatform/locals.tf.
+module "scope_requirements_voltmx_foundry_app" {
+  source = "git::https://github.com/nullplatform/scopes-voltmx-foundry-app.git//voltmx-foundry-app/specs/requirements/aws?ref=v0.1.2"
+
+  cluster_name       = module.eks.eks_cluster_name
+  agent_role_arn     = local.agent_role_arn
+  assets_bucket_name = aws_s3_bucket.assets_mobile.bucket
+}
+
 module "service_requirements_s3" {
   source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.2.0"
 
