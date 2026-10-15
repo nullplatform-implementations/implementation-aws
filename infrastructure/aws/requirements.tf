@@ -53,7 +53,7 @@ module "scope_requirements_mobile_store" {
 # bucket) and the voltmx/ secrets. Keep this ref equal to version/tag of
 # voltmx_foundry_app_definition in nullplatform/locals.tf.
 module "scope_requirements_voltmx_foundry_app" {
-  source = "git::https://github.com/nullplatform/scopes-voltmx-foundry-app.git//voltmx-foundry-app/specs/requirements/aws?ref=v0.1.2"
+  source = "git::https://github.com/nullplatform/scopes-voltmx-foundry-app.git//voltmx-foundry-app/specs/requirements/aws?ref=v0.1.3"
 
   cluster_name       = module.eks.eks_cluster_name
   agent_role_arn     = local.agent_role_arn

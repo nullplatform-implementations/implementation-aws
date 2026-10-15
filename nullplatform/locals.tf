@@ -131,14 +131,14 @@ locals {
     service_path               = "voltmx-foundry-app"
     repository_org             = "nullplatform"
     repository_name            = "scopes-voltmx-foundry-app"
-    version                    = "v0.1.2"
+    version                    = "v0.1.3"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
     # Must match worker_orchestrated_packages (infrastructure/aws) and the
     # "voltmx-foundry-app" IAM selector (nullplatform-bindings).
     package_slug    = "voltmx-foundry-app"
-    package_version = "0.1.2"
+    package_version = "0.1.3"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -146,7 +146,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/agent-plugins/scopes/voltmx-foundry-app"
-        tag        = "v0.1.2"
+        tag        = "v0.1.3"
       }
     }]
   }

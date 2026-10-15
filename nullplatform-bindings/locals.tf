@@ -143,7 +143,7 @@ locals {
       service_path                           = "voltmx-foundry-app"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-voltmx-foundry-app"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-voltmx-foundry-app/refs/tags"
-      repository_notification_channel_branch = "v0.1.2"
+      repository_notification_channel_branch = "v0.1.3"
       # Runs from the voltmx-foundry-app worker image, pinned in infrastructure/aws.
       # The service spec slug is "volt-mx-foundry-app" (derived from its name) but
       # the package slug is "voltmx-foundry-app": the agent matches
