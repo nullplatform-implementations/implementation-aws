@@ -67,6 +67,12 @@ module "alb_controller" {
 
   cluster_name = module.eks.eks_cluster_name
   vpc_id       = module.vpc.vpc_id
+
+  # Chart 3.x carries the controller's own version (v2.13.4 shipped as chart
+  # 1.13.4). Helm does not upgrade CRDs: before bumping, apply the chart's CRDs
+  #   kubectl apply --server-side -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=<eks-charts tag>"
+  # with the eks-charts tag whose Chart.yaml matches this version (v0.0.249 for 3.6.2).
+  aws_load_balancer_controller_version = "3.6.2"
 }
 
 ###############################################################################
