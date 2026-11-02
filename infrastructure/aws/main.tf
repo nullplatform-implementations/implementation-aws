@@ -24,6 +24,11 @@ module "eks" {
   # (istiod HA + rolling updates). Current 2-node cluster is saturated.
   node_group_min_size     = 3
   node_group_desired_size = 3
+  # t3.large (8Gi) instead of t3.medium (4Gi): istiod and the agent's workers
+  # request 2Gi each, and with t3.medium three of four nodes sat above 55% of
+  # requested memory, leaving no room for rollouts (a logs-controller pod went
+  # Pending during the istio 1.30.7 upgrade).
+  instance_types = "t3.large"
 
   # Pin AMI to avoid rolling drift on every plan. Current state value.
   ami_release_version            = "1.34.6-20260415"
