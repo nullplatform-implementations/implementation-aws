@@ -30,18 +30,20 @@ module "eks" {
   # Pending during the istio 1.30.7 upgrade).
   instance_types = "t3.large"
 
-  # Pin AMI to avoid rolling drift on every plan. Current state value.
-  ami_release_version            = "1.34.6-20260415"
+  # EKS upgrades one minor at a time: bump kubernetes_version, the AMI release
+  # and the addons together, apply, verify, then repeat for the next minor.
+  # AMI:    aws ssm get-parameter --name /aws/service/eks/optimized-ami/<k8s>/amazon-linux-2023/x86_64/standard/recommended/release_version
+  # Addons: aws eks describe-addon-versions --kubernetes-version <k8s> --addon-name <addon>
+  # Pinned so neither follows whatever AWS publishes between plans.
+  kubernetes_version             = "1.35"
+  ami_release_version            = "1.35.9-20261031"
   use_latest_ami_release_version = false
-
-  # Same reason for the addons: unpinned they follow whatever AWS publishes.
-  # Current values: aws eks describe-addon --cluster-name <c> --addon-name <a>
   addon_versions = {
-    aws-ebs-csi-driver     = "v1.65.0-eksbuild.2"
-    coredns                = "v1.13.2-eksbuild.24"
-    eks-pod-identity-agent = "v1.4.0-eksbuild.2"
-    kube-proxy             = "v1.34.6-eksbuild.25"
-    vpc-cni                = "v1.23.1-eksbuild.1"
+    aws-ebs-csi-driver     = "v1.67.2-eksbuild.1"
+    coredns                = "v1.14.7-eksbuild.22"
+    eks-pod-identity-agent = "v1.4.1-eksbuild.3"
+    kube-proxy             = "v1.35.3-eksbuild.62"
+    vpc-cni                = "v1.23.2-eksbuild.8"
   }
 }
 
