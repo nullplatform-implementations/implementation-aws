@@ -374,15 +374,9 @@ module "agent" {
     ]
   }
 
-  # Every worker keeps the 2Gi memory limit v8.0.0 used to patch per package.
-  # Since v9.x the module leaves it to the chart (2Gi only from chart 3.4.0),
-  # and this install still runs chart 3.1.0 (var.agent_helm_version).
-  worker_resources = {
-    limits = { memory = "2Gi" }
-  }
-
-  # Packages run as workers: they get the agent's ServiceAccount (IRSA).
-  # These are package slugs, not catalog keys.
+  # Packages run as workers: they get the agent's ServiceAccount (IRSA) and the
+  # chart's worker resources (2Gi memory limit from chart 3.4.0). These are
+  # package slugs, not catalog keys.
   worker_orchestrated_packages = [
     "containers",
     "static-scope",
