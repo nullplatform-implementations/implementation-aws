@@ -35,14 +35,14 @@ module "eks" {
   # AMI:    aws ssm get-parameter --name /aws/service/eks/optimized-ami/<k8s>/amazon-linux-2023/x86_64/standard/recommended/release_version
   # Addons: aws eks describe-addon-versions --kubernetes-version <k8s> --addon-name <addon>
   # Pinned so neither follows whatever AWS publishes between plans.
-  kubernetes_version             = "1.35"
-  ami_release_version            = "1.35.9-20261031"
+  kubernetes_version             = "1.36"
+  ami_release_version            = "1.36.5-20261031"
   use_latest_ami_release_version = false
   addon_versions = {
     aws-ebs-csi-driver     = "v1.67.2-eksbuild.1"
     coredns                = "v1.14.7-eksbuild.22"
     eks-pod-identity-agent = "v1.4.1-eksbuild.3"
-    kube-proxy             = "v1.35.3-eksbuild.62"
+    kube-proxy             = "v1.36.0-eksbuild.58"
     vpc-cni                = "v1.23.2-eksbuild.8"
   }
 }
