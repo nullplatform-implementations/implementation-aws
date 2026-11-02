@@ -72,8 +72,8 @@ module "istio" {
 
   # Istio only supports in-place upgrades one minor at a time: 1.27.1 -> 1.28.10
   # -> 1.29.7 -> 1.30.4 (the module default), one apply per hop.
-  istio_base_version = "1.30.4"
-  istiod_version     = "1.30.4"
+  istio_base_version = "1.30.7"
+  istiod_version     = "1.30.7"
   istiod_replicas    = 2
 
   depends_on = [module.alb_controller]
@@ -85,8 +85,8 @@ module "istio" {
 module "prometheus" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/prometheus?ref=v9.9.0"
 
-  # Pinned to the chart version already deployed.
-  prometheus_version = "29.27.0"
+  # Pinned per tofu-modules VERSIONS.md.
+  prometheus_version = "29.40.0"
 }
 
 ###############################################################################
@@ -191,15 +191,16 @@ module "external_dns_public" {
 
   depends_on = [module.alb_controller]
 
-  type              = "public"
-  zone_type         = "public"
-  dns_provider_name = var.dns_provider_name
-  domain_filters    = module.dns.public_zone_name
-  zone_id_filter    = module.dns.public_zone_id
-  policy            = var.policy
-  sources           = var.sources
-  aws_region        = var.aws_region
-  aws_iam_role_arn  = module.external_dns_iam.nullplatform_external_dns_role_arn
+  type                 = "public"
+  zone_type            = "public"
+  dns_provider_name    = var.dns_provider_name
+  external_dns_version = "1.23.0"
+  domain_filters       = module.dns.public_zone_name
+  zone_id_filter       = module.dns.public_zone_id
+  policy               = var.policy
+  sources              = var.sources
+  aws_region           = var.aws_region
+  aws_iam_role_arn     = module.external_dns_iam.nullplatform_external_dns_role_arn
 }
 
 module "external_dns_private" {
@@ -207,16 +208,17 @@ module "external_dns_private" {
 
   depends_on = [module.alb_controller, module.external_dns_public]
 
-  type              = "private"
-  zone_type         = "private"
-  create_namespace  = false
-  dns_provider_name = var.dns_provider_name
-  domain_filters    = module.dns.private_zone_name
-  zone_id_filter    = module.dns.private_zone_id
-  policy            = var.policy
-  sources           = var.sources
-  aws_region        = var.aws_region
-  aws_iam_role_arn  = module.external_dns_iam.nullplatform_external_dns_role_arn
+  type                 = "private"
+  zone_type            = "private"
+  create_namespace     = false
+  dns_provider_name    = var.dns_provider_name
+  external_dns_version = "1.23.0"
+  domain_filters       = module.dns.private_zone_name
+  zone_id_filter       = module.dns.private_zone_id
+  policy               = var.policy
+  sources              = var.sources
+  aws_region           = var.aws_region
+  aws_iam_role_arn     = module.external_dns_iam.nullplatform_external_dns_role_arn
 }
 
 ###############################################################################
@@ -234,8 +236,8 @@ module "cert_manager" {
   account_slug        = var.organization_slug
   aws_region          = var.aws_region
 
-  # Pinned to the chart version already deployed.
-  cert_manager_version = "v1.21.1"
+  # Pinned per tofu-modules VERSIONS.md.
+  cert_manager_version = "v1.21.3"
 }
 
 ###############################################################################
@@ -295,8 +297,8 @@ module "base" {
 
   # Everything pinned: the chart to what is deployed, the images to the
   # versions VERSIONS.md documents (they were running :latest).
-  nullplatform_base_helm_version = "2.44.5"
-  logging_controller_image_tag   = "1.6.0"
+  nullplatform_base_helm_version = "2.44.7"
+  logging_controller_image_tag   = "v1.7.0"
 
   # The chart's CRD job is a no-op once the CRDs exist (helm-charts#183).
   install_gateway_v2_crd = false
