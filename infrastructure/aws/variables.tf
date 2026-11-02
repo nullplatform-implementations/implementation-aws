@@ -83,9 +83,9 @@ EOF
 }
 
 variable "image_tag" {
-  description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator; the -nonroot variant runs as uid 1001 and clones repositories under /home/agent/.np."
+  description = "Docker image tag for the Nullplatform agent (controlplane-agent). aws-0.11.0+ is required for the worker orchestrator; 0.14.0+ drains running commands on SIGTERM (NP_SHUTDOWN_DRAIN_TIMEOUT, set by chart 3.4.0+); the -nonroot variant runs as uid 1001 and clones repositories under /home/agent/.np."
   type        = string
-  default     = "aws-0.12.0-nonroot"
+  default     = "aws-0.15.0-nonroot"
 }
 
 variable "agent_helm_version" {
@@ -101,9 +101,9 @@ variable "scopes_networking_version" {
 }
 
 variable "traffic_manager_tag" {
-  description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE."
+  description = "k8s-traffic-manager image tag, published to the agent as TRAFFIC_CONTAINER_IMAGE. Tags carry a v prefix from 1.9.0 on (v1.9.0); the registry also holds an older v2.0.2 from an abandoned line, so compare build dates, not numbers (see tofu-modules VERSIONS.md)."
   type        = string
-  default     = "1.8.0"
+  default     = "v1.9.0"
 }
 
 variable "tags_selectors" {
