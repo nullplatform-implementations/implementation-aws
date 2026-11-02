@@ -197,3 +197,13 @@ variable "secrets_manager_iam_role" {
     name   = ""
   }
 }
+
+variable "github_organization" {
+  description = "GitHub organization whose Actions jobs may assume the build workflow role (OIDC subject repo:<org>/*)."
+  type        = string
+}
+
+variable "github_organization_id" {
+  description = "Numeric ID of that GitHub organization (gh api orgs/<org> --jq .id). Repositories with immutable OIDC subjects send repo:<org>@<id>/..., so both patterns are trusted."
+  type        = string
+}

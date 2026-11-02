@@ -2,7 +2,7 @@
 # Each one also publishes a package revision pinning its spec, actions and
 # artifacts; re-applying the same package_version with the same content is a no-op.
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v9.9.0"
   for_each = local.scope_definitions_enabled
 
   nrn        = var.nrn
@@ -33,7 +33,7 @@ module "scope_definitions" {
 
 # Service definitions: one module instance per enabled catalog entry.
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v9.9.0"
   for_each = local.service_definitions_enabled
 
   nrn                 = var.nrn
@@ -55,7 +55,7 @@ module "service_definitions" {
 
 # Dimensions: one module instance per enabled catalog entry.
 module "dimensions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v9.9.0"
   for_each = local.dimensions_enabled
 
   nrn    = var.nrn
@@ -66,7 +66,7 @@ module "dimensions" {
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v9.9.0"
 
   dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"

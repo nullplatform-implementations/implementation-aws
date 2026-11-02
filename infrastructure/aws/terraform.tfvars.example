@@ -33,3 +33,9 @@ dns_provider_name = "aws"
 dns_type          = "external_dns"
 policy            = "sync"
 sources           = ["crd", "gateway-httproute"]
+
+###############################################################################
+# CI build workflow role (OIDC)
+###############################################################################
+github_organization    = ""
+github_organization_id = ""

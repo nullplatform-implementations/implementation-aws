@@ -39,15 +39,9 @@ output "ecr_application_role_arn" {
   value       = module.ecr_iam.application_role_arn
 }
 
-output "ecr_build_workflow_access_key_id" {
-  description = "Access key ID for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
-  value       = module.ci_build_workflow_user.build_workflow_access_key_id
-}
-
-output "ecr_build_workflow_access_key_secret" {
-  description = "Secret access key for the CI/CD build workflow IAM user (created by the build-user module; consumed by nullplatform/asset/ecr and asset/s3)"
-  value       = module.ci_build_workflow_user.build_workflow_access_key_secret
-  sensitive   = true
+output "ci_build_workflow_role_arn" {
+  description = "ARN of the IAM role CI pipelines assume with their OIDC token to push assets; consumed by nullplatform/asset/ecr as build_workflow_role_arn and by pipelines that call AWS directly (role-to-assume)"
+  value       = module.ci_build_workflow_role.role_arn
 }
 
 output "lambda_assume_role_arn" {

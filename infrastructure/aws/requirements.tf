@@ -198,9 +198,9 @@ resource "aws_s3_bucket_versioning" "assets_mobile" {
 # (s3://assets-aws-mobile/maven). Besides Get and Put, Maven clients and the
 # immutability check in the module CIs need ListBucket: without it, S3 answers
 # 403 instead of 404 for a key that does not exist yet.
-resource "aws_iam_group_policy" "ci_build_workflow_mobile_maven" {
-  name  = "mobile-maven-list"
-  group = module.ci_build_workflow_user.group_name
+resource "aws_iam_role_policy" "ci_build_workflow_mobile_maven" {
+  name = "mobile-maven-list"
+  role = module.ci_build_workflow_role.role_name
 
   policy = jsonencode({
     Version = "2012-10-17"

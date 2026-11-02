@@ -15,3 +15,7 @@ password     = ""
 
 # Azure Cloud Provider Configuration
 dimensions = {}
+
+# Other accounts that must see the Parameter Store / Secrets Manager specs.
+# api-private (1671037747) was granted outside tofu; keep it.
+extra_visible_to_nrns = []

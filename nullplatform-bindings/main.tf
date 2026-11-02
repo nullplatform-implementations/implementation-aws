@@ -2,7 +2,7 @@
 # Code Repository (GitHub)
 # =============================================================================
 module "code_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/code_repository?ref=v9.9.0"
 
   git_provider           = "github"
   nrn                    = var.nrn
@@ -14,19 +14,21 @@ module "code_repository" {
 # Asset Repository (ECR)
 # =============================================================================
 module "asset_repository" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/ecr?ref=v9.9.0"
 
-  nrn                              = var.nrn
-  application_role_arn             = local.ecr_application_role_arn
-  build_workflow_access_key_id     = local.ecr_build_workflow_access_key_id
-  build_workflow_access_key_secret = local.ecr_build_workflow_access_key_secret
+  nrn                  = var.nrn
+  application_role_arn = local.ecr_application_role_arn
+
+  # `np asset push` assumes this role with the job's GitHub OIDC token; no
+  # static access keys are configured.
+  build_workflow_role_arn = local.ci_build_workflow_role_arn
 }
 
 # =============================================================================
 # Asset Repository (S3 - Lambda/bundle assets)
 # =============================================================================
 module "asset_s3" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/s3?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/asset/s3?ref=v9.9.0"
 
   nrn         = var.nrn
   bucket_name = "lambda-files-aws-services"
@@ -36,7 +38,7 @@ module "asset_s3" {
 # Cloud Provider (AWS)
 # =============================================================================
 module "cloud_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/cloud?ref=v9.9.0"
 
   nrn                    = var.nrn
   domain_name            = local.domain_name
@@ -48,7 +50,7 @@ module "cloud_provider" {
 # from the provider instead of an env var on the agent. ARNs come from
 # infrastructure/aws via remote state.
 module "identity_access_control" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/identity-access-control?ref=v9.9.0"
 
   nrn = var.nrn
 
@@ -72,23 +74,13 @@ module "identity_access_control" {
   }
 }
 
-# Notification API keys: one per entry in the catalog, keyed by scope/service slug.
-module "notification_api_keys" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v8.0.0"
-  for_each = local.notification_api_keys_catalog
-
-  type               = each.value.type
-  nrn                = var.nrn
-  specification_slug = each.value.specification_slug
-}
-
-# Scope channels: one per catalog entry; api_key wires by each.key.
+# Scope channels: one per catalog entry. The channel credential is created and
+# managed by the platform (tofu-modules >= 9.0.0), so no api_key is passed.
 module "scope_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v9.9.0"
   for_each = local.scope_channel_associations_catalog
 
   nrn                                    = var.nrn
-  api_key                                = module.notification_api_keys[each.key].api_key
   tags_selectors                         = var.tags_selectors
   description                            = each.value.description
   scope_specification_id                 = each.value.scope_specification_id
@@ -114,11 +106,10 @@ module "scope_channel_associations" {
 # run the package image; the rest are resolved from the agent's clone at
 # <base_clone_path>/<repo>/<service_path>/entrypoint/entrypoint.
 module "service_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v9.9.0"
   for_each = local.service_channel_associations_catalog
 
   nrn                          = var.nrn
-  api_key                      = module.notification_api_keys[each.key].api_key
   tags_selectors               = var.tags_selectors
   description                  = each.value.description
   service_specification_slug   = each.value.service_specification_slug
@@ -135,7 +126,7 @@ module "service_channel_associations" {
 }
 
 module "vpc" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/cloud/aws/vpc?ref=v9.9.0"
 
   nrn                 = var.nrn
   vpc_id              = local.vpc_id
@@ -161,7 +152,7 @@ module "vpc" {
 # Monitoring (Prometheus)
 # =============================================================================
 module "monitoring_provider" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/metrics?ref=v9.9.0"
 
   nrn = var.nrn
 }
@@ -173,7 +164,7 @@ module "monitoring_provider" {
 
 # Provider specification (replaces nullplatform_provider_specification.this).
 module "parameter_store_spec" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v9.9.0"
 
   nrn                                      = var.nrn
   np_api_key                               = var.np_api_key
@@ -185,7 +176,7 @@ module "parameter_store_spec" {
 
 # Provider instances (replaces module.scope_configuration on scope_configuration v4.5.1).
 module "parameter_store_configuration" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v9.9.0"
 
   for_each = var.parameter_store_instances
 
@@ -201,18 +192,18 @@ module "parameter_store_configuration" {
 
 # Agent API keys (replaces nullplatform_api_key.this). type="agent" applies the
 # same grants: controlplane:agent, developer, ops, secops, secrets-reader.
+# Kept on purpose: the parameter storage channels still use a customer key.
 module "parameter_store_api_keys" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v9.9.0"
   for_each = { for key, instance in var.parameter_store_instances : key => instance if instance.enable_notification_channel }
 
-  type               = "agent"
-  nrn                = each.value.nrn
-  specification_slug = "parameter_storage"
+  type = "agent"
+  nrn  = each.value.nrn
 }
 
 # Agent notification channels (replaces nullplatform_notification_channel.from_template).
 module "parameter_store_channels" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v9.9.0"
   for_each = { for key, instance in var.parameter_store_instances : key => instance if instance.enable_notification_channel }
 
   nrn            = each.value.nrn
@@ -228,7 +219,7 @@ module "parameter_store_channels" {
 
 # Provider specification.
 module "secrets_manager_spec" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition?ref=v9.9.0"
 
   nrn                                      = var.nrn
   np_api_key                               = var.np_api_key
@@ -240,7 +231,7 @@ module "secrets_manager_spec" {
 
 # Provider instances.
 module "secrets_manager_configuration" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_configuration?ref=v9.9.0"
 
   for_each = var.secrets_manager_instances
 
@@ -253,19 +244,18 @@ module "secrets_manager_configuration" {
   depends_on = [module.secrets_manager_spec]
 }
 
-# Agent API keys (type="agent"). specification_slug stays "parameter_storage".
+# Agent API keys (type="agent"). Kept on purpose, same as parameter_store_api_keys.
 module "secrets_manager_api_keys" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/api_key?ref=v9.9.0"
   for_each = { for key, instance in var.secrets_manager_instances : key => instance if instance.enable_notification_channel }
 
-  type               = "agent"
-  nrn                = each.value.nrn
-  specification_slug = "parameter_storage"
+  type = "agent"
+  nrn  = each.value.nrn
 }
 
 # Agent notification channels.
 module "secrets_manager_channels" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v8.0.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/parameter_storage_definition_agent_association?ref=v9.9.0"
   for_each = { for key, instance in var.secrets_manager_instances : key => instance if instance.enable_notification_channel }
 
   nrn            = each.value.nrn
@@ -279,6 +269,9 @@ module "secrets_manager_channels" {
 
 # Static scope configuration; the provider slug comes from the nullplatform
 # layer via remote state.
+# Pinned to v8.0.0: from 8.3.1 the module sends azure_distribution = "front-door",
+# which the static-files spec installed here (scopes-static-files v1.1.5) rejects
+# (its schema only allows "blob-cdn"). Bump together with the static-files spec.
 module "scope_configuration_static_scope" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v8.0.0"
 
@@ -330,6 +323,7 @@ module "scope_configuration_static_scope" {
 # =============================================================================
 # Mirrors what staging already runs: a policy-based default behavior with
 # security headers, an uncached CORS-enabled /api/* and a cached /static/*.
+# Pinned to v8.0.0 for the same reason as scope_configuration_static_scope.
 module "scope_configuration_static_scope_staging" {
   source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v8.0.0"
 
@@ -391,7 +385,7 @@ module "scope_configuration_static_scope_staging" {
 }
 
 module "scope_configuration_lambda" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v8.0.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_configuration?ref=v9.9.0"
 
   nrn  = var.nrn
   type = "aws-lambda"

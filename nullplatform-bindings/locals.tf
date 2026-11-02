@@ -37,10 +37,9 @@ locals {
   lambda_alb_arn          = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_arn
   lambda_alb_listener_arn = data.terraform_remote_state.infrastructure[0].outputs.lambda_alb_listener_arn
 
-  # ECR IAM (created by infrastructure/aws module "ecr_iam", consumed by asset_repository)
-  ecr_application_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
-  ecr_build_workflow_access_key_id     = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_id
-  ecr_build_workflow_access_key_secret = data.terraform_remote_state.infrastructure[0].outputs.ecr_build_workflow_access_key_secret
+  # ECR IAM (created by infrastructure/aws modules "ecr_iam" and "ci_build_workflow_role", consumed by asset_repository)
+  ecr_application_role_arn   = data.terraform_remote_state.infrastructure[0].outputs.ecr_application_role_arn
+  ci_build_workflow_role_arn = data.terraform_remote_state.infrastructure[0].outputs.ci_build_workflow_role_arn
 
   # Lambda assume-role from infrastructure/aws, published under selector "lambda".
   lambda_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
@@ -56,24 +55,8 @@ locals {
   rds_db_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
 
 
-  # One notification api_key per scope/service, keyed by slug. The spec slugs
-  # come from the nullplatform layer via remote state.
-  notification_api_keys_catalog = {
-    containers         = { type = "scope_notification", specification_slug = local.scope_specification_slug }
-    scheduled_task     = { type = "scope_notification", specification_slug = local.scope_specification_slug_scheduled_task }
-    static_scope       = { type = "scope_notification", specification_slug = local.scope_specification_slug_static_scope }
-    aws_lambda         = { type = "scope_notification", specification_slug = local.scope_specification_slug_lambda }
-    mobile_store       = { type = "scope_notification", specification_slug = local.scope_specification_slug_mobile_store }
-    voltmx_foundry_app = { type = "scope_notification", specification_slug = local.scope_specification_slug_voltmx_foundry_app }
-    rds_server         = { type = "service_notification", specification_slug = local.service_specification_slug_rds_server }
-    rds_db             = { type = "service_notification", specification_slug = local.service_specification_slug_rds_db }
-    aws_s3_bucket      = { type = "service_notification", specification_slug = local.service_specification_slug_aws_s3_bucket }
-    aws_dynamodb       = { type = "service_notification", specification_slug = local.service_specification_slug_aws_dynamodb }
-    postgres_db        = { type = "service_notification", specification_slug = local.service_specification_slug_postgres_db }
-  }
-
-  # Scope channels. Keys match notification_api_keys_catalog so api_key wires
-  # by each.key; optional fields are null when the module default is fine.
+  # Scope channels, keyed by scope slug; optional fields are null when the
+  # module default is fine.
   scope_channel_associations_catalog = {
     containers = {
       description                            = "Containers scope agent channel"
