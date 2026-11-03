@@ -365,10 +365,12 @@ module "agent" {
 
     # The lambda image ships scopes-lambda alone, so an init container fetches
     # the ALB/Route53 steps from scopes-networking into a shared volume and
-    # NP_OVERRIDES_PATH points the worker at them.
+    # NP_OVERRIDES_PATH points the worker at them. One patch per Lambda
+    # package: the copy registered in nullplatform/ and the global package
+    # installed from nullplatform's publication.
     patches = [
-      {
-        target = { package = "aws-lambda-agustin" }
+      for lambda_package in ["aws-lambda-agustin", "nullplatform-aws-lambda"] : {
+        target = { package = lambda_package }
         merge = {
           spec = {
             volumes = [{ name = "overrides", emptyDir = {} }]
@@ -404,6 +406,10 @@ module "agent" {
     "scheduled-task",
     "aws-dynamodb-agustin-test",
     "postgres-db-k8s-agustin-test",
+    # Global packages installed from nullplatform's publication (nullplatform/
+    # catalog entries with install_package): the slug is the published one.
+    "nullplatform-aws-lambda",
+    "nullplatform-aws-s3-bucket",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the

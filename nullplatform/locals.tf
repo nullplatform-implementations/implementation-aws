@@ -151,11 +151,39 @@ locals {
     }]
   }
 
+  # Installed from the package nullplatform publishes for every organization
+  # instead of registering a copy of its specification. `install_package` is
+  # what marks the entry: the scope type, NRN settings and scope-configuration
+  # schema are still ours, the specification and its actions are not. The
+  # repository URL and tag only feed the templates of those pieces, so pin the
+  # tag the installed version was published from. Existing scopes stay on the
+  # aws_lambda copy above: a scope cannot change specification, so the copy
+  # goes only once it has no scopes left.
+  aws_lambda_global_definition = {
+    service_spec_name          = "nullplatform AWS Lambda"
+    service_spec_description   = "Serverless functions on AWS Lambda"
+    service_path               = "lambda"
+    repository_org             = "nullplatform"
+    repository_name            = "scopes-lambda"
+    version                    = "v0.11.1"
+    repository_ref_type        = "tags"
+    create_scope_configuration = true
+    # The template names its schema "AWS Lambda", the same name (and slug) the
+    # copy's schema already has in this organization: the two must differ.
+    scope_configuration_name_override = "nullplatform AWS Lambda"
+
+    install_package = {
+      slug    = "nullplatform-aws-lambda"
+      version = "0.11.1"
+    }
+  }
+
   scope_definitions_catalog = {
     containers         = local.containers_definition
     scheduled_tasks    = local.scheduled_tasks_definition
     static_files       = local.static_files_definition
     aws_lambda         = local.aws_lambda_definition
+    aws_lambda_global  = local.aws_lambda_global_definition
     mobile_store       = local.mobile_store_definition
     voltmx_foundry_app = local.voltmx_foundry_app_definition
   }
@@ -298,12 +326,27 @@ locals {
     }]
   }
 
+  # Installed from the global package: for a service the installation is the
+  # whole nullplatform side, the channel stays in nullplatform-bindings.
+  aws_s3_bucket_global_definition = {
+    repository_org    = "nullplatform"
+    repository_name   = "services-s-3"
+    repository_branch = "v0.5.6"
+    service_path      = "aws-s3-bucket"
+
+    install_package = {
+      slug    = "nullplatform-aws-s3-bucket"
+      version = "0.5.6"
+    }
+  }
+
   service_definitions_catalog = {
-    rds_postgres_server = local.rds_postgres_server_definition
-    rds_postgres_db     = local.rds_postgres_db_definition
-    aws_s3_bucket       = local.aws_s3_bucket_definition
-    aws_dynamodb        = local.aws_dynamodb_definition
-    postgres_db_k8s     = local.postgres_db_k8s_definition
+    rds_postgres_server  = local.rds_postgres_server_definition
+    rds_postgres_db      = local.rds_postgres_db_definition
+    aws_s3_bucket        = local.aws_s3_bucket_definition
+    aws_s3_bucket_global = local.aws_s3_bucket_global_definition
+    aws_dynamodb         = local.aws_dynamodb_definition
+    postgres_db_k8s      = local.postgres_db_k8s_definition
   }
 
   # version overrides the catalog branch, but not the artifact reference.
