@@ -49,13 +49,16 @@ module "scope_installations" {
   package_slug    = each.value.install_package.slug
   package_version = each.value.install_package.version
 
-  service_spec_name                = each.value.service_spec_name
-  service_spec_description         = each.value.service_spec_description
-  service_path                     = each.value.service_path
-  create_scope_configuration       = each.value.create_scope_configuration
-  repository_scope_template        = coalesce(each.value.repository_scope_template, each.value.repository_url)
-  repository_scope_template_branch = coalesce(each.value.repository_scope_template_version, each.value.version)
-  create_agent_channel             = false
+  service_spec_name          = each.value.service_spec_name
+  service_spec_description   = each.value.service_spec_description
+  service_path               = each.value.service_path
+  create_scope_configuration = each.value.create_scope_configuration
+  # Null keeps the template's name; set it when that name is already taken by
+  # a copy's schema in the organization (the slug must be unique).
+  scope_configuration_name_override = try(each.value.scope_configuration_name_override, null)
+  repository_scope_template         = coalesce(each.value.repository_scope_template, each.value.repository_url)
+  repository_scope_template_branch  = coalesce(each.value.repository_scope_template_version, each.value.version)
+  create_agent_channel              = false
 }
 
 # Service definitions: one module instance per enabled catalog entry that

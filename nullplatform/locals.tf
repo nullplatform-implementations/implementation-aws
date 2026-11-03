@@ -168,6 +168,9 @@ locals {
     version                    = "v0.11.1"
     repository_ref_type        = "tags"
     create_scope_configuration = true
+    # The template names its schema "AWS Lambda", the same name (and slug) the
+    # copy's schema already has in this organization: the two must differ.
+    scope_configuration_name_override = "nullplatform AWS Lambda"
 
     install_package = {
       slug    = "nullplatform-aws-lambda"
