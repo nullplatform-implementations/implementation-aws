@@ -1,10 +1,13 @@
 # Specs exposed as maps keyed by catalog slug, built from the module for_each
-# instances, so a disabled scope/service simply drops out of the map.
+# instances, so a disabled scope/service simply drops out of the map. Copies
+# (scope_definition / service_definition) and installs of global packages
+# (scope_package_installation / package_installation) expose the same output
+# names, so nullplatform-bindings reads one map either way.
 
 output "scope_definitions" {
   description = "Enabled scope definitions keyed by catalog slug (id, slug, provider_specification_slug + catalog metadata + package)."
   value = {
-    for k, m in module.scope_definitions : k => {
+    for k, m in merge(module.scope_definitions, module.scope_installations) : k => {
       id                          = m.service_specification_id
       slug                        = m.service_slug
       provider_specification_slug = try(m.provider_specification_slug, "")
@@ -23,7 +26,7 @@ output "scope_definitions" {
 output "service_definitions" {
   description = "Enabled service definitions keyed by catalog slug (id, slug + catalog metadata + package)."
   value = {
-    for k, m in module.service_definitions : k => {
+    for k, m in merge(module.service_definitions, module.service_installations) : k => {
       id              = m.service_specification_id
       slug            = m.service_specification_slug
       repository_org  = local.service_definitions_enabled[k].repository_org
