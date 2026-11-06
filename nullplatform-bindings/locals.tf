@@ -22,14 +22,16 @@ locals {
   scope_specification_id_voltmx_foundry_app   = local.scope_specs["voltmx_foundry_app"].id
   scope_specification_slug_voltmx_foundry_app = local.scope_specs["voltmx_foundry_app"].slug
   # The global Lambda package: the specification is nullplatform's, read through
-  # the installation; id and slug reach here through the same output map.
-  scope_specification_id_lambda_global   = local.scope_specs["aws_lambda_global"].id
-  scope_specification_slug_lambda_global = local.scope_specs["aws_lambda_global"].slug
+  # the installation; id and slug reach here through the same output map. Null
+  # while the catalog entry is disabled, so its channel drops out instead of
+  # failing the plan.
+  scope_specification_id_lambda_global   = try(local.scope_specs["aws_lambda_global"].id, null)
+  scope_specification_slug_lambda_global = try(local.scope_specs["aws_lambda_global"].slug, null)
 
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
-  service_specification_slug_s3_global     = local.service_specs["aws_s3_bucket_global"].slug
+  service_specification_slug_s3_global     = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
   service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
 
