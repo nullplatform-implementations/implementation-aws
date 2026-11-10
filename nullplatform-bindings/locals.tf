@@ -31,7 +31,6 @@ locals {
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
-  service_specification_slug_s3_global     = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
   service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
 
@@ -115,19 +114,19 @@ locals {
       package_slug        = local.scope_specification_slug_lambda
     }
     aws_lambda_global = {
-      description                            = "nullplatform AWS Lambda agent channel"
+      description                            = "AWS Lambda (global package) agent channel"
       scope_specification_id                 = local.scope_specification_id_lambda_global
       scope_specification_slug               = local.scope_specification_slug_lambda_global
       service_path                           = "lambda"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
-      repository_notification_channel_branch = "v0.11.1"
+      repository_notification_channel_branch = "v0.13.1"
       # Runs from the worker image the global package pins. The package slug is
       # the one nullplatform publishes under, not the specification slug of a
       # copy, and it must be listed in worker_orchestrated_packages
       # (infrastructure/aws).
       worker_orchestrator = true
-      package_slug        = "nullplatform-aws-lambda"
+      package_slug        = "np-aws-lambda"
     }
     mobile_store = {
       description                            = "Mobile store agent channel"
@@ -186,15 +185,6 @@ locals {
       # Runs from the package worker image (services-s-3 v0.3.1), not the clone.
       worker_orchestrator = true
       package_slug        = local.service_specification_slug_aws_s3_bucket
-    }
-    aws_s3_bucket_global = {
-      description                  = "nullplatform AWS S3 bucket service agent channel"
-      service_specification_slug   = local.service_specification_slug_s3_global
-      repository_service_spec_repo = "nullplatform/services-s-3"
-      service_path                 = "aws-s3-bucket"
-      # Runs from the worker image the global package pins (services-s-3 v0.5.6).
-      worker_orchestrator = true
-      package_slug        = "nullplatform-aws-s3-bucket"
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"

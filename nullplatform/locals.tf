@@ -160,21 +160,23 @@ locals {
   # aws_lambda copy above: a scope cannot change specification, so the copy
   # goes only once it has no scopes left.
   aws_lambda_global_definition = {
-    service_spec_name          = "nullplatform AWS Lambda"
+    service_spec_name          = "AWS Lambda"
     service_spec_description   = "Serverless functions on AWS Lambda"
     service_path               = "lambda"
     repository_org             = "nullplatform"
     repository_name            = "scopes-lambda"
-    version                    = "v0.11.1"
+    version                    = "v0.13.1"
     repository_ref_type        = "tags"
     create_scope_configuration = true
     # The template names its schema "AWS Lambda", the same name (and slug) the
     # copy's schema already has in this organization: the two must differ.
     scope_configuration_name_override = "nullplatform AWS Lambda"
 
+    # The published package: the np- prefix keeps it apart from copies an
+    # organization registered under aws-lambda / lambda.
     install_package = {
-      slug    = "nullplatform-aws-lambda"
-      version = "0.11.1"
+      slug    = "np-aws-lambda"
+      version = "0.13.1"
     }
   }
 
@@ -326,27 +328,12 @@ locals {
     }]
   }
 
-  # Installed from the global package: for a service the installation is the
-  # whole nullplatform side, the channel stays in nullplatform-bindings.
-  aws_s3_bucket_global_definition = {
-    repository_org    = "nullplatform"
-    repository_name   = "services-s-3"
-    repository_branch = "v0.5.6"
-    service_path      = "aws-s3-bucket"
-
-    install_package = {
-      slug    = "nullplatform-aws-s3-bucket"
-      version = "0.5.6"
-    }
-  }
-
   service_definitions_catalog = {
-    rds_postgres_server  = local.rds_postgres_server_definition
-    rds_postgres_db      = local.rds_postgres_db_definition
-    aws_s3_bucket        = local.aws_s3_bucket_definition
-    aws_s3_bucket_global = local.aws_s3_bucket_global_definition
-    aws_dynamodb         = local.aws_dynamodb_definition
-    postgres_db_k8s      = local.postgres_db_k8s_definition
+    rds_postgres_server = local.rds_postgres_server_definition
+    rds_postgres_db     = local.rds_postgres_db_definition
+    aws_s3_bucket       = local.aws_s3_bucket_definition
+    aws_dynamodb        = local.aws_dynamodb_definition
+    postgres_db_k8s     = local.postgres_db_k8s_definition
   }
 
   # version overrides the catalog branch, but not the artifact reference.

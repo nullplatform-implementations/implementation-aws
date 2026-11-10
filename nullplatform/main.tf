@@ -4,7 +4,7 @@
 # same package_version with the same content is a no-op. Entries that install
 # a global package instead are handled by scope_installations below.
 module "scope_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v9.9.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition?ref=v9.12.0"
   for_each = { for k, v in local.scope_definitions_enabled : k => v if try(v.install_package, null) == null }
 
   nrn        = var.nrn
@@ -40,7 +40,7 @@ module "scope_definitions" {
 # same catalog fields, by repository URL and tag, with no checkout. The channel
 # stays in nullplatform-bindings, as for every other scope.
 module "scope_installations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=v9.9.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=v9.12.0"
   for_each = { for k, v in local.scope_definitions_enabled : k => v if try(v.install_package, null) != null }
 
   nrn        = var.nrn
@@ -65,7 +65,7 @@ module "scope_installations" {
 # registers its own copy. Entries with `install_package` go to
 # service_installations below.
 module "service_definitions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v9.9.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition?ref=v9.12.0"
   for_each = { for k, v in local.service_definitions_enabled : k => v if try(v.install_package, null) == null }
 
   nrn                 = var.nrn
@@ -88,7 +88,7 @@ module "service_definitions" {
 # Service installations: for a service the installation is the whole
 # nullplatform side; the channel stays in nullplatform-bindings.
 module "service_installations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/package_installation?ref=v9.9.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/package_installation?ref=v9.12.0"
   for_each = { for k, v in local.service_definitions_enabled : k => v if try(v.install_package, null) != null }
 
   nrn             = var.nrn
@@ -98,7 +98,7 @@ module "service_installations" {
 
 # Dimensions: one module instance per enabled catalog entry.
 module "dimensions" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v9.9.0"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension?ref=v9.12.0"
   for_each = local.dimensions_enabled
 
   nrn    = var.nrn
@@ -109,7 +109,7 @@ module "dimensions" {
 
 # Extra value for the Environment dimension, scoped to a specific namespace.
 module "dimension_value_environment_produccion_only" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v9.9.0"
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/dimension_value?ref=v9.12.0"
 
   dimension_id = module.dimensions["environment"].id
   name         = "produccion-only"

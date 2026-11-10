@@ -369,7 +369,7 @@ module "agent" {
     # package: the copy registered in nullplatform/ and the global package
     # installed from nullplatform's publication.
     patches = [
-      for lambda_package in ["aws-lambda-agustin", "nullplatform-aws-lambda"] : {
+      for lambda_package in ["aws-lambda-agustin", "np-aws-lambda"] : {
         target = { package = lambda_package }
         merge = {
           spec = {
@@ -408,8 +408,7 @@ module "agent" {
     "postgres-db-k8s-agustin-test",
     # Global packages installed from nullplatform's publication (nullplatform/
     # catalog entries with install_package): the slug is the published one.
-    "nullplatform-aws-lambda",
-    "nullplatform-aws-s3-bucket",
+    "np-aws-lambda",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
