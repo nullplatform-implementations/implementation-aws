@@ -409,6 +409,7 @@ module "agent" {
     # Global packages installed from nullplatform's publication (nullplatform/
     # catalog entries with install_package): the slug is the published one.
     "np-aws-lambda",
+    "np-aws-s3-bucket",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the

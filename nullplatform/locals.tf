@@ -328,12 +328,30 @@ locals {
     }]
   }
 
+  # Installed from the global package nullplatform publishes (slug
+  # np-aws-s3-bucket, specification "AWS S3 Bucket"): for a service the
+  # installation is the whole nullplatform side, the channel stays in
+  # nullplatform-bindings. The aws_s3_bucket copy above stays while it has
+  # services: a service cannot change specification.
+  aws_s3_bucket_global_definition = {
+    repository_org    = "nullplatform"
+    repository_name   = "services-s-3"
+    repository_branch = "v0.6.0"
+    service_path      = "aws-s3-bucket"
+
+    install_package = {
+      slug    = "np-aws-s3-bucket"
+      version = "0.6.0"
+    }
+  }
+
   service_definitions_catalog = {
-    rds_postgres_server = local.rds_postgres_server_definition
-    rds_postgres_db     = local.rds_postgres_db_definition
-    aws_s3_bucket       = local.aws_s3_bucket_definition
-    aws_dynamodb        = local.aws_dynamodb_definition
-    postgres_db_k8s     = local.postgres_db_k8s_definition
+    rds_postgres_server  = local.rds_postgres_server_definition
+    rds_postgres_db      = local.rds_postgres_db_definition
+    aws_s3_bucket        = local.aws_s3_bucket_definition
+    aws_s3_bucket_global = local.aws_s3_bucket_global_definition
+    aws_dynamodb         = local.aws_dynamodb_definition
+    postgres_db_k8s      = local.postgres_db_k8s_definition
   }
 
   # version overrides the catalog branch, but not the artifact reference.

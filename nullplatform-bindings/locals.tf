@@ -31,6 +31,7 @@ locals {
   service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
+  service_specification_slug_s3_global     = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
   service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
   service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
 
@@ -185,6 +186,17 @@ locals {
       # Runs from the package worker image (services-s-3 v0.3.1), not the clone.
       worker_orchestrator = true
       package_slug        = local.service_specification_slug_aws_s3_bucket
+    }
+    aws_s3_bucket_global = {
+      description                  = "AWS S3 bucket (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_s3_global
+      repository_service_spec_repo = "nullplatform/services-s-3"
+      service_path                 = "aws-s3-bucket"
+      # Runs from the worker image the global package pins (services-s-3
+      # v0.6.0). The package slug is the one nullplatform publishes under, and
+      # it must be listed in worker_orchestrated_packages (infrastructure/aws).
+      worker_orchestrator = true
+      package_slug        = "np-aws-s3-bucket"
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"
