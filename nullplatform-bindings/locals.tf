@@ -15,8 +15,6 @@ locals {
   scope_specification_slug_scheduled_task     = local.scope_specs["scheduled_tasks"].slug
   scope_specification_id_static_scope         = local.scope_specs["static_files"].id
   scope_specification_slug_static_scope       = local.scope_specs["static_files"].slug
-  scope_specification_id_lambda               = local.scope_specs["aws_lambda"].id
-  scope_specification_slug_lambda             = local.scope_specs["aws_lambda"].slug
   scope_specification_id_mobile_store         = local.scope_specs["mobile_store"].id
   scope_specification_slug_mobile_store       = local.scope_specs["mobile_store"].slug
   scope_specification_id_voltmx_foundry_app   = local.scope_specs["voltmx_foundry_app"].id
@@ -28,12 +26,11 @@ locals {
   scope_specification_id_lambda_global   = try(local.scope_specs["aws_lambda_global"].id, null)
   scope_specification_slug_lambda_global = try(local.scope_specs["aws_lambda_global"].slug, null)
 
-  service_specification_slug_rds_server    = local.service_specs["rds_postgres_server"].slug
-  service_specification_slug_rds_db        = local.service_specs["rds_postgres_db"].slug
-  service_specification_slug_aws_s3_bucket = local.service_specs["aws_s3_bucket"].slug
-  service_specification_slug_s3_global     = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
-  service_specification_slug_postgres_db   = local.service_specs["postgres_db_k8s"].slug
-  service_specification_slug_aws_dynamodb  = local.service_specs["aws_dynamodb"].slug
+  service_specification_slug_rds_server   = local.service_specs["rds_postgres_server"].slug
+  service_specification_slug_rds_db       = local.service_specs["rds_postgres_db"].slug
+  service_specification_slug_s3_global    = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
+  service_specification_slug_postgres_db  = local.service_specs["postgres_db_k8s"].slug
+  service_specification_slug_aws_dynamodb = local.service_specs["aws_dynamodb"].slug
 
   vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
@@ -101,19 +98,6 @@ locals {
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_static_scope
     }
-    aws_lambda = {
-      description                            = "AWS Lambda scope agent channel"
-      scope_specification_id                 = local.scope_specification_id_lambda
-      scope_specification_slug               = local.scope_specification_slug_lambda
-      service_path                           = "lambda"
-      repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
-      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
-      repository_notification_channel_branch = "v0.5.0"
-      # The scopes-networking overrides (ALB / Route53) reach the worker through
-      # NP_OVERRIDES_PATH, set by the agent's worker patch in infrastructure/aws.
-      worker_orchestrator = true
-      package_slug        = local.scope_specification_slug_lambda
-    }
     aws_lambda_global = {
       description                            = "AWS Lambda (global package) agent channel"
       scope_specification_id                 = local.scope_specification_id_lambda_global
@@ -177,15 +161,6 @@ locals {
       service_path                 = "rds-postgres-db"
       worker_orchestrator          = true
       package_slug                 = local.service_specification_slug_rds_db
-    }
-    aws_s3_bucket = {
-      description                  = "AWS S3 bucket service agent channel"
-      service_specification_slug   = local.service_specification_slug_aws_s3_bucket
-      repository_service_spec_repo = "nullplatform/services-s-3"
-      service_path                 = "aws-s3-bucket"
-      # Runs from the package worker image (services-s-3 v0.3.1), not the clone.
-      worker_orchestrator = true
-      package_slug        = local.service_specification_slug_aws_s3_bucket
     }
     aws_s3_bucket_global = {
       description                  = "AWS S3 bucket (global package) agent channel"

@@ -41,7 +41,6 @@ variable "scope_definitions" {
     containers         = { enabled = true }
     scheduled_tasks    = { enabled = true }
     static_files       = { enabled = true }
-    aws_lambda         = { enabled = true }
     aws_lambda_global  = { enabled = true }
     mobile_store       = { enabled = true }
     voltmx_foundry_app = { enabled = true }
@@ -61,7 +60,6 @@ variable "service_definitions" {
   default = {
     rds_postgres_server  = { enabled = true }
     rds_postgres_db      = { enabled = true }
-    aws_s3_bucket        = { enabled = true }
     aws_s3_bucket_global = { enabled = true }
     postgres_db_k8s      = { enabled = true }
   }

@@ -76,29 +76,6 @@ locals {
     }]
   }
 
-  aws_lambda_definition = {
-    service_spec_name          = "AWS Lambda Agustin"
-    service_spec_description   = "AWS Lambda"
-    service_path               = "lambda"
-    repository_org             = "nullplatform"
-    repository_name            = "scopes-lambda"
-    version                    = "v0.7.2"
-    repository_ref_type        = "tags"
-    create_scope_configuration = true
-
-    package_version = "0.7.2"
-    package_artifacts = [{
-      name   = "worker-image"
-      type   = "oci_image"
-      lookup = true
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/scopes/lambda"
-        tag        = "v0.7.2"
-      }
-    }]
-  }
-
   mobile_store_definition = {
     service_spec_name          = "Mobile store"
     service_spec_description   = "Publishes mobile app binaries to distribution channels"
@@ -156,9 +133,7 @@ locals {
   # what marks the entry: the scope type, NRN settings and scope-configuration
   # schema are still ours, the specification and its actions are not. The
   # repository URL and tag only feed the templates of those pieces, so pin the
-  # tag the installed version was published from. Existing scopes stay on the
-  # aws_lambda copy above: a scope cannot change specification, so the copy
-  # goes only once it has no scopes left.
+  # tag the installed version was published from.
   aws_lambda_global_definition = {
     service_spec_name          = "AWS Lambda"
     service_spec_description   = "Serverless functions on AWS Lambda"
@@ -168,8 +143,9 @@ locals {
     version                    = "v0.13.1"
     repository_ref_type        = "tags"
     create_scope_configuration = true
-    # The template names its schema "AWS Lambda", the same name (and slug) the
-    # copy's schema already has in this organization: the two must differ.
+    # The template names its schema "AWS Lambda", which a copy of this scope
+    # owned when the package was installed. The copy is gone; the name stays,
+    # because renaming the schema would replace the one installed scopes use.
     scope_configuration_name_override = "nullplatform AWS Lambda"
 
     # The published package: the np- prefix keeps it apart from copies an
@@ -184,7 +160,6 @@ locals {
     containers         = local.containers_definition
     scheduled_tasks    = local.scheduled_tasks_definition
     static_files       = local.static_files_definition
-    aws_lambda         = local.aws_lambda_definition
     aws_lambda_global  = local.aws_lambda_global_definition
     mobile_store       = local.mobile_store_definition
     voltmx_foundry_app = local.voltmx_foundry_app_definition
@@ -257,29 +232,6 @@ locals {
     }]
   }
 
-  aws_s3_bucket_definition = {
-    repository_org      = "nullplatform"
-    repository_name     = "services-s-3"
-    repository_branch   = "v0.3.1"
-    repository_ref_type = "tags"
-    service_path        = "aws-s3-bucket"
-    service_name        = "AWS S3 Bucket - Agent K8s"
-    available_links     = ["connect"]
-    available_actions   = []
-
-    package_version = "0.0.3"
-    package_artifacts = [{
-      name   = "worker-image"
-      type   = "oci_image"
-      lookup = true
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/services/s3"
-        tag        = "v0.3.1"
-      }
-    }]
-  }
-
   aws_dynamodb_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-dynamo-db"
@@ -331,8 +283,7 @@ locals {
   # Installed from the global package nullplatform publishes (slug
   # np-aws-s3-bucket, specification "AWS S3 Bucket"): for a service the
   # installation is the whole nullplatform side, the channel stays in
-  # nullplatform-bindings. The aws_s3_bucket copy above stays while it has
-  # services: a service cannot change specification.
+  # nullplatform-bindings.
   aws_s3_bucket_global_definition = {
     repository_org    = "nullplatform"
     repository_name   = "services-s-3"
@@ -348,7 +299,6 @@ locals {
   service_definitions_catalog = {
     rds_postgres_server  = local.rds_postgres_server_definition
     rds_postgres_db      = local.rds_postgres_db_definition
-    aws_s3_bucket        = local.aws_s3_bucket_definition
     aws_s3_bucket_global = local.aws_s3_bucket_global_definition
     aws_dynamodb         = local.aws_dynamodb_definition
     postgres_db_k8s      = local.postgres_db_k8s_definition
