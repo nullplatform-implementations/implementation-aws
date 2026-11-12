@@ -143,10 +143,6 @@ locals {
     version                    = "v0.13.1"
     repository_ref_type        = "tags"
     create_scope_configuration = true
-    # The template names its schema "AWS Lambda", which a copy of this scope
-    # owned when the package was installed. The copy is gone; the name stays,
-    # because renaming the schema would replace the one installed scopes use.
-    scope_configuration_name_override = "nullplatform AWS Lambda"
 
     # The published package: the np- prefix keeps it apart from copies an
     # organization registered under aws-lambda / lambda.
