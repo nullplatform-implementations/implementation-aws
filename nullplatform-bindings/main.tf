@@ -77,8 +77,10 @@ module "identity_access_control" {
 # Scope channels: one per catalog entry. The channel credential is created and
 # managed by the platform (tofu-modules >= 9.0.0), so no api_key is passed.
 module "scope_channel_associations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v9.9.0"
-  for_each = local.scope_channel_associations_catalog
+  source = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_definition_agent_association?ref=v9.9.0"
+  # An entry whose specification is not in the nullplatform layer (a disabled
+  # catalog entry) has no channel.
+  for_each = { for k, v in local.scope_channel_associations_catalog : k => v if v.scope_specification_slug != null }
 
   nrn                                    = var.nrn
   tags_selectors                         = var.tags_selectors
@@ -107,7 +109,7 @@ module "scope_channel_associations" {
 # <base_clone_path>/<repo>/<service_path>/entrypoint/entrypoint.
 module "service_channel_associations" {
   source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/service_definition_agent_association?ref=v9.9.0"
-  for_each = local.service_channel_associations_catalog
+  for_each = { for k, v in local.service_channel_associations_catalog : k => v if v.service_specification_slug != null }
 
   nrn                          = var.nrn
   tags_selectors               = var.tags_selectors

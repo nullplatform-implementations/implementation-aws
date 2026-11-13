@@ -22,11 +22,11 @@ variable "organization_slug" {
 }
 
 ################################################################################
-# Scope definitions
+# Scopes
 ################################################################################
 
-variable "scope_definitions" {
-  description = "Per-environment configuration for scope definitions, keyed by scope slug (keys must match local.scope_definitions_catalog). 'enabled' toggles registration (default true); 'version' pins the spec repo branch, falling back to the branch in local.scope_definitions_catalog when unset. The optional 'repository_*' fields override the catalog-derived URL/branch for a specific spec pair (service_spec, scope_template or action_templates)."
+variable "published_scopes" {
+  description = "Per-environment configuration for the scopes this organization publishes, keyed like local.published_scopes. 'enabled' toggles registration (default true); 'version' pins the spec repo branch, falling back to the catalog's when unset. The optional 'repository_*' fields override the catalog-derived URL/branch for a specific spec pair (service_spec, scope_template or action_templates)."
   type = map(object({
     enabled                             = optional(bool, true)
     version                             = optional(string)
@@ -37,32 +37,38 @@ variable "scope_definitions" {
     repository_action_templates         = optional(string)
     repository_action_templates_version = optional(string)
   }))
-  default = {
-    containers         = { enabled = true }
-    scheduled_tasks    = { enabled = true }
-    static_files       = { enabled = true }
-    aws_lambda         = { enabled = true }
-    mobile_store       = { enabled = true }
-    voltmx_foundry_app = { enabled = true }
-  }
+  default = {}
 }
 
-################################################################################
-# Service definitions
-################################################################################
-
-variable "service_definitions" {
-  description = "Per-environment configuration for service definitions, keyed by service slug (keys must match local.service_definitions_catalog). 'enabled' toggles registration (default true); 'version' overrides the catalog branch of the spec repo (defaults to the catalog branch)."
+variable "installed_scopes" {
+  description = "Per-environment configuration for the scope packages this organization installs, keyed like local.installed_scopes. 'enabled' toggles the installation (default true); 'version' pins another package version (the templates follow its tag, v<version>)."
   type = map(object({
     enabled = optional(bool, true)
     version = optional(string)
   }))
-  default = {
-    rds_postgres_server = { enabled = true }
-    rds_postgres_db     = { enabled = true }
-    aws_s3_bucket       = { enabled = true }
-    postgres_db_k8s     = { enabled = true }
-  }
+  default = {}
+}
+
+################################################################################
+# Services
+################################################################################
+
+variable "published_services" {
+  description = "Per-environment configuration for the services this organization publishes, keyed like local.published_services. 'enabled' toggles registration (default true); 'version' overrides the catalog branch of the spec repo."
+  type = map(object({
+    enabled = optional(bool, true)
+    version = optional(string)
+  }))
+  default = {}
+}
+
+variable "installed_services" {
+  description = "Per-environment configuration for the service packages this organization installs, keyed like local.installed_services. 'enabled' toggles the installation (default true); 'version' pins another package version."
+  type = map(object({
+    enabled = optional(bool, true)
+    version = optional(string)
+  }))
+  default = {}
 }
 
 ################################################################################
