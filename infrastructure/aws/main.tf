@@ -403,8 +403,8 @@ module "agent" {
     "scheduled-task",
     "aws-dynamodb-agustin-test",
     "postgres-db-k8s-agustin-test",
-    # Global packages installed from nullplatform's publication (nullplatform/
-    # catalog entries with install_package): the slug is the published one.
+    # Global packages installed from nullplatform's publication (the installed_*
+    # entries of the nullplatform/ catalog): the slug is the published one.
     "np-aws-lambda",
     "np-aws-s3-bucket",
   ]
