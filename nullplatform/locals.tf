@@ -21,11 +21,11 @@ locals {
     service_path               = "k8s"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "v1.16.2"
+    version                    = "v1.20.0"
     repository_ref_type        = "tags"
     create_scope_configuration = false
 
-    package_version = "0.0.2"
+    package_version = "0.0.6"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -33,7 +33,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/containers"
-        tag        = "v1.16.2"
+        tag        = "v1.20.0"
       }
     }]
   }
@@ -44,11 +44,11 @@ locals {
     service_path               = "scheduled_task"
     repository_org             = "nullplatform"
     repository_name            = "scopes"
-    version                    = "v1.16.2"
+    version                    = "v1.20.0"
     repository_ref_type        = "tags"
     create_scope_configuration = false
 
-    package_version = "0.0.5"
+    package_version = "0.0.6"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -56,7 +56,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/scheduled-task"
-        tag        = "v1.16.2"
+        tag        = "v1.20.0"
       }
     }]
   }
@@ -67,11 +67,11 @@ locals {
     service_path               = "static-files"
     repository_org             = "nullplatform"
     repository_name            = "scopes-static-files"
-    version                    = "v1.1.5"
+    version                    = "v4.2.0"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
-    package_version = "1.1.7"
+    package_version = "4.2.0"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -79,7 +79,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/scopes/static-files"
-        tag        = "v1.1.5"
+        tag        = "v4.2.0"
       }
     }]
   }
@@ -90,14 +90,14 @@ locals {
     service_path               = "mobile-store"
     repository_org             = "nullplatform"
     repository_name            = "scopes-mobile-store"
-    version                    = "v0.5.0"
+    version                    = "v0.5.3"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
     # Must match worker_orchestrated_packages (infrastructure/aws) and the
     # "mobile-store" IAM selector (nullplatform-bindings).
     package_slug    = "mobile-store"
-    package_version = "0.2.0"
+    package_version = "0.2.1"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -105,7 +105,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/agent-plugins/scopes/mobile-store"
-        tag        = "v0.5.0"
+        tag        = "v0.5.3"
       }
     }]
   }
@@ -116,14 +116,14 @@ locals {
     service_path               = "voltmx-foundry-app"
     repository_org             = "nullplatform"
     repository_name            = "scopes-voltmx-foundry-app"
-    version                    = "v0.1.3"
+    version                    = "v0.1.5"
     repository_ref_type        = "tags"
     create_scope_configuration = true
 
     # Must match worker_orchestrated_packages (infrastructure/aws) and the
     # "voltmx-foundry-app" IAM selector (nullplatform-bindings).
     package_slug    = "voltmx-foundry-app"
-    package_version = "0.1.3"
+    package_version = "0.1.5"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -131,7 +131,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/agent-plugins/scopes/voltmx-foundry-app"
-        tag        = "v0.1.3"
+        tag        = "v0.1.5"
       }
     }]
   }
@@ -172,7 +172,7 @@ locals {
     aws_lambda_global = {
       package = {
         slug    = "np-aws-lambda"
-        version = "0.13.1"
+        version = "0.13.3"
       }
       repository_org             = "nullplatform"
       repository_name            = "scopes-lambda"
@@ -204,14 +204,14 @@ locals {
   rds_postgres_server_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-rds"
-    repository_branch   = "v0.2.0"
+    repository_branch   = "v0.6.5"
     repository_ref_type = "tags"
     service_path        = "rds-postgres-server"
     service_name        = "RDS Postgres Server - Agustin Test"
     available_links     = ["connect"]
     available_actions   = []
 
-    package_version = "0.0.3"
+    package_version = "0.0.4"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -219,7 +219,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/services/rds-postgres-server"
-        tag        = "v0.2.0"
+        tag        = "v0.6.5"
       }
     }]
   }
@@ -227,11 +227,34 @@ locals {
   rds_postgres_db_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-rds"
-    repository_branch   = "v0.2.0"
+    repository_branch   = "v0.6.5"
     repository_ref_type = "tags"
     service_path        = "rds-postgres-db"
     service_name        = "RDS Postgres Database - Agustin Test"
     available_links     = ["connect"]
+    available_actions   = []
+
+    package_version = "0.0.4"
+    package_artifacts = [{
+      name   = "worker-image"
+      type   = "oci_image"
+      lookup = true
+      meta = {
+        registry   = "public.ecr.aws"
+        repository = "nullplatform/services/rds-postgres-db"
+        tag        = "v0.6.5"
+      }
+    }]
+  }
+
+  aws_dynamodb_definition = {
+    repository_org      = "nullplatform"
+    repository_name     = "services-dynamo-db"
+    repository_branch   = "v0.6.3"
+    repository_ref_type = "tags"
+    service_path        = "dynamodb"
+    service_name        = "AWS DynamoDB - Agustin Test"
+    available_links     = ["connect", "trigger"]
     available_actions   = []
 
     package_version = "0.0.3"
@@ -241,31 +264,8 @@ locals {
       lookup = true
       meta = {
         registry   = "public.ecr.aws"
-        repository = "nullplatform/services/rds-postgres-db"
-        tag        = "v0.2.0"
-      }
-    }]
-  }
-
-  aws_dynamodb_definition = {
-    repository_org      = "nullplatform"
-    repository_name     = "services-dynamo-db"
-    repository_branch   = "v0.3.0"
-    repository_ref_type = "tags"
-    service_path        = "dynamodb"
-    service_name        = "AWS DynamoDB - Agustin Test"
-    available_links     = ["connect", "trigger"]
-    available_actions   = []
-
-    package_version = "0.0.2"
-    package_artifacts = [{
-      name   = "worker-image"
-      type   = "oci_image"
-      lookup = true
-      meta = {
-        registry   = "public.ecr.aws"
         repository = "nullplatform/services/dynamo-db"
-        tag        = "v0.3.0"
+        tag        = "v0.6.3"
       }
     }]
   }
@@ -275,14 +275,14 @@ locals {
   postgres_db_k8s_definition = {
     repository_org      = "nullplatform"
     repository_name     = "services-postgresql-k-8-s"
-    repository_branch   = "v1.0.2"
+    repository_branch   = "v1.2.5"
     repository_ref_type = "tags"
     service_path        = "postgres-db"
     service_name        = "Postgres DB K8s - Agustin Test"
     available_links     = ["database-user"]
     available_actions   = ["run-ddl-query", "run-dml-query"]
 
-    package_version = "0.0.6"
+    package_version = "0.0.7"
     package_artifacts = [{
       name   = "worker-image"
       type   = "oci_image"
@@ -290,7 +290,7 @@ locals {
       meta = {
         registry   = "public.ecr.aws"
         repository = "nullplatform/services/postgresql-k8s"
-        tag        = "v1.0.2"
+        tag        = "v1.2.5"
       }
     }]
   }
@@ -318,7 +318,7 @@ locals {
     aws_s3_bucket_global = {
       package = {
         slug    = "np-aws-s3-bucket"
-        version = "0.6.0"
+        version = "0.6.1"
       }
       repository_org  = "nullplatform"
       repository_name = "services-s-3"

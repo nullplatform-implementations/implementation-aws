@@ -69,7 +69,7 @@ locals {
       service_path                           = "k8s"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.16.2"
+      repository_notification_channel_branch = "v1.20.0"
       # Runs from the containers worker image, pinned in infrastructure/aws so
       # scopes created before the package existed also resolve it.
       worker_orchestrator = true
@@ -82,7 +82,7 @@ locals {
       service_path                           = "scheduled_task"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.16.2"
+      repository_notification_channel_branch = "v1.20.0"
       worker_orchestrator                    = true
       package_slug                           = local.scope_specification_slug_scheduled_task
     }
@@ -93,7 +93,7 @@ locals {
       service_path                           = "static-files"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-static-files"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/tags"
-      repository_notification_channel_branch = "v0.5.0"
+      repository_notification_channel_branch = "v4.2.0"
       # Runs from the static-files worker image, pinned in infrastructure/aws.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_static_scope
@@ -105,7 +105,7 @@ locals {
       service_path                           = "lambda"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-lambda"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-lambda/refs/tags"
-      repository_notification_channel_branch = "v0.13.1"
+      repository_notification_channel_branch = "v0.13.3"
       # Runs from the worker image the global package pins. The package slug is
       # the one nullplatform publishes under, not the specification slug of a
       # copy, and it must be listed in worker_orchestrated_packages
@@ -120,7 +120,7 @@ locals {
       service_path                           = "mobile-store"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-mobile-store"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-mobile-store/refs/tags"
-      repository_notification_channel_branch = "v0.5.0"
+      repository_notification_channel_branch = "v0.5.3"
       # Runs from the mobile-store worker image, pinned in infrastructure/aws.
       worker_orchestrator = true
       package_slug        = local.scope_specification_slug_mobile_store
@@ -132,7 +132,7 @@ locals {
       service_path                           = "voltmx-foundry-app"
       repo_path                              = "/home/agent/.np/nullplatform/scopes-voltmx-foundry-app"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-voltmx-foundry-app/refs/tags"
-      repository_notification_channel_branch = "v0.1.3"
+      repository_notification_channel_branch = "v0.1.5"
       # Runs from the voltmx-foundry-app worker image, pinned in infrastructure/aws.
       # The service spec slug is "volt-mx-foundry-app" (derived from its name) but
       # the package slug is "voltmx-foundry-app": the agent matches
@@ -168,7 +168,7 @@ locals {
       repository_service_spec_repo = "nullplatform/services-s-3"
       service_path                 = "aws-s3-bucket"
       # Runs from the worker image the global package pins (services-s-3
-      # v0.6.0). The package slug is the one nullplatform publishes under, and
+      # v0.6.1). The package slug is the one nullplatform publishes under, and
       # it must be listed in worker_orchestrated_packages (infrastructure/aws).
       worker_orchestrator = true
       package_slug        = "np-aws-s3-bucket"
@@ -178,7 +178,7 @@ locals {
       service_specification_slug   = local.service_specification_slug_aws_dynamodb
       repository_service_spec_repo = "nullplatform/services-dynamo-db"
       service_path                 = "dynamodb"
-      # Runs from the package worker image (services-dynamo-db v0.3.0), not the clone.
+      # Runs from the package worker image (services-dynamo-db v0.6.3), not the clone.
       worker_orchestrator = true
       package_slug        = local.service_specification_slug_aws_dynamodb
     }
@@ -187,7 +187,7 @@ locals {
       service_specification_slug   = local.service_specification_slug_postgres_db
       repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
       service_path                 = "postgres-db"
-      # Runs from the package worker image (services-postgresql-k-8-s v1.0.2), not the clone.
+      # Runs from the package worker image (services-postgresql-k-8-s v1.2.5), not the clone.
       worker_orchestrator = true
       package_slug        = local.service_specification_slug_postgres_db
     }
