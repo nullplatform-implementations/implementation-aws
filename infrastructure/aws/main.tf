@@ -81,7 +81,14 @@ module "alb_controller" {
 # Istio
 ###############################################################################
 module "istio" {
-  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=v9.17.1"
+  # TEMPORARY (no-sidecar test): pinned to the head of tofu-modules#682
+  # (v9.12.0 + the gateway access log provider) until it is released; then go
+  # back to the release tag used by the rest of this file.
+  source = "git::https://github.com/nullplatform/tofu-modules.git//infrastructure/commons/istio?ref=920cf5da475276363992497c6e3f8e062d8b692b"
+
+  # Declares the np-gateway-access-log provider (JSON access log to stdout) in
+  # istiod's meshConfig. Nothing logs until a Telemetry turns it on per gateway.
+  gateway_access_log_enabled = true
 
   # Istio only supports in-place upgrades one minor at a time: 1.27.1 -> 1.28.10
   # -> 1.29.7 -> 1.30.4 (the module default), one apply per hop.
@@ -312,10 +319,46 @@ module "base" {
   # Everything pinned: the chart to what is deployed, the images to the
   # versions VERSIONS.md documents (they were running :latest).
   nullplatform_base_helm_version = "2.44.8"
-  logging_controller_image_tag   = "v1.7.0"
+
+  # TEMPORARY (no-sidecar test): beta image built from k8s-tools#156, which
+  # parses the Istio gateway access log. Betas are deleted 30 days after they
+  # are pushed: go back to a released tag (and the default repository) once
+  # the PR ships.
+  logging_controller_image_repository = "public.ecr.aws/nullplatform/beta/k8s-logs-controller"
+  logging_controller_image_tag        = "test-feature-no-sidecar-access-logs-72e0327"
 
   # The chart's CRD job is a no-op once the CRDs exist (helm-charts#183).
   install_gateway_v2_crd = false
+}
+
+# TEMPORARY (no-sidecar test): what helm-charts#218 renders with
+# logging.istioAccessLogs.enabled, until a base chart ships it. One Telemetry
+# per gateway turns the np-gateway-access-log provider on for that gateway
+# only. The same PR also sets ISTIO_ACCESS_LOGS_ENABLED and NODE_NAME on the
+# logs-controller DaemonSet; that part is patched by hand (kubectl set env).
+resource "kubernetes_manifest" "gateway_access_log" {
+  for_each = toset(["gateway-public", "gateway-private"])
+
+  depends_on = [module.base, module.istio]
+
+  manifest = {
+    apiVersion = "telemetry.istio.io/v1"
+    kind       = "Telemetry"
+    metadata = {
+      name      = "np-gateway-access-log-${each.key}"
+      namespace = "gateways"
+    }
+    spec = {
+      targetRefs = [{
+        group = "gateway.networking.k8s.io"
+        kind  = "Gateway"
+        name  = each.key
+      }]
+      accessLogging = [{
+        providers = [{ name = "np-gateway-access-log" }]
+      }]
+    }
+  }
 }
 
 ###############################################################################
