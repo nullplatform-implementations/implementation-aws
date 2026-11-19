@@ -5,7 +5,7 @@
 ###############################################################################
 
 module "scope_requirements_k8s" {
-  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=v1.16.2"
+  source = "git::https://github.com/nullplatform/scopes.git//k8s/specs/requirements/aws?ref=v1.20.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -20,7 +20,7 @@ data "aws_acm_certificate" "wildcard" {
 }
 
 module "scope_requirements_lambda" {
-  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=v0.7.2"
+  source = "git::https://github.com/nullplatform/scopes-lambda.git//lambda/specs/requirements?ref=v0.13.3"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -32,7 +32,7 @@ module "scope_requirements_lambda" {
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v1.1.5"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v4.2.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -42,7 +42,7 @@ module "scope_requirements_static_files" {
 # Keep this ref equal to version/tag of mobile_store_definition in
 # nullplatform/locals.tf: both pin the same scopes-mobile-store release.
 module "scope_requirements_mobile_store" {
-  source = "git::https://github.com/nullplatform/scopes-mobile-store.git//mobile-store/specs/requirements/aws?ref=v0.5.0"
+  source = "git::https://github.com/nullplatform/scopes-mobile-store.git//mobile-store/specs/requirements/aws?ref=v0.5.3"
 
   cluster_name       = module.eks.eks_cluster_name
   agent_role_arn     = local.agent_role_arn
@@ -53,42 +53,74 @@ module "scope_requirements_mobile_store" {
 # bucket) and the voltmx/ secrets. Keep this ref equal to version/tag of
 # voltmx_foundry_app_definition in nullplatform/locals.tf.
 module "scope_requirements_voltmx_foundry_app" {
-  source = "git::https://github.com/nullplatform/scopes-voltmx-foundry-app.git//voltmx-foundry-app/specs/requirements/aws?ref=v0.1.3"
+  source = "git::https://github.com/nullplatform/scopes-voltmx-foundry-app.git//voltmx-foundry-app/specs/requirements/aws?ref=v0.1.5"
 
   cluster_name       = module.eks.eks_cluster_name
   agent_role_arn     = local.agent_role_arn
   assets_bucket_name = aws_s3_bucket.assets_mobile.bucket
 }
 
-# At the version of the installed global package (np-aws-s3-bucket 0.6.0). From
+# At the version of the installed global package (np-aws-s3-bucket 0.6.1). From
 # v0.5.3 the role may list and clear a link user's groups, which the AWS provider
 # does before DeleteUser: without it, unlinking fails with a 403.
 module "service_requirements_s3" {
-  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.6.0"
+  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.6.1"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
+
+  # The services-ci workflow provisions buckets from GitHub Actions with its own
+  # OIDC role (created outside this repo), so it assumes this role too.
+  additional_agent_role_arns = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/gha-nullplatform-implementations-services-ci-role",
+  ]
+}
+
+# Shared tofu state for the service instances: from services-dynamo-db v0.4 and
+# services-postgresql-rds v0.4 every instance keeps its state here under its
+# own prefix (services/<service>/<service-id>/) instead of in a bucket of its
+# own (np-service-<service-id>). Versioned, so an overwritten state is recoverable.
+resource "aws_s3_bucket" "services_state" {
+  bucket = "nullplatform-services-tfstate-aws-services"
+}
+
+resource "aws_s3_bucket_public_access_block" "services_state" {
+  bucket                  = aws_s3_bucket.services_state.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "services_state" {
+  bucket = aws_s3_bucket.services_state.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 module "service_requirements_dynamodb" {
-  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.3.0"
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.6.3"
 
-  cluster_name   = module.eks.eks_cluster_name
-  agent_role_arn = local.agent_role_arn
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
 }
 
 module "service_requirements_rds_server" {
-  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.2.0"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.6.5"
 
-  cluster_name   = module.eks.eks_cluster_name
-  agent_role_arn = local.agent_role_arn
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
 }
 
 module "service_requirements_rds_db" {
-  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.2.0"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.6.5"
 
-  cluster_name   = module.eks.eks_cluster_name
-  agent_role_arn = local.agent_role_arn
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
 }
 
 module "parameter_store_requirements" {
