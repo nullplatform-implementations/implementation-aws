@@ -29,6 +29,7 @@ locals {
   service_specification_slug_rds_server   = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db       = local.service_specs["rds_postgres_db"].slug
   service_specification_slug_s3_global    = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
+  service_specification_slug_sns_global   = try(local.service_specs["aws_sns_global"].slug, null)       # null while disabled
   service_specification_slug_postgres_db  = local.service_specs["postgres_db_k8s"].slug
   service_specification_slug_aws_dynamodb = local.service_specs["aws_dynamodb"].slug
 
@@ -54,6 +55,7 @@ locals {
   parameter_store_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
   secret_manager_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  sns_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.sns_assume_role_arn
   dynamodb_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
   rds_server_assume_role_arn         = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
   rds_db_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
@@ -172,6 +174,16 @@ locals {
       # it must be listed in worker_orchestrated_packages (infrastructure/aws).
       worker_orchestrator = true
       package_slug        = "np-aws-s3-bucket"
+    }
+    aws_sns_global = {
+      description                  = "AWS SNS (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_sns_global
+      repository_service_spec_repo = "nullplatform/services-aws-sns"
+      service_path                 = "sns"
+      # Runs from the worker image the global package pins (services-aws-sns
+      # v1.1.0); np-aws-sns is listed in worker_orchestrated_packages.
+      worker_orchestrator = true
+      package_slug        = "np-aws-sns"
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"

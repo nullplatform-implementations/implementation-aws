@@ -151,6 +151,7 @@ module "agent_iam" {
     module.scope_requirements_mobile_store.permissions_role_arn,
     module.scope_requirements_voltmx_foundry_app.permissions_role_arn,
     module.service_requirements_s3.permissions_role_arn,
+    module.service_requirements_sns.permissions_role_arn,
     module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,
     module.service_requirements_rds_db.permissions_role_arn,
@@ -432,10 +433,11 @@ module "agent" {
         }
       }
       ], [
-      # The DynamoDB and RDS services keep every instance's tofu state in the
-      # shared bucket (requirements.tf) and fail before touching AWS without
+      # The DynamoDB, RDS and SNS services keep every instance's tofu state in
+      # the shared bucket (requirements.tf) and fail before touching AWS without
       # its name. Workers do not inherit the agent's env, so each package gets it.
       for package, variable in {
+        "np-aws-sns"                         = "SNS_S3_STATE_BUCKET"
         "aws-dynamodb-agustin-test"          = "DYNAMO_S3_STATE_BUCKET"
         "rds-postgres-server-agustin-test"   = "RDS_POSTGRES_S3_STATE_BUCKET"
         "rds-postgres-database-agustin-test" = "RDS_POSTGRES_S3_STATE_BUCKET"
@@ -470,6 +472,7 @@ module "agent" {
     # entries of the nullplatform/ catalog): the slug is the published one.
     "np-aws-lambda",
     "np-aws-s3-bucket",
+    "np-aws-sns",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
