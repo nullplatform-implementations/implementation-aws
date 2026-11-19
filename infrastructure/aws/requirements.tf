@@ -99,6 +99,17 @@ resource "aws_s3_bucket_versioning" "services_state" {
   }
 }
 
+# At the version of the installed global package (np-aws-sns 1.1.0). Topics and
+# links keep their tofu state in the shared bucket above; the worker gets its
+# name as SNS_S3_STATE_BUCKET (main.tf).
+module "service_requirements_sns" {
+  source = "git::https://github.com/nullplatform/services-aws-sns.git//sns/specs/requirements/aws?ref=v1.1.0"
+
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
+}
+
 module "service_requirements_dynamodb" {
   source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.6.3"
 

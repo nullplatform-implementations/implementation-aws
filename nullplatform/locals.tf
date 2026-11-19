@@ -324,6 +324,16 @@ locals {
       repository_name = "services-s-3"
       service_path    = "aws-s3-bucket"
     }
+    # nullplatform's SNS topic service (specification "AWS SNS").
+    aws_sns_global = {
+      package = {
+        slug    = "np-aws-sns"
+        version = "1.1.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-aws-sns"
+      service_path    = "sns"
+    }
   }
 
   # var.installed_services toggles an entry and may pin another package version.
