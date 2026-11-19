@@ -13,28 +13,43 @@
 # (disable something, pin a spec-repo branch, or change a dimension's values).
 ###############################################################################
 
-# --- Scope definitions -------------------------------------------------------
-# Keys must match local.scope_definitions_catalog.
+# --- Published scopes --------------------------------------------------------
+# Keys must match local.published_scopes.
 #   enabled: register the scope (default true)
-#   version: spec-repo branch for the service spec/templates (default "main")
+#   version: spec-repo branch for the service spec/templates
 #   repository_*: override the catalog-derived URL/branch for a specific pair
 #
-# scope_definitions = {
+# published_scopes = {
 #   containers      = { enabled = true }
-#   scheduled_tasks = { enabled = true }
-#   static_files    = { enabled = false }            # example: turn one off
+#   static_files    = { enabled = false }             # example: turn one off
 # }
 
-# --- Service definitions -----------------------------------------------------
-# Keys must match local.service_definitions_catalog.
+# --- Installed scopes --------------------------------------------------------
+# Keys must match local.installed_scopes.
+#   enabled: install the package (default true)
+#   version: another package version; its templates follow the tag v<version>
+#
+# installed_scopes = {
+#   aws_lambda_global = { version = "0.13.1" }
+# }
+
+# --- Published services ------------------------------------------------------
+# Keys must match local.published_services.
 #   enabled: register the service (default true)
 #   version: overrides the catalog branch of the spec repo (else catalog wins)
 #
-# service_definitions = {
+# published_services = {
 #   rds_postgres_server = { enabled = true }
-#   rds_postgres_db     = { enabled = true }
-#   aws_s3_bucket       = { enabled = true, version = "main" }
-#   postgres_db_k8s     = { enabled = true }         # keeps the catalog branch
+#   postgres_db_k8s     = { enabled = true }          # keeps the catalog branch
+# }
+
+# --- Installed services ------------------------------------------------------
+# Keys must match local.installed_services.
+#   enabled: install the package (default true)
+#   version: another package version
+#
+# installed_services = {
+#   aws_s3_bucket_global = { version = "0.6.0" }
 # }
 
 # --- Dimensions --------------------------------------------------------------

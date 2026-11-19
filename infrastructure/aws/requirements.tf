@@ -60,8 +60,11 @@ module "scope_requirements_voltmx_foundry_app" {
   assets_bucket_name = aws_s3_bucket.assets_mobile.bucket
 }
 
+# At the version of the installed global package (np-aws-s3-bucket 0.6.0). From
+# v0.5.3 the role may list and clear a link user's groups, which the AWS provider
+# does before DeleteUser: without it, unlinking fails with a 403.
 module "service_requirements_s3" {
-  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.2.0"
+  source = "git::https://github.com/nullplatform/services-s-3.git//aws-s3-bucket/specs/requirements/aws?ref=v0.6.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn

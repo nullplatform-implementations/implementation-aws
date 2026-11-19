@@ -1,6 +1,14 @@
 locals {
-  # Scope definitions catalog; per-environment toggles live in
-  # var.scope_definitions and are merged below. Two rules:
+  # The catalog has two halves, one per verb:
+  #   - published_*: specifications this organization maintains and publishes
+  #     as its own packages (scope_definition / service_definition);
+  #   - installed_*: packages someone published (nullplatform, another
+  #     organization, or this one) that this organization installs at a pinned
+  #     version (scope_package_installation / package_installation).
+  # An entry appears in both when the organization installs what it publishes.
+  #
+  # Published scopes; per-environment toggles live in var.published_scopes and
+  # are merged below. Two rules:
   #   - version must match the requirements module ref in infrastructure/aws
   #     (a mismatch only shows up at deploy time, never at plan time)
   #   - package_version is the revision published here: bump it with any change
@@ -76,29 +84,6 @@ locals {
     }]
   }
 
-  aws_lambda_definition = {
-    service_spec_name          = "AWS Lambda Agustin"
-    service_spec_description   = "AWS Lambda"
-    service_path               = "lambda"
-    repository_org             = "nullplatform"
-    repository_name            = "scopes-lambda"
-    version                    = "v0.7.2"
-    repository_ref_type        = "tags"
-    create_scope_configuration = true
-
-    package_version = "0.7.2"
-    package_artifacts = [{
-      name   = "worker-image"
-      type   = "oci_image"
-      lookup = true
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/scopes/lambda"
-        tag        = "v0.7.2"
-      }
-    }]
-  }
-
   mobile_store_definition = {
     service_spec_name          = "Mobile store"
     service_spec_description   = "Publishes mobile app binaries to distribution channels"
@@ -151,32 +136,67 @@ locals {
     }]
   }
 
-  scope_definitions_catalog = {
+  published_scopes = {
     containers         = local.containers_definition
     scheduled_tasks    = local.scheduled_tasks_definition
     static_files       = local.static_files_definition
-    aws_lambda         = local.aws_lambda_definition
     mobile_store       = local.mobile_store_definition
     voltmx_foundry_app = local.voltmx_foundry_app_definition
   }
 
   # Catalog + per-environment overrides, keeping only the entries toggled on.
-  scope_definitions_enabled = {
-    for k, v in local.scope_definitions_catalog : k => merge(v, {
-      version        = coalesce(try(var.scope_definitions[k].version, null), v.version)
+  published_scopes_enabled = {
+    for k, v in local.published_scopes : k => merge(v, {
+      version        = coalesce(try(var.published_scopes[k].version, null), v.version)
       repository_url = "https://raw.githubusercontent.com/${v.repository_org}/${v.repository_name}/refs/${v.repository_ref_type}"
 
-      repository_service_spec             = try(var.scope_definitions[k].repository_service_spec, null)
-      repository_service_spec_version     = try(var.scope_definitions[k].repository_service_spec_version, null)
-      repository_scope_template           = try(var.scope_definitions[k].repository_scope_template, null)
-      repository_scope_template_version   = try(var.scope_definitions[k].repository_scope_template_version, null)
-      repository_action_templates         = try(var.scope_definitions[k].repository_action_templates, null)
-      repository_action_templates_version = try(var.scope_definitions[k].repository_action_templates_version, null)
+      repository_service_spec             = try(var.published_scopes[k].repository_service_spec, null)
+      repository_service_spec_version     = try(var.published_scopes[k].repository_service_spec_version, null)
+      repository_scope_template           = try(var.published_scopes[k].repository_scope_template, null)
+      repository_scope_template_version   = try(var.published_scopes[k].repository_scope_template_version, null)
+      repository_action_templates         = try(var.published_scopes[k].repository_action_templates, null)
+      repository_action_templates_version = try(var.published_scopes[k].repository_action_templates_version, null)
     })
-    if try(var.scope_definitions[k].enabled, true)
+    if try(var.published_scopes[k].enabled, true)
   }
 
-  # Service definitions catalog. Same package rules as the scopes above.
+  # Installed scopes. The package brings the specification and its actions,
+  # read-only; the organization owns what it creates on top of them (the scope
+  # type, the NRN settings and the scope-configuration schema), rendered from
+  # the templates of the repository the package is published from, at the tag
+  # of the installed version (v<version>: packages are versioned by their
+  # release tag).
+  installed_scopes = {
+    # nullplatform's Lambda scope. The np- prefix keeps it apart from copies
+    # an organization registered under aws-lambda / lambda.
+    aws_lambda_global = {
+      package = {
+        slug    = "np-aws-lambda"
+        version = "0.13.1"
+      }
+      repository_org             = "nullplatform"
+      repository_name            = "scopes-lambda"
+      repository_ref_type        = "tags"
+      service_spec_name          = "AWS Lambda"
+      service_spec_description   = "Serverless functions on AWS Lambda"
+      service_path               = "lambda"
+      create_scope_configuration = true
+    }
+  }
+
+  # var.installed_scopes toggles an entry and may pin another package version.
+  installed_scopes_enabled = {
+    for k, v in local.installed_scopes : k => merge(v, {
+      package = merge(v.package, {
+        version = coalesce(try(var.installed_scopes[k].version, null), v.package.version)
+      })
+      version        = "v${coalesce(try(var.installed_scopes[k].version, null), v.package.version)}"
+      repository_url = "https://raw.githubusercontent.com/${v.repository_org}/${v.repository_name}/refs/${v.repository_ref_type}"
+    })
+    if try(var.installed_scopes[k].enabled, true)
+  }
+
+  # Published services. Same package rules as the published scopes above.
   # repository_branch must be immutable: a tag with repository_ref_type = "tags"
   # or a SHA with "" (the module rejects main/master/head/latest).
 
@@ -223,29 +243,6 @@ locals {
         registry   = "public.ecr.aws"
         repository = "nullplatform/services/rds-postgres-db"
         tag        = "v0.2.0"
-      }
-    }]
-  }
-
-  aws_s3_bucket_definition = {
-    repository_org      = "nullplatform"
-    repository_name     = "services-s-3"
-    repository_branch   = "v0.3.1"
-    repository_ref_type = "tags"
-    service_path        = "aws-s3-bucket"
-    service_name        = "AWS S3 Bucket - Agent K8s"
-    available_links     = ["connect"]
-    available_actions   = []
-
-    package_version = "0.0.3"
-    package_artifacts = [{
-      name   = "worker-image"
-      type   = "oci_image"
-      lookup = true
-      meta = {
-        registry   = "public.ecr.aws"
-        repository = "nullplatform/services/s3"
-        tag        = "v0.3.1"
       }
     }]
   }
@@ -298,20 +295,46 @@ locals {
     }]
   }
 
-  service_definitions_catalog = {
+  published_services = {
     rds_postgres_server = local.rds_postgres_server_definition
     rds_postgres_db     = local.rds_postgres_db_definition
-    aws_s3_bucket       = local.aws_s3_bucket_definition
     aws_dynamodb        = local.aws_dynamodb_definition
     postgres_db_k8s     = local.postgres_db_k8s_definition
   }
 
   # version overrides the catalog branch, but not the artifact reference.
-  service_definitions_enabled = {
-    for k, v in local.service_definitions_catalog : k => merge(v, {
-      repository_branch = coalesce(try(var.service_definitions[k].version, null), v.repository_branch)
+  published_services_enabled = {
+    for k, v in local.published_services : k => merge(v, {
+      repository_branch = coalesce(try(var.published_services[k].version, null), v.repository_branch)
     })
-    if try(var.service_definitions[k].enabled, true)
+    if try(var.published_services[k].enabled, true)
+  }
+
+  # Installed services. For a service the installation is the whole
+  # nullplatform side; the channel stays in nullplatform-bindings. The
+  # repository fields only describe where the package is published from.
+  installed_services = {
+    # nullplatform's S3 bucket service (specification "AWS S3 Bucket").
+    aws_s3_bucket_global = {
+      package = {
+        slug    = "np-aws-s3-bucket"
+        version = "0.6.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-s-3"
+      service_path    = "aws-s3-bucket"
+    }
+  }
+
+  # var.installed_services toggles an entry and may pin another package version.
+  installed_services_enabled = {
+    for k, v in local.installed_services : k => merge(v, {
+      package = merge(v.package, {
+        version = coalesce(try(var.installed_services[k].version, null), v.package.version)
+      })
+      repository_branch = "v${coalesce(try(var.installed_services[k].version, null), v.package.version)}"
+    })
+    if try(var.installed_services[k].enabled, true)
   }
 
   ##############################################################################
