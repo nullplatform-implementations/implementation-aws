@@ -110,8 +110,33 @@ module "service_requirements_sns" {
   state_bucket_name = aws_s3_bucket.services_state.bucket
 }
 
+# At the version of the installed global package (np-aws-sqs 1.1.0); queues and
+# links keep their tofu state in the shared bucket (SQS_S3_STATE_BUCKET, main.tf).
+module "service_requirements_sqs" {
+  source = "git::https://github.com/nullplatform/services-aws-sqs.git//sqs/specs/requirements/aws?ref=v1.1.0"
+
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
+}
+
+# At the version of the installed global package (np-serverless-valkey 0.7.0).
+# Besides the permissions role it attaches the CloudWatch read policy the cache
+# metrics need to the agent role. Caches and links keep their tofu state in the
+# shared bucket (VALKEY_S3_STATE_BUCKET, main.tf).
+module "service_requirements_valkey" {
+  source = "git::https://github.com/nullplatform/services-valkey.git//valkey/specs/requirements/aws?ref=v0.7.0"
+
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
+}
+
+# Shared by the registered copy (aws-dynamodb-agustin-test) and the installed
+# global package (np-aws-dynamodb 0.7.0): both assume the role under selector
+# "dynamodb". The module is identical between v0.6.3 and v0.7.0.
 module "service_requirements_dynamodb" {
-  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.6.3"
+  source = "git::https://github.com/nullplatform/services-dynamo-db.git//dynamodb/specs/requirements/aws?ref=v0.7.0"
 
   cluster_name      = module.eks.eks_cluster_name
   agent_role_arn    = local.agent_role_arn

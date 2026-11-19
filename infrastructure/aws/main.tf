@@ -152,6 +152,8 @@ module "agent_iam" {
     module.scope_requirements_voltmx_foundry_app.permissions_role_arn,
     module.service_requirements_s3.permissions_role_arn,
     module.service_requirements_sns.permissions_role_arn,
+    module.service_requirements_sqs.permissions_role_arn,
+    module.service_requirements_valkey.permissions_role_arn,
     module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,
     module.service_requirements_rds_db.permissions_role_arn,
@@ -433,11 +435,15 @@ module "agent" {
         }
       }
       ], [
-      # The DynamoDB, RDS and SNS services keep every instance's tofu state in
-      # the shared bucket (requirements.tf) and fail before touching AWS without
-      # its name. Workers do not inherit the agent's env, so each package gets it.
+      # The DynamoDB, RDS, SNS, SQS and Valkey services keep every instance's tofu
+      # state in the shared bucket (requirements.tf) and fail before touching AWS
+      # without its name. Workers do not inherit the agent's env, so each package
+      # gets it.
       for package, variable in {
         "np-aws-sns"                         = "SNS_S3_STATE_BUCKET"
+        "np-aws-sqs"                         = "SQS_S3_STATE_BUCKET"
+        "np-aws-dynamodb"                    = "DYNAMO_S3_STATE_BUCKET"
+        "np-serverless-valkey"               = "VALKEY_S3_STATE_BUCKET"
         "aws-dynamodb-agustin-test"          = "DYNAMO_S3_STATE_BUCKET"
         "rds-postgres-server-agustin-test"   = "RDS_POSTGRES_S3_STATE_BUCKET"
         "rds-postgres-database-agustin-test" = "RDS_POSTGRES_S3_STATE_BUCKET"
@@ -473,6 +479,10 @@ module "agent" {
     "np-aws-lambda",
     "np-aws-s3-bucket",
     "np-aws-sns",
+    "np-aws-sqs",
+    "np-aws-dynamodb",
+    "np-serverless-valkey",
+    "np-postgres-db",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
