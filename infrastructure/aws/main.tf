@@ -435,6 +435,50 @@ module "agent" {
         }
       }
       ], [
+      # The Endpoint Exposer worker renders Istio routes with kubectl: it needs
+      # the ingress stack named and the authorization scheme of this
+      # installation (none: no Cognito nor Verified Permissions here).
+      {
+        target = { package = "np-http-route-access-control" }
+        merge = {
+          spec = {
+            containers = [{
+              name = "worker"
+              env = [
+                { name = "INGRESS_TYPE", value = "istio" },
+                { name = "AUTH_TYPE", value = "none" },
+              ]
+            }]
+          }
+        }
+      },
+      # After every deploy of a Containers scope, the exposer's
+      # container-scope-override re-points the HTTPRoutes of the links that
+      # target it at the new Kubernetes Services. The worker runs the scopes
+      # image, which does not ship that override, so an init container fetches
+      # it from the exposer release and NP_OVERRIDES_PATH (read by worker-bridge
+      # and passed to the entrypoint as --overrides-path) points the scope at it.
+      # Strategic merge: the env joins the module's k8s variables by name.
+      {
+        target = { package = "containers" }
+        merge = {
+          spec = {
+            volumes = [{ name = "exposer-override", emptyDir = {} }]
+            initContainers = [{
+              name         = "fetch-exposer-override"
+              image        = "public.ecr.aws/docker/library/alpine:3.20"
+              command      = ["sh", "-c", "wget -qO- https://github.com/nullplatform/services-endpoint-exposer/archive/refs/tags/${var.endpoint_exposer_version}.tar.gz | tar -xzC /overrides --strip-components=1"]
+              volumeMounts = [{ name = "exposer-override", mountPath = "/overrides" }]
+            }]
+            containers = [{
+              name         = "worker"
+              volumeMounts = [{ name = "exposer-override", mountPath = "/app/overrides/exposer", readOnly = true }]
+              env          = [{ name = "NP_OVERRIDES_PATH", value = "/app/overrides/exposer/container-scope-override" }]
+            }]
+          }
+        }
+      }
+      ], [
       # The DynamoDB, RDS, SNS, SQS and Valkey services keep every instance's tofu
       # state in the shared bucket (requirements.tf) and fail before touching AWS
       # without its name. Workers do not inherit the agent's env, so each package
@@ -483,6 +527,7 @@ module "agent" {
     "np-aws-dynamodb",
     "np-serverless-valkey",
     "np-postgres-db",
+    "np-http-route-access-control",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the

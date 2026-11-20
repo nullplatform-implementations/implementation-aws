@@ -376,6 +376,18 @@ locals {
       repository_name = "services-postgresql-k-8-s"
       service_path    = "postgres-db"
     }
+    # nullplatform's Endpoint Exposer (specification "Endpoint Exposer"): Istio
+    # routes on the public and private gateways towards Containers scopes. Its
+    # repository keeps the specs at the root.
+    endpoint_exposer_global = {
+      package = {
+        slug    = "np-http-route-access-control"
+        version = "2.2.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-endpoint-exposer"
+      service_path    = ""
+    }
   }
 
   # var.installed_services toggles an entry and may pin another package version.
