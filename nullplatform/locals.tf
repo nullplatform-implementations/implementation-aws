@@ -334,6 +334,60 @@ locals {
       repository_name = "services-aws-sns"
       service_path    = "sns"
     }
+    # nullplatform's SQS queue service (specification "AWS SQS").
+    aws_sqs_global = {
+      package = {
+        slug    = "np-aws-sqs"
+        version = "1.1.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-aws-sqs"
+      service_path    = "sqs"
+    }
+    # nullplatform's DynamoDB table service (specification "AWS DynamoDB"). The
+    # registered copy aws-dynamodb-agustin-test keeps running next to it.
+    aws_dynamodb_global = {
+      package = {
+        slug    = "np-aws-dynamodb"
+        version = "0.7.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-dynamo-db"
+      service_path    = "dynamodb"
+    }
+    # nullplatform's ElastiCache Serverless Valkey service (specification "Serverless Valkey").
+    serverless_valkey_global = {
+      package = {
+        slug    = "np-serverless-valkey"
+        version = "0.7.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-valkey"
+      service_path    = "valkey"
+    }
+    # nullplatform's in-cluster PostgreSQL service (specification "Postgres DB"),
+    # a Helm release per instance on this cluster.
+    postgres_db_global = {
+      package = {
+        slug    = "np-postgres-db"
+        version = "1.3.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-postgresql-k-8-s"
+      service_path    = "postgres-db"
+    }
+    # nullplatform's Endpoint Exposer (specification "Endpoint Exposer"): Istio
+    # routes on the public and private gateways towards Containers scopes. Its
+    # repository keeps the specs at the root.
+    endpoint_exposer_global = {
+      package = {
+        slug    = "np-http-route-access-control"
+        version = "2.2.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-endpoint-exposer"
+      service_path    = ""
+    }
   }
 
   # var.installed_services toggles an entry and may pin another package version.

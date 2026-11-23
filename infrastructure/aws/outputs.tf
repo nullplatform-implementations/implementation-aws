@@ -79,6 +79,16 @@ output "sns_assume_role_arn" {
   value       = module.service_requirements_sns.permissions_role_arn
 }
 
+output "sqs_assume_role_arn" {
+  description = "ARN of the aws-sqs service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"sqs\")"
+  value       = module.service_requirements_sqs.permissions_role_arn
+}
+
+output "valkey_assume_role_arn" {
+  description = "ARN of the serverless-valkey service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"valkey\")"
+  value       = module.service_requirements_valkey.permissions_role_arn
+}
+
 output "s3_assume_role_arn" {
   description = "ARN of the aws-s3-bucket service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"s3\")"
   value       = module.service_requirements_s3.permissions_role_arn

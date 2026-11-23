@@ -26,12 +26,17 @@ locals {
   scope_specification_id_lambda_global   = try(local.scope_specs["aws_lambda_global"].id, null)
   scope_specification_slug_lambda_global = try(local.scope_specs["aws_lambda_global"].slug, null)
 
-  service_specification_slug_rds_server   = local.service_specs["rds_postgres_server"].slug
-  service_specification_slug_rds_db       = local.service_specs["rds_postgres_db"].slug
-  service_specification_slug_s3_global    = try(local.service_specs["aws_s3_bucket_global"].slug, null) # null while disabled
-  service_specification_slug_sns_global   = try(local.service_specs["aws_sns_global"].slug, null)       # null while disabled
-  service_specification_slug_postgres_db  = local.service_specs["postgres_db_k8s"].slug
-  service_specification_slug_aws_dynamodb = local.service_specs["aws_dynamodb"].slug
+  service_specification_slug_rds_server      = local.service_specs["rds_postgres_server"].slug
+  service_specification_slug_rds_db          = local.service_specs["rds_postgres_db"].slug
+  service_specification_slug_s3_global       = try(local.service_specs["aws_s3_bucket_global"].slug, null)     # null while disabled
+  service_specification_slug_sns_global      = try(local.service_specs["aws_sns_global"].slug, null)           # null while disabled
+  service_specification_slug_sqs_global      = try(local.service_specs["aws_sqs_global"].slug, null)           # null while disabled
+  service_specification_slug_dynamodb_global = try(local.service_specs["aws_dynamodb_global"].slug, null)      # null while disabled
+  service_specification_slug_valkey_global   = try(local.service_specs["serverless_valkey_global"].slug, null) # null while disabled
+  service_specification_slug_postgres_global = try(local.service_specs["postgres_db_global"].slug, null)       # null while disabled
+  service_specification_slug_exposer_global  = try(local.service_specs["endpoint_exposer_global"].slug, null)  # null while disabled
+  service_specification_slug_postgres_db     = local.service_specs["postgres_db_k8s"].slug
+  service_specification_slug_aws_dynamodb    = local.service_specs["aws_dynamodb"].slug
 
   vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
@@ -56,6 +61,8 @@ locals {
   secret_manager_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
   s3_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
   sns_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.sns_assume_role_arn
+  sqs_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.sqs_assume_role_arn
+  valkey_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.valkey_assume_role_arn
   dynamodb_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
   rds_server_assume_role_arn         = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
   rds_db_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
@@ -184,6 +191,46 @@ locals {
       # v1.1.0); np-aws-sns is listed in worker_orchestrated_packages.
       worker_orchestrator = true
       package_slug        = "np-aws-sns"
+    }
+    aws_sqs_global = {
+      description                  = "AWS SQS (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_sqs_global
+      repository_service_spec_repo = "nullplatform/services-aws-sqs"
+      service_path                 = "sqs"
+      worker_orchestrator          = true
+      package_slug                 = "np-aws-sqs"
+    }
+    aws_dynamodb_global = {
+      description                  = "AWS DynamoDB (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_dynamodb_global
+      repository_service_spec_repo = "nullplatform/services-dynamo-db"
+      service_path                 = "dynamodb"
+      worker_orchestrator          = true
+      package_slug                 = "np-aws-dynamodb"
+    }
+    serverless_valkey_global = {
+      description                  = "Serverless Valkey (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_valkey_global
+      repository_service_spec_repo = "nullplatform/services-valkey"
+      service_path                 = "valkey"
+      worker_orchestrator          = true
+      package_slug                 = "np-serverless-valkey"
+    }
+    postgres_db_global = {
+      description                  = "Postgres DB (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_postgres_global
+      repository_service_spec_repo = "nullplatform/services-postgresql-k-8-s"
+      service_path                 = "postgres-db"
+      worker_orchestrator          = true
+      package_slug                 = "np-postgres-db"
+    }
+    endpoint_exposer_global = {
+      description                  = "Endpoint Exposer (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_exposer_global
+      repository_service_spec_repo = "nullplatform/services-endpoint-exposer"
+      service_path                 = ""
+      worker_orchestrator          = true
+      package_slug                 = "np-http-route-access-control"
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"
