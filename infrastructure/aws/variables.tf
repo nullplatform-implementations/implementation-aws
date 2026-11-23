@@ -94,6 +94,12 @@ variable "agent_helm_version" {
   default     = "3.6.1"
 }
 
+variable "endpoint_exposer_version" {
+  description = "Release tag of nullplatform/services-endpoint-exposer whose container-scope-override the Containers worker runs after each deploy; the same release as the installed np-http-route-access-control package."
+  type        = string
+  default     = "v2.2.0"
+}
+
 variable "scopes_networking_version" {
   description = "Tag of nullplatform/scopes-networking fetched into the lambda worker as its overrides overlay (ALB target group / listener rule, Route53)."
   type        = string

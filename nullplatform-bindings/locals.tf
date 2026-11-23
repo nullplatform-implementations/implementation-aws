@@ -34,6 +34,7 @@ locals {
   service_specification_slug_dynamodb_global = try(local.service_specs["aws_dynamodb_global"].slug, null)      # null while disabled
   service_specification_slug_valkey_global   = try(local.service_specs["serverless_valkey_global"].slug, null) # null while disabled
   service_specification_slug_postgres_global = try(local.service_specs["postgres_db_global"].slug, null)       # null while disabled
+  service_specification_slug_exposer_global  = try(local.service_specs["endpoint_exposer_global"].slug, null)  # null while disabled
   service_specification_slug_postgres_db     = local.service_specs["postgres_db_k8s"].slug
   service_specification_slug_aws_dynamodb    = local.service_specs["aws_dynamodb"].slug
 
@@ -222,6 +223,14 @@ locals {
       service_path                 = "postgres-db"
       worker_orchestrator          = true
       package_slug                 = "np-postgres-db"
+    }
+    endpoint_exposer_global = {
+      description                  = "Endpoint Exposer (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_exposer_global
+      repository_service_spec_repo = "nullplatform/services-endpoint-exposer"
+      service_path                 = ""
+      worker_orchestrator          = true
+      package_slug                 = "np-http-route-access-control"
     }
     aws_dynamodb = {
       description                  = "AWS DynamoDB service agent channel"
