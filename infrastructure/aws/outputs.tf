@@ -126,3 +126,33 @@ output "voltmx_foundry_app_assume_role_arn" {
   description = "ARN of the voltmx-foundry-app assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"voltmx-foundry-app\")"
   value       = module.scope_requirements_voltmx_foundry_app.permissions_role_arn
 }
+
+output "aurora_postgres_server_assume_role_arn" {
+  description = "ARN of the aurora-postgres-server service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"aurora-postgres-server\")"
+  value       = module.service_requirements_aurora_postgres_server.permissions_role_arn
+}
+
+output "aurora_postgres_db_assume_role_arn" {
+  description = "ARN of the aurora-postgres-db service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"aurora-postgres-db\")"
+  value       = module.service_requirements_aurora_postgres_db.permissions_role_arn
+}
+
+output "rds_sqlserver_server_assume_role_arn" {
+  description = "ARN of the rds-sqlserver-server service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"rds-sqlserver-server\")"
+  value       = module.service_requirements_rds_sqlserver_server.permissions_role_arn
+}
+
+output "rds_sqlserver_db_assume_role_arn" {
+  description = "ARN of the rds-sqlserver-db service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"rds-sqlserver-db\")"
+  value       = module.service_requirements_rds_sqlserver_db.permissions_role_arn
+}
+
+output "documentdb_cluster_assume_role_arn" {
+  description = "ARN of the documentdb-cluster service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"documentdb-cluster\")"
+  value       = module.service_requirements_documentdb_cluster.permissions_role_arn
+}
+
+output "documentdb_database_assume_role_arn" {
+  description = "ARN of the documentdb-database service assume-role; consumed by nullplatform-bindings to publish the AWS IAM provider (selector \"documentdb-database\")"
+  value       = module.service_requirements_documentdb_database.permissions_role_arn
+}
