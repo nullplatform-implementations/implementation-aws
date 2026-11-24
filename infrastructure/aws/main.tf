@@ -521,6 +521,21 @@ module "agent" {
         }
       }
       ], [
+      # The containers image bakes the k8s flavor; on-premise is the overlay
+      # directory its worker runs, chosen with NP_OVERRIDES_PATH (read by
+      # worker-bridge and passed to the entrypoint as --overrides-path).
+      {
+        target = { package = "np-containers-on-premise" }
+        merge = {
+          spec = {
+            containers = [{
+              name = "worker"
+              env  = [{ name = "NP_OVERRIDES_PATH", value = "/app/pkg/onprem" }]
+            }]
+          }
+        }
+      }
+      ], [
       # The DynamoDB, RDS, SNS, SQS and Valkey services keep every instance's tofu
       # state in the shared bucket (requirements.tf) and fail before touching AWS
       # without its name. Workers do not inherit the agent's env, so each package
@@ -570,12 +585,17 @@ module "agent" {
     "np-serverless-valkey",
     "np-postgres-db",
     "np-http-route-access-control",
+    "np-containers",
+    "np-containers-on-premise",
+    "np-scheduled-task",
     "np-path-router",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
   # scheduled_task overlay), so both workers get its env from the module.
-  worker_k8s_packages = ["containers", "scheduled-task"]
+  # The global Kubernetes packages run the same k8s scope code, so they get
+  # its env too.
+  worker_k8s_packages = ["containers", "scheduled-task", "np-containers", "np-containers-on-premise", "np-scheduled-task"]
   cluster_name        = module.eks.eks_cluster_name
 
 
