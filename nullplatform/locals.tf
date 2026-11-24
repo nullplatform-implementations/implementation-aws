@@ -440,7 +440,7 @@ locals {
     path_router_global = {
       package = {
         slug    = "np-path-router"
-        version = "0.5.0"
+        version = "0.5.1"
       }
       repository_org  = "nullplatform"
       repository_name = "services-path-router"

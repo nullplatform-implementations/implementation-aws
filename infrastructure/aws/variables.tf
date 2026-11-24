@@ -102,7 +102,7 @@ variable "path_router_base_domains" {
 variable "path_router_version" {
   description = "Release tag of nullplatform/services-path-router whose container-scope-override the np-containers worker runs after each deploy; the same release as the installed np-path-router package."
   type        = string
-  default     = "v0.5.0"
+  default     = "v0.5.1"
 }
 
 variable "endpoint_exposer_version" {
