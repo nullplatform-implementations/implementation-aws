@@ -38,7 +38,7 @@ module "scope_definitions" {
 # settings and the scope-configuration schema), by repository URL and tag, with
 # no checkout. The channel stays in nullplatform-bindings, as for every scope.
 module "scope_installations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=v9.17.1"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=fix/package-version-prerelease"
   for_each = local.installed_scopes_enabled
 
   nrn        = var.nrn
@@ -47,13 +47,16 @@ module "scope_installations" {
   package_slug    = each.value.package.slug
   package_version = each.value.package.version
 
-  service_spec_name                = each.value.service_spec_name
-  service_spec_description         = each.value.service_spec_description
-  service_path                     = each.value.service_path
-  create_scope_configuration       = each.value.create_scope_configuration
-  repository_scope_template        = each.value.repository_url
-  repository_scope_template_branch = each.value.version
-  create_agent_channel             = false
+  service_spec_name          = each.value.service_spec_name
+  service_spec_description   = each.value.service_spec_description
+  service_path               = each.value.service_path
+  create_scope_configuration = each.value.create_scope_configuration
+  # Null unless the catalog entry names one (the template's name collides with
+  # a schema the account already has).
+  scope_configuration_name_override = try(each.value.scope_configuration_name_override, null)
+  repository_scope_template         = each.value.repository_url
+  repository_scope_template_branch  = each.value.version
+  create_agent_channel              = false
 }
 
 # Published services (local.published_services): specifications this
