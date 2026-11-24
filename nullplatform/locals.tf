@@ -207,7 +207,7 @@ locals {
       repository_name          = "scopes"
       repository_ref_type      = "tags"
       service_spec_name        = "Containers On-Premise (nullplatform)"
-      service_spec_description = "Docker containers on pods, on self-managed clusters" # scope type descriptions are capped at 60 characters
+      service_spec_description = "Docker containers on pods, in on-premise clusters"
       service_path             = "onprem"
       # The scope configuration (the zone the cluster serves) is the organization's.
       create_scope_configuration = true
