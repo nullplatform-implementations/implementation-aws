@@ -94,6 +94,17 @@ variable "agent_helm_version" {
   default     = "3.6.1"
 }
 
+variable "path_router_base_domains" {
+  description = "Comma-separated domains this cluster serves for Path Router services (PATH_ROUTER_BASE_DOMAINS of the np-path-router worker)."
+  type        = string
+}
+
+variable "path_router_version" {
+  description = "Release tag of nullplatform/services-path-router whose container-scope-override the np-containers worker runs after each deploy; the same release as the installed np-path-router package."
+  type        = string
+  default     = "v0.5.0"
+}
+
 variable "endpoint_exposer_version" {
   description = "Release tag of nullplatform/services-endpoint-exposer whose container-scope-override the Containers worker runs after each deploy; the same release as the installed np-http-route-access-control package."
   type        = string

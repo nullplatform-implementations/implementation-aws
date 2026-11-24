@@ -388,6 +388,18 @@ locals {
       repository_name = "services-endpoint-exposer"
       service_path    = ""
     }
+    # nullplatform's Path Router (specification "Path Router"): an Istio
+    # HTTPRoute mounting a Containers scope under a path prefix of a shared
+    # domain. Its repository keeps the specs at the root.
+    path_router_global = {
+      package = {
+        slug    = "np-path-router"
+        version = "0.5.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-path-router"
+      service_path    = ""
+    }
   }
 
   # var.installed_services toggles an entry and may pin another package version.

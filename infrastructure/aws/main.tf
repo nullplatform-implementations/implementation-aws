@@ -452,6 +452,48 @@ module "agent" {
           }
         }
       },
+      # The Path Router worker renders Istio HTTPRoutes with kubectl: it needs
+      # the ingress stack named and the domains this cluster serves, which
+      # create/update check the service's base_domain against (unset, nothing
+      # is validated). The public gateway's own hostname is the one domain
+      # that resolves here without a DNS record.
+      {
+        target = { package = "np-path-router" }
+        merge = {
+          spec = {
+            containers = [{
+              name = "worker"
+              env = [
+                { name = "INGRESS_TYPE", value = "istio" },
+                { name = "PATH_ROUTER_BASE_DOMAINS", value = var.path_router_base_domains },
+              ]
+            }]
+          }
+        }
+      },
+      # After every deploy of a Containers scope created from the global
+      # package, the path router's container-scope-override re-points the
+      # HTTPRoutes of the services that target it. Same shape as the exposer
+      # override below, on the np-containers worker.
+      {
+        target = { package = "np-containers" }
+        merge = {
+          spec = {
+            volumes = [{ name = "path-router-override", emptyDir = {} }]
+            initContainers = [{
+              name         = "fetch-path-router-override"
+              image        = "public.ecr.aws/docker/library/alpine:3.20"
+              command      = ["sh", "-c", "wget -qO- https://github.com/nullplatform/services-path-router/archive/refs/tags/${var.path_router_version}.tar.gz | tar -xzC /overrides --strip-components=1"]
+              volumeMounts = [{ name = "path-router-override", mountPath = "/overrides" }]
+            }]
+            containers = [{
+              name         = "worker"
+              volumeMounts = [{ name = "path-router-override", mountPath = "/app/overrides/path-router", readOnly = true }]
+              env          = [{ name = "NP_OVERRIDES_PATH", value = "/app/overrides/path-router/container-scope-override" }]
+            }]
+          }
+        }
+      },
       # After every deploy of a Containers scope, the exposer's
       # container-scope-override re-points the HTTPRoutes of the links that
       # target it at the new Kubernetes Services. The worker runs the scopes
@@ -528,6 +570,7 @@ module "agent" {
     "np-serverless-valkey",
     "np-postgres-db",
     "np-http-route-access-control",
+    "np-path-router",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
