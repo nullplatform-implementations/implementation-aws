@@ -71,7 +71,13 @@ module "identity_access_control" {
         { selector = "valkey", arn = local.valkey_assume_role_arn },
         { selector = "dynamodb", arn = local.dynamodb_assume_role_arn },
         { selector = "rds-postgres-server", arn = local.rds_server_assume_role_arn },
-        { selector = "rds-postgres-db", arn = local.rds_db_assume_role_arn }
+        { selector = "rds-postgres-db", arn = local.rds_db_assume_role_arn },
+        { selector = "aurora-postgres-server", arn = local.aurora_postgres_server_assume_role_arn },
+        { selector = "aurora-postgres-db", arn = local.aurora_postgres_db_assume_role_arn },
+        { selector = "rds-sqlserver-server", arn = local.rds_sqlserver_server_assume_role_arn },
+        { selector = "rds-sqlserver-db", arn = local.rds_sqlserver_db_assume_role_arn },
+        { selector = "documentdb-cluster", arn = local.documentdb_cluster_assume_role_arn },
+        { selector = "documentdb-database", arn = local.documentdb_database_assume_role_arn }
       ]
     }
   }
@@ -318,6 +324,26 @@ module "scope_configuration_static_scope" {
   ]
 
   aws_price_class = "PriceClass_200"
+}
+
+# Scope configuration of the global static-files package: the same AWS layers
+# as the copy above, typed with the schema the installation created. The
+# scope_configuration module only knows the fixed type slugs, so the provider
+# is written directly with the keys of static-files/specs/scope-configuration.json.tpl.
+resource "nullplatform_provider_config" "static_files_global" {
+  count = local.scope_configuration_slug_static_files_global == null ? 0 : 1
+
+  nrn  = var.nrn
+  type = local.scope_configuration_slug_static_files_global
+  dimensions = {
+    environment = "development"
+  }
+  attributes = jsonencode({
+    cloud_provider = "aws"
+    provider       = { aws_region = "us-east-1", aws_state_bucket = "tf-state-0269fb2df210b43c" }
+    network        = { aws_network = "route53", aws_hosted_public_zone_id = "Z08274782HV2M61TD1NFE" }
+    distribution   = { aws_distribution = "cloudfront" }
+  })
 }
 
 # =============================================================================

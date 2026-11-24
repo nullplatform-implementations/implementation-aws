@@ -23,8 +23,13 @@ locals {
   # the installation; id and slug reach here through the same output map. Null
   # while the catalog entry is disabled, so its channel drops out instead of
   # failing the plan.
-  scope_specification_id_lambda_global   = try(local.scope_specs["aws_lambda_global"].id, null)
-  scope_specification_slug_lambda_global = try(local.scope_specs["aws_lambda_global"].slug, null)
+  scope_specification_id_lambda_global         = try(local.scope_specs["aws_lambda_global"].id, null)
+  scope_specification_slug_lambda_global       = try(local.scope_specs["aws_lambda_global"].slug, null)
+  scope_specification_id_static_files_global   = try(local.scope_specs["static_files_global"].id, null)
+  scope_specification_slug_static_files_global = try(local.scope_specs["static_files_global"].slug, null)
+  # Slug of the scope-configuration schema the installation created; the
+  # provider below is typed with it.
+  scope_configuration_slug_static_files_global = try(local.scope_specs["static_files_global"].provider_specification_slug, null)
   # The global Kubernetes packages (scopes monorepo), same rule.
   scope_specification_id_containers_global              = try(local.scope_specs["containers_global"].id, null)
   scope_specification_slug_containers_global            = try(local.scope_specs["containers_global"].slug, null)
@@ -33,18 +38,26 @@ locals {
   scope_specification_id_scheduled_task_global          = try(local.scope_specs["scheduled_task_global"].id, null)
   scope_specification_slug_scheduled_task_global        = try(local.scope_specs["scheduled_task_global"].slug, null)
 
-  service_specification_slug_rds_server         = local.service_specs["rds_postgres_server"].slug
-  service_specification_slug_rds_db             = local.service_specs["rds_postgres_db"].slug
-  service_specification_slug_s3_global          = try(local.service_specs["aws_s3_bucket_global"].slug, null)     # null while disabled
-  service_specification_slug_sns_global         = try(local.service_specs["aws_sns_global"].slug, null)           # null while disabled
-  service_specification_slug_sqs_global         = try(local.service_specs["aws_sqs_global"].slug, null)           # null while disabled
-  service_specification_slug_dynamodb_global    = try(local.service_specs["aws_dynamodb_global"].slug, null)      # null while disabled
-  service_specification_slug_valkey_global      = try(local.service_specs["serverless_valkey_global"].slug, null) # null while disabled
-  service_specification_slug_postgres_global    = try(local.service_specs["postgres_db_global"].slug, null)       # null while disabled
-  service_specification_slug_exposer_global     = try(local.service_specs["endpoint_exposer_global"].slug, null)  # null while disabled
-  service_specification_slug_path_router_global = try(local.service_specs["path_router_global"].slug, null)       # null while disabled
-  service_specification_slug_postgres_db        = local.service_specs["postgres_db_k8s"].slug
-  service_specification_slug_aws_dynamodb       = local.service_specs["aws_dynamodb"].slug
+  service_specification_slug_rds_server                    = local.service_specs["rds_postgres_server"].slug
+  service_specification_slug_rds_db                        = local.service_specs["rds_postgres_db"].slug
+  service_specification_slug_s3_global                     = try(local.service_specs["aws_s3_bucket_global"].slug, null)          # null while disabled
+  service_specification_slug_sns_global                    = try(local.service_specs["aws_sns_global"].slug, null)                # null while disabled
+  service_specification_slug_sqs_global                    = try(local.service_specs["aws_sqs_global"].slug, null)                # null while disabled
+  service_specification_slug_dynamodb_global               = try(local.service_specs["aws_dynamodb_global"].slug, null)           # null while disabled
+  service_specification_slug_valkey_global                 = try(local.service_specs["serverless_valkey_global"].slug, null)      # null while disabled
+  service_specification_slug_rds_server_global             = try(local.service_specs["rds_postgres_server_global"].slug, null)    # null while disabled
+  service_specification_slug_rds_db_global                 = try(local.service_specs["rds_postgres_db_global"].slug, null)        # null while disabled
+  service_specification_slug_aurora_postgres_server_global = try(local.service_specs["aurora_postgres_server_global"].slug, null) # null while disabled
+  service_specification_slug_aurora_postgres_db_global     = try(local.service_specs["aurora_postgres_db_global"].slug, null)     # null while disabled
+  service_specification_slug_rds_sqlserver_server_global   = try(local.service_specs["rds_sqlserver_server_global"].slug, null)   # null while disabled
+  service_specification_slug_rds_sqlserver_db_global       = try(local.service_specs["rds_sqlserver_db_global"].slug, null)       # null while disabled
+  service_specification_slug_documentdb_cluster_global     = try(local.service_specs["documentdb_cluster_global"].slug, null)     # null while disabled
+  service_specification_slug_documentdb_database_global    = try(local.service_specs["documentdb_database_global"].slug, null)    # null while disabled
+  service_specification_slug_postgres_global               = try(local.service_specs["postgres_db_global"].slug, null)            # null while disabled
+  service_specification_slug_exposer_global                = try(local.service_specs["endpoint_exposer_global"].slug, null)       # null while disabled
+  service_specification_slug_path_router_global            = try(local.service_specs["path_router_global"].slug, null)            # null while disabled
+  service_specification_slug_postgres_db                   = local.service_specs["postgres_db_k8s"].slug
+  service_specification_slug_aws_dynamodb                  = local.service_specs["aws_dynamodb"].slug
 
   vpc_id                  = data.terraform_remote_state.infrastructure[0].outputs.vpc_id
   vpc_subnets_ids         = data.terraform_remote_state.infrastructure[0].outputs.vpc_subnets_ids
@@ -60,20 +73,26 @@ locals {
   ci_build_workflow_role_arn = data.terraform_remote_state.infrastructure[0].outputs.ci_build_workflow_role_arn
 
   # Lambda assume-role from infrastructure/aws, published under selector "lambda".
-  lambda_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
-  k8s_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
-  static_files_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
-  mobile_store_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.mobile_store_assume_role_arn
-  voltmx_foundry_app_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.voltmx_foundry_app_assume_role_arn
-  parameter_store_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
-  secret_manager_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
-  s3_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
-  sns_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.sns_assume_role_arn
-  sqs_assume_role_arn                = data.terraform_remote_state.infrastructure[0].outputs.sqs_assume_role_arn
-  valkey_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.valkey_assume_role_arn
-  dynamodb_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
-  rds_server_assume_role_arn         = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
-  rds_db_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
+  lambda_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.lambda_assume_role_arn
+  k8s_assume_role_arn                    = data.terraform_remote_state.infrastructure[0].outputs.k8s_assume_role_arn
+  static_files_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.static_files_assume_role_arn
+  mobile_store_assume_role_arn           = data.terraform_remote_state.infrastructure[0].outputs.mobile_store_assume_role_arn
+  voltmx_foundry_app_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.voltmx_foundry_app_assume_role_arn
+  parameter_store_assume_role_arn        = data.terraform_remote_state.infrastructure[0].outputs.iam_role_arn
+  secret_manager_assume_role_arn         = data.terraform_remote_state.infrastructure[0].outputs.secret_manager_iam_role_arn
+  s3_assume_role_arn                     = data.terraform_remote_state.infrastructure[0].outputs.s3_assume_role_arn
+  sns_assume_role_arn                    = data.terraform_remote_state.infrastructure[0].outputs.sns_assume_role_arn
+  sqs_assume_role_arn                    = data.terraform_remote_state.infrastructure[0].outputs.sqs_assume_role_arn
+  valkey_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.valkey_assume_role_arn
+  dynamodb_assume_role_arn               = data.terraform_remote_state.infrastructure[0].outputs.dynamodb_assume_role_arn
+  rds_server_assume_role_arn             = data.terraform_remote_state.infrastructure[0].outputs.rds_server_assume_role_arn
+  rds_db_assume_role_arn                 = data.terraform_remote_state.infrastructure[0].outputs.rds_db_assume_role_arn
+  aurora_postgres_server_assume_role_arn = data.terraform_remote_state.infrastructure[0].outputs.aurora_postgres_server_assume_role_arn
+  aurora_postgres_db_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.aurora_postgres_db_assume_role_arn
+  rds_sqlserver_server_assume_role_arn   = data.terraform_remote_state.infrastructure[0].outputs.rds_sqlserver_server_assume_role_arn
+  rds_sqlserver_db_assume_role_arn       = data.terraform_remote_state.infrastructure[0].outputs.rds_sqlserver_db_assume_role_arn
+  documentdb_cluster_assume_role_arn     = data.terraform_remote_state.infrastructure[0].outputs.documentdb_cluster_assume_role_arn
+  documentdb_database_assume_role_arn    = data.terraform_remote_state.infrastructure[0].outputs.documentdb_database_assume_role_arn
 
 
   # Scope channels, keyed by scope slug; optional fields are null when the
@@ -129,6 +148,19 @@ locals {
       # (infrastructure/aws).
       worker_orchestrator = true
       package_slug        = "np-aws-lambda"
+    }
+    static_files_global = {
+      description                            = "Static files (global package) agent channel"
+      scope_specification_id                 = local.scope_specification_id_static_files_global
+      scope_specification_slug               = local.scope_specification_slug_static_files_global
+      service_path                           = "static-files"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes-static-files"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes-static-files/refs/tags"
+      repository_notification_channel_branch = "v4.3.0"
+      # Runs from the worker image the global package pins; np-static-files is
+      # listed in worker_orchestrated_packages (infrastructure/aws).
+      worker_orchestrator = true
+      package_slug        = "np-static-files"
     }
     # The global Kubernetes packages: the three channels read the same
     # notification-channel template of the scopes monorepo at the installed tag.
@@ -234,6 +266,73 @@ locals {
       # v1.1.0); np-aws-sns is listed in worker_orchestrated_packages.
       worker_orchestrator = true
       package_slug        = "np-aws-sns"
+    }
+    rds_postgres_server_global = {
+      description                  = "RDS PostgreSQL server (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_rds_server_global
+      repository_service_spec_repo = "nullplatform/services-postgresql-rds"
+      service_path                 = "rds-postgres-server"
+      # Runs from the worker image the global package pins
+      # (services-postgresql-rds v0.7.0); np-rds-postgres is listed in
+      # worker_orchestrated_packages.
+      worker_orchestrator = true
+      package_slug        = "np-rds-postgres"
+    }
+    rds_postgres_db_global = {
+      description                  = "RDS PostgreSQL database (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_rds_db_global
+      repository_service_spec_repo = "nullplatform/services-postgresql-rds"
+      service_path                 = "rds-postgres-db"
+      worker_orchestrator          = true
+      package_slug                 = "np-rds-postgres-db"
+    }
+    aurora_postgres_server_global = {
+      description                  = "aurora-postgres-server (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_aurora_postgres_server_global
+      repository_service_spec_repo = "nullplatform/services-postgresql-aurora"
+      service_path                 = "aurora-postgres-server"
+      worker_orchestrator          = true
+      package_slug                 = "np-aurora-postgres-server"
+    }
+    aurora_postgres_db_global = {
+      description                  = "aurora-postgres-db (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_aurora_postgres_db_global
+      repository_service_spec_repo = "nullplatform/services-postgresql-aurora"
+      service_path                 = "aurora-postgres-db"
+      worker_orchestrator          = true
+      package_slug                 = "np-aurora-postgres-db"
+    }
+    rds_sqlserver_server_global = {
+      description                  = "rds-sqlserver-server (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_rds_sqlserver_server_global
+      repository_service_spec_repo = "nullplatform/services-sqlserver-rds"
+      service_path                 = "rds-sqlserver-server"
+      worker_orchestrator          = true
+      package_slug                 = "np-rds-sqlserver"
+    }
+    rds_sqlserver_db_global = {
+      description                  = "rds-sqlserver-db (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_rds_sqlserver_db_global
+      repository_service_spec_repo = "nullplatform/services-sqlserver-rds"
+      service_path                 = "rds-sqlserver-db"
+      worker_orchestrator          = true
+      package_slug                 = "np-rds-sqlserver-db"
+    }
+    documentdb_cluster_global = {
+      description                  = "documentdb-cluster (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_documentdb_cluster_global
+      repository_service_spec_repo = "nullplatform/services-document-db"
+      service_path                 = "documentdb-cluster"
+      worker_orchestrator          = true
+      package_slug                 = "np-documentdb-cluster"
+    }
+    documentdb_database_global = {
+      description                  = "documentdb-database (global package) agent channel"
+      service_specification_slug   = local.service_specification_slug_documentdb_database_global
+      repository_service_spec_repo = "nullplatform/services-document-db"
+      service_path                 = "documentdb-database"
+      worker_orchestrator          = true
+      package_slug                 = "np-documentdb-database"
     }
     aws_sqs_global = {
       description                  = "AWS SQS (global package) agent channel"

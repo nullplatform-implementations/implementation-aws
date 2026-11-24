@@ -182,6 +182,23 @@ locals {
       service_path               = "lambda"
       create_scope_configuration = true
     }
+    # nullplatform's static-files scope (S3 + CloudFront). The name carries
+    # "(nullplatform)" because the account also runs its own copy ("Static Scope").
+    static_files_global = {
+      package = {
+        slug    = "np-static-files"
+        version = "4.3.0"
+      }
+      repository_org             = "nullplatform"
+      repository_name            = "scopes-static-files"
+      repository_ref_type        = "tags"
+      service_spec_name          = "Static files (nullplatform)"
+      service_spec_description   = "Static sites on S3 behind CloudFront"
+      service_path               = "static-files"
+      create_scope_configuration = true
+      # The template names it "Static Files", the slug of the copy's configuration.
+      scope_configuration_name_override = "Static Files (nullplatform)"
+    }
     # nullplatform's Kubernetes scopes, from the scopes monorepo: three packages
     # published at the same tag. Names carry "(nullplatform)" because the
     # account also runs its own copies ("Containers", "Scheduled Task").
@@ -437,6 +454,83 @@ locals {
     # nullplatform's Path Router (specification "Path Router"): an Istio
     # HTTPRoute mounting a Containers scope under a path prefix of a shared
     # domain. Its repository keeps the specs at the root.
+    # nullplatform's RDS PostgreSQL services (services-postgresql-rds): the
+    # server creates the instance, the database manages databases, roles and
+    # grants in it (auto-discovered by hostname + master secret, same namespace).
+    rds_postgres_server_global = {
+      package = {
+        slug    = "np-rds-postgres"
+        version = "0.7.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-postgresql-rds"
+      service_path    = "rds-postgres-server"
+    }
+    rds_postgres_db_global = {
+      package = {
+        slug    = "np-rds-postgres-db"
+        version = "0.7.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-postgresql-rds"
+      service_path    = "rds-postgres-db"
+    }
+    # nullplatform's Aurora PostgreSQL, RDS SQL Server and DocumentDB services
+    # (one server/cluster package and one database package each).
+    aurora_postgres_server_global = {
+      package = {
+        slug    = "np-aurora-postgres-server"
+        version = "0.5.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-postgresql-aurora"
+      service_path    = "aurora-postgres-server"
+    }
+    aurora_postgres_db_global = {
+      package = {
+        slug    = "np-aurora-postgres-db"
+        version = "0.5.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-postgresql-aurora"
+      service_path    = "aurora-postgres-db"
+    }
+    rds_sqlserver_server_global = {
+      package = {
+        slug    = "np-rds-sqlserver"
+        version = "0.5.1"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-sqlserver-rds"
+      service_path    = "rds-sqlserver-server"
+    }
+    rds_sqlserver_db_global = {
+      package = {
+        slug    = "np-rds-sqlserver-db"
+        version = "0.5.1"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-sqlserver-rds"
+      service_path    = "rds-sqlserver-db"
+    }
+    documentdb_cluster_global = {
+      package = {
+        slug    = "np-documentdb-cluster"
+        version = "0.3.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-document-db"
+      service_path    = "documentdb-cluster"
+    }
+    documentdb_database_global = {
+      package = {
+        slug    = "np-documentdb-database"
+        version = "0.3.0"
+      }
+      repository_org  = "nullplatform"
+      repository_name = "services-document-db"
+      service_path    = "documentdb-database"
+    }
     path_router_global = {
       package = {
         slug    = "np-path-router"

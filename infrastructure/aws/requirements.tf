@@ -32,7 +32,7 @@ module "scope_requirements_lambda" {
 }
 
 module "scope_requirements_static_files" {
-  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v4.2.0"
+  source = "git::https://github.com/nullplatform/scopes-static-files.git//static-files/specs/requirements/aws?ref=v4.3.0"
 
   cluster_name   = module.eks.eks_cluster_name
   agent_role_arn = local.agent_role_arn
@@ -144,7 +144,7 @@ module "service_requirements_dynamodb" {
 }
 
 module "service_requirements_rds_server" {
-  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.6.5"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-server/specs/requirements/aws?ref=v0.7.0"
 
   cluster_name      = module.eks.eks_cluster_name
   agent_role_arn    = local.agent_role_arn
@@ -152,11 +152,61 @@ module "service_requirements_rds_server" {
 }
 
 module "service_requirements_rds_db" {
-  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.6.5"
+  source = "git::https://github.com/nullplatform/services-postgresql-rds.git//rds-postgres-db/specs/requirements/aws?ref=v0.7.0"
 
   cluster_name      = module.eks.eks_cluster_name
   agent_role_arn    = local.agent_role_arn
   state_bucket_name = aws_s3_bucket.services_state.bucket
+}
+
+module "service_requirements_aurora_postgres_server" {
+  source = "git::https://github.com/nullplatform/services-postgresql-aurora.git//aurora-postgres-server/specs/requirements/aws?ref=v0.5.0"
+
+  # The three RDS-family server requirements (rds-postgres, aurora, sqlserver)
+  # name their policies "nullplatform-<cluster>-rds-*" by default and collide
+  # in one account; the prefix keeps each package's policies apart.
+  policies_name_prefix = "nullplatform-${module.eks.eks_cluster_name}-aurora"
+  cluster_name         = module.eks.eks_cluster_name
+  agent_role_arn       = local.agent_role_arn
+}
+
+module "service_requirements_aurora_postgres_db" {
+  source = "git::https://github.com/nullplatform/services-postgresql-aurora.git//aurora-postgres-db/specs/requirements/aws?ref=v0.5.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_rds_sqlserver_server" {
+  source = "git::https://github.com/nullplatform/services-sqlserver-rds.git//rds-sqlserver-server/specs/requirements/aws?ref=v0.5.1"
+
+  # Same policy-name collision as aurora_postgres_server, see above.
+  policies_name_prefix = "nullplatform-${module.eks.eks_cluster_name}-sqlserver"
+  cluster_name         = module.eks.eks_cluster_name
+  agent_role_arn       = local.agent_role_arn
+  state_bucket_name    = aws_s3_bucket.services_state.bucket
+}
+
+module "service_requirements_rds_sqlserver_db" {
+  source = "git::https://github.com/nullplatform/services-sqlserver-rds.git//rds-sqlserver-db/specs/requirements/aws?ref=v0.5.1"
+
+  cluster_name      = module.eks.eks_cluster_name
+  agent_role_arn    = local.agent_role_arn
+  state_bucket_name = aws_s3_bucket.services_state.bucket
+}
+
+module "service_requirements_documentdb_cluster" {
+  source = "git::https://github.com/nullplatform/services-document-db.git//documentdb-cluster/specs/requirements/aws?ref=v0.3.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
+}
+
+module "service_requirements_documentdb_database" {
+  source = "git::https://github.com/nullplatform/services-document-db.git//documentdb-database/specs/requirements/aws?ref=v0.3.0"
+
+  cluster_name   = module.eks.eks_cluster_name
+  agent_role_arn = local.agent_role_arn
 }
 
 module "parameter_store_requirements" {

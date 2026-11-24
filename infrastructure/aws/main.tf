@@ -157,6 +157,12 @@ module "agent_iam" {
     module.service_requirements_dynamodb.permissions_role_arn,
     module.service_requirements_rds_server.permissions_role_arn,
     module.service_requirements_rds_db.permissions_role_arn,
+    module.service_requirements_aurora_postgres_server.permissions_role_arn,
+    module.service_requirements_aurora_postgres_db.permissions_role_arn,
+    module.service_requirements_rds_sqlserver_server.permissions_role_arn,
+    module.service_requirements_rds_sqlserver_db.permissions_role_arn,
+    module.service_requirements_documentdb_cluster.permissions_role_arn,
+    module.service_requirements_documentdb_database.permissions_role_arn,
     module.parameter_store_requirements.iam_role_arn,
     module.secrets_manager_requirements.iam_role_arn
   ]
@@ -548,6 +554,10 @@ module "agent" {
         "aws-dynamodb-agustin-test"          = "DYNAMO_S3_STATE_BUCKET"
         "rds-postgres-server-agustin-test"   = "RDS_POSTGRES_S3_STATE_BUCKET"
         "rds-postgres-database-agustin-test" = "RDS_POSTGRES_S3_STATE_BUCKET"
+        "np-rds-postgres"                    = "RDS_POSTGRES_S3_STATE_BUCKET"
+        "np-rds-postgres-db"                 = "RDS_POSTGRES_S3_STATE_BUCKET"
+        "np-rds-sqlserver"                   = "RDS_SQL_SERVER_S3_STATE_BUCKET"
+        "np-rds-sqlserver-db"                = "RDS_SQL_SERVER_S3_STATE_BUCKET"
         } : {
         target = { package = package }
         merge = {
@@ -589,6 +599,15 @@ module "agent" {
     "np-containers-on-premise",
     "np-scheduled-task",
     "np-path-router",
+    "np-rds-postgres",
+    "np-rds-postgres-db",
+    "np-aurora-postgres-server",
+    "np-aurora-postgres-db",
+    "np-rds-sqlserver",
+    "np-rds-sqlserver-db",
+    "np-documentdb-cluster",
+    "np-documentdb-database",
+    "np-static-files",
   ]
 
   # Both run the k8s scope code (scheduled-task is the k8s scope with the
