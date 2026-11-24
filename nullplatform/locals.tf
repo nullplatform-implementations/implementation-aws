@@ -188,7 +188,7 @@ locals {
     containers_global = {
       package = {
         slug    = "np-containers"
-        version = "1.21.0-beta.2"
+        version = "1.21.0"
       }
       repository_org             = "nullplatform"
       repository_name            = "scopes"
@@ -201,7 +201,7 @@ locals {
     containers_on_premise_global = {
       package = {
         slug    = "np-containers-on-premise"
-        version = "1.21.0-beta.2"
+        version = "1.21.0"
       }
       repository_org           = "nullplatform"
       repository_name          = "scopes"
@@ -218,7 +218,7 @@ locals {
     scheduled_task_global = {
       package = {
         slug    = "np-scheduled-task"
-        version = "1.21.0-beta.2"
+        version = "1.21.0"
       }
       repository_org             = "nullplatform"
       repository_name            = "scopes"

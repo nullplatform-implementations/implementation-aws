@@ -138,7 +138,7 @@ locals {
       service_path                           = "k8s"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.21.0-beta.2"
+      repository_notification_channel_branch = "v1.21.0"
       worker_orchestrator                    = true
       package_slug                           = "np-containers"
     }
@@ -149,7 +149,7 @@ locals {
       service_path                           = "onprem"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.21.0-beta.2"
+      repository_notification_channel_branch = "v1.21.0"
       worker_orchestrator                    = true
       package_slug                           = "np-containers-on-premise"
     }
@@ -160,7 +160,7 @@ locals {
       service_path                           = "scheduled_task"
       repo_path                              = "/home/agent/.np/nullplatform/scopes"
       repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
-      repository_notification_channel_branch = "v1.21.0-beta.2"
+      repository_notification_channel_branch = "v1.21.0"
       worker_orchestrator                    = true
       package_slug                           = "np-scheduled-task"
     }

@@ -38,7 +38,7 @@ module "scope_definitions" {
 # settings and the scope-configuration schema), by repository URL and tag, with
 # no checkout. The channel stays in nullplatform-bindings, as for every scope.
 module "scope_installations" {
-  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=fix/package-version-prerelease"
+  source   = "git::https://github.com/nullplatform/tofu-modules.git//nullplatform/scope_package_installation?ref=v9.17.1"
   for_each = local.installed_scopes_enabled
 
   nrn        = var.nrn
