@@ -182,6 +182,52 @@ locals {
       service_path               = "lambda"
       create_scope_configuration = true
     }
+    # nullplatform's Kubernetes scopes, from the scopes monorepo: three packages
+    # published at the same tag. Names carry "(nullplatform)" because the
+    # account also runs its own copies ("Containers", "Scheduled Task").
+    containers_global = {
+      package = {
+        slug    = "np-containers"
+        version = "1.21.0"
+      }
+      repository_org             = "nullplatform"
+      repository_name            = "scopes"
+      repository_ref_type        = "tags"
+      service_spec_name          = "Containers (nullplatform)"
+      service_spec_description   = "Docker containers on pods"
+      service_path               = "k8s"
+      create_scope_configuration = false
+    }
+    containers_on_premise_global = {
+      package = {
+        slug    = "np-containers-on-premise"
+        version = "1.21.0"
+      }
+      repository_org           = "nullplatform"
+      repository_name          = "scopes"
+      repository_ref_type      = "tags"
+      service_spec_name        = "Containers On-Premise (nullplatform)"
+      service_spec_description = "Docker containers on pods, in on-premise clusters"
+      service_path             = "onprem"
+      # The scope configuration (the zone the cluster serves) is the organization's.
+      create_scope_configuration = true
+      # The template's name would collide with the schemas of the on-premise
+      # copies the account already has.
+      scope_configuration_name_override = "Containers On-Premise (nullplatform)"
+    }
+    scheduled_task_global = {
+      package = {
+        slug    = "np-scheduled-task"
+        version = "1.21.0"
+      }
+      repository_org             = "nullplatform"
+      repository_name            = "scopes"
+      repository_ref_type        = "tags"
+      service_spec_name          = "Scheduled Task (nullplatform)"
+      service_spec_description   = "Allows you to deploy periodic jobs in Kubernetes"
+      service_path               = "scheduled_task"
+      create_scope_configuration = false
+    }
   }
 
   # var.installed_scopes toggles an entry and may pin another package version.

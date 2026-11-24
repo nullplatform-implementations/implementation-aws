@@ -25,6 +25,13 @@ locals {
   # failing the plan.
   scope_specification_id_lambda_global   = try(local.scope_specs["aws_lambda_global"].id, null)
   scope_specification_slug_lambda_global = try(local.scope_specs["aws_lambda_global"].slug, null)
+  # The global Kubernetes packages (scopes monorepo), same rule.
+  scope_specification_id_containers_global              = try(local.scope_specs["containers_global"].id, null)
+  scope_specification_slug_containers_global            = try(local.scope_specs["containers_global"].slug, null)
+  scope_specification_id_containers_on_premise_global   = try(local.scope_specs["containers_on_premise_global"].id, null)
+  scope_specification_slug_containers_on_premise_global = try(local.scope_specs["containers_on_premise_global"].slug, null)
+  scope_specification_id_scheduled_task_global          = try(local.scope_specs["scheduled_task_global"].id, null)
+  scope_specification_slug_scheduled_task_global        = try(local.scope_specs["scheduled_task_global"].slug, null)
 
   service_specification_slug_rds_server      = local.service_specs["rds_postgres_server"].slug
   service_specification_slug_rds_db          = local.service_specs["rds_postgres_db"].slug
@@ -121,6 +128,41 @@ locals {
       # (infrastructure/aws).
       worker_orchestrator = true
       package_slug        = "np-aws-lambda"
+    }
+    # The global Kubernetes packages: the three channels read the same
+    # notification-channel template of the scopes monorepo at the installed tag.
+    containers_global = {
+      description                            = "Containers (global package) agent channel"
+      scope_specification_id                 = local.scope_specification_id_containers_global
+      scope_specification_slug               = local.scope_specification_slug_containers_global
+      service_path                           = "k8s"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
+      repository_notification_channel_branch = "v1.21.0"
+      worker_orchestrator                    = true
+      package_slug                           = "np-containers"
+    }
+    containers_on_premise_global = {
+      description                            = "Containers On-Premise (global package) agent channel"
+      scope_specification_id                 = local.scope_specification_id_containers_on_premise_global
+      scope_specification_slug               = local.scope_specification_slug_containers_on_premise_global
+      service_path                           = "onprem"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
+      repository_notification_channel_branch = "v1.21.0"
+      worker_orchestrator                    = true
+      package_slug                           = "np-containers-on-premise"
+    }
+    scheduled_task_global = {
+      description                            = "Scheduled Task (global package) agent channel"
+      scope_specification_id                 = local.scope_specification_id_scheduled_task_global
+      scope_specification_slug               = local.scope_specification_slug_scheduled_task_global
+      service_path                           = "scheduled_task"
+      repo_path                              = "/home/agent/.np/nullplatform/scopes"
+      repository_notification_channel        = "https://raw.githubusercontent.com/nullplatform/scopes/refs/tags"
+      repository_notification_channel_branch = "v1.21.0"
+      worker_orchestrator                    = true
+      package_slug                           = "np-scheduled-task"
     }
     mobile_store = {
       description                            = "Mobile store agent channel"
