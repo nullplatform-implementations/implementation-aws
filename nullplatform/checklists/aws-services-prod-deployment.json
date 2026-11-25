@@ -1,0 +1,23 @@
+{
+  "items": [
+    {
+      "id": "ventana_de_deploy",
+      "type": "external",
+      "title": "Sin freeze en el calendario de deployments",
+      "behavior": "gate",
+      "external": {
+        "kind": "np-deploy-window-check",
+        "inputs": {
+          "scope_slug": "{{ context.scope.slug }}",
+          "deployment_id": "{{ context.deployment.id }}",
+          "application_slug": "{{ context.application.slug }}"
+        },
+        "trigger": "auto",
+        "timeout_seconds": 300
+      },
+      "severity": "major",
+      "description": "Se consulta automáticamente el calendario compartido «Deployments Nullplatform» (Platform Settings › Extensions › Deploy calendar). Sin freeze, el deployment queda aprobado. Con un freeze activo el deployment queda pendiente: podés esperar a que termine y crear otro, o pedir revisión manual (Ask for manual review), que avisa a Slack y espera la aprobación clásica. El link al evento queda en los detalles del item."
+    }
+  ],
+  "execution_trigger": "explicit"
+}
